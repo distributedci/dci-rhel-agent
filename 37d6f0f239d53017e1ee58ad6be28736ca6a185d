@@ -1,0 +1,9 @@
+Code-Review+1: Michael Burke <miburke@redhat.com>
+Code-Review+2: Haïkel Guémar <hguemar@fedoraproject.org>
+Workflow+1: Frederic Lepied <flepied@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Thu, 22 Jul 2021 12:32:29 +0000
+Reviewed-on: https://softwarefactory-project.io/r/c/dci-rhel-agent/+/22332
+Project: dci-rhel-agent
+Branch: refs/heads/master
