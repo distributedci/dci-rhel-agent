@@ -8,6 +8,7 @@
       - virt-install
       - python3-libvirt
       - python3-lxml
+      - wget
 
 - name: Enable libvirt service
   become: true
