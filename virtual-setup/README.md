@@ -1,16 +1,21 @@
 # Deploying a virtual environment of the dci-rhel-agent
 
 ## Introduction
-This playbook will provide a way to deploy a full virtualized environment of the 
+This playbook will provide a way to deploy a full virtualized environment of the
 `dci-rhel-agent` with one jumpbox and one SUT.
 
 ## Installation of the requirements
 ```
 cd virtual-setup/
-ansible-galaxy install -r requirements.yml
+ansible-galaxy collection install -r requirements.yml
 ```
 
-Download Centos 7 qemu base image and put it in `/var/lib/libvirt/images/CentOS-7-x86_64-GenericCloud-2009.qcow2`
+Download Centos 7 qemu base image and put it in `wget https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-2009.qcow2  -P /var/lib/libvirt/images`
+
+Ensure that you can login locally without password:
+
+`ssh <my-login>@locahost`
+
 
 ## Running the virtual setup
 
