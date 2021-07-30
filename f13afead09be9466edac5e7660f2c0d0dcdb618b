@@ -1,0 +1,8 @@
+Code-Review+2: Farid Da Encarnacao <fdaencar@redhat.com>
+Workflow+1: Farid Da Encarnacao <fdaencar@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Fri, 30 Jul 2021 15:43:33 +0000
+Reviewed-on: https://softwarefactory-project.io/r/c/dci-rhel-agent/+/22381
+Project: dci-rhel-agent
+Branch: refs/heads/master
