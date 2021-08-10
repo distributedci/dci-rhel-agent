@@ -33,6 +33,10 @@
         components: "{{ job_info['job']['components'] }}"
         product: "{{ job_info['job']['topic']['product_id'] }}"
 
+    - name: copy the job_id to the JOB_ID_FILE if it exists
+      copy: content="{{ job_id }}" dest={{ JOB_ID_FILE }}
+      when: JOB_ID_FILE is defined
+
     - name: 'Set DCI tags for the current job'
       dci_job:
         id: "{{ job_id }}"
