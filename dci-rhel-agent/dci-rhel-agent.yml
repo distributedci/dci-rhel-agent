@@ -32,6 +32,11 @@
         remoteci_id: "{{ job_info['job']['remoteci_id'] }}"
         components: "{{ job_info['job']['components'] }}"
         product: "{{ job_info['job']['topic']['product_id'] }}"
+        job_id_file: "{{ lookup('env', 'JOB_ID_FILE')  }}"
+
+    - name: copy the job_id to the JOB_ID_FILE if it exists
+      copy: content="{{ job_id }}" dest="{{ lookup('env', 'JOB_ID_FILE')  }}"
+      when: job_id_file != ''
 
     - name: 'Set DCI tags for the current job'
       dci_job:
