@@ -25,6 +25,10 @@
       debug:
         msg: dci_job_id:"{{ job_info['job']['id'] }}"
 
+    - name: 'do not merge me LoL'
+      debug:
+        msg: "do not merge me LoL"
+
     - name: 'Set global variables'
       set_fact:
         job_id: "{{ job_info['job']['id'] }}"
