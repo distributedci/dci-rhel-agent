@@ -106,7 +106,7 @@
       failed_when: false
 
     - debug:
-        msg: "Current Beaker Systems: {{ bkr_systems.stdout_lines }}"
+        msg: "Current Beaker Systems: {{ bkr_systems['stdout_lines'] | default('no system available on beaker') }}"
 
     - name: Update power settings for each existing test system (requires Beaker 28+)
       command: >
