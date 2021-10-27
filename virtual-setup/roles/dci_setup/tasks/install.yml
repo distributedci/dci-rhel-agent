@@ -11,31 +11,15 @@
     name: https://packages.distributed-ci.io/dci-release.el7.noarch.rpm
     state: present
 
-- name: Install DCI rhel agent
-  become: true
+- name: Install needed packages
   yum:
-    name: dci-rhel-agent
+    name:
+      - dci-rhel-agent
+      - ansible
+      - git
+      - wget
+      - ca-certificates
     state: present
-
-- name: Install ansible
-  become: true
-  yum:
-    name: ansible
-    state: present
-
-- name: Install git
-  become: true
-  yum:
-    name: git
-    state: present
-
-
-- name: Install wget
-  become: true
-  yum:
-    name: wget
-    state: present
-
 
 - name: Create the dci-rhel-agent user
   become: true
