@@ -16,6 +16,24 @@
       "revId": "2fe2aed2c7097740da2c617dcb64cb85c9acd94d",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "53235e15_c89c7c35",
+        "filename": "dci-rhel-agent/dci-import.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2021-10-27T15:29:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6006f68_be3e72b9",
+      "revId": "2fe2aed2c7097740da2c617dcb64cb85c9acd94d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
