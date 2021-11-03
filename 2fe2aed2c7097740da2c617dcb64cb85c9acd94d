@@ -1,0 +1,11 @@
+Code-Review+1: Michael Burke <miburke@redhat.com>
+Code-Review+2: Yassine Lamgarchal <yassine.lamgarchal@redhat.com>
+Code-Review+2: Guillaume Vincent <gvincent@redhat.com>
+Verified+1: dci-ci-bot <dci-ci-bot@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Workflow+1: Guillaume Vincent <gvincent@redhat.com>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Wed, 03 Nov 2021 16:30:42 +0000
+Reviewed-on: https://softwarefactory-project.io/r/c/dci-rhel-agent/+/22967
+Project: dci-rhel-agent
+Branch: refs/heads/master
