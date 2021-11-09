@@ -1,0 +1,10 @@
+Code-Review+1: Michael Burke <miburke@redhat.com>
+Code-Review+2: Guillaume Vincent <gvincent@redhat.com>
+Code-Review+2: Farid Da Encarnacao <fdaencar@redhat.com>
+Workflow+1: Farid Da Encarnacao <fdaencar@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Tue, 09 Nov 2021 17:16:07 +0000
+Reviewed-on: https://softwarefactory-project.io/r/c/dci-rhel-agent/+/23097
+Project: dci-rhel-agent
+Branch: refs/heads/master
