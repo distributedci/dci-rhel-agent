@@ -1,5 +1,5 @@
 Name:             dci-rhel-agent
-Version:          0.2.0
+Version:          0.3.0
 Release:          1.VERS%{?dist}
 Summary:          The RHEL's DCI agent
 License:          ASL 2.0
@@ -46,6 +46,7 @@ install -p -D -m 644 hooks/pre-run.yml %{buildroot}%{_sysconfdir}/dci-rhel-agent
 install -p -D -m 755 dci-rhel-agent-ctl %{buildroot}%{_bindir}/dci-rhel-agent-ctl
 mkdir %{buildroot}%{_sysconfdir}/dci-rhel-agent/secrets
 mkdir %{buildroot}%{_sysconfdir}/dci-rhel-agent/hooks/roles
+cp -r hooks/roles/ansible-role-dci-rhel-os-tests/ %{buildroot}%{_sysconfdir}/dci-rhel-agent/hooks/roles/
 
 %if 0%{?rhel} && 0%{?rhel} < 8
 pathfix.py -pni "%{__python2}" %{buildroot}%{_bindir}/dci-rhel-agent-ctl
@@ -74,6 +75,8 @@ pathfix.py -pni "%{__python3}" %{buildroot}%{_bindir}/dci-rhel-agent-ctl
 %dir  %{_sysconfdir}/dci-rhel-agent/hooks/roles
 
 %changelog
+* Mon Dec 06 2021 Guillaume Vincent <guillaume@oslab.fr> 0.3.0-1
+- Add os-tests role
 * Tue Jul 28 2020 Michael Burke <miburke@redhat.com> 0.2.0-2
 - Add support for Ansible roles in hooks directory
 * Wed Apr 1 2020 Guillaume Vincent <gvincent@redhat.com> - 0.2.0-1
