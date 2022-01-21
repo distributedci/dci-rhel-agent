@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "6e9e65861d1ec02762744a58963994782fbab737",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f05e8081_2f691ed5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29
+      },
+      "writtenOn": "2022-01-21T14:12:32Z",
+      "side": 1,
+      "message": "The virtual setup is not getting the latest rhel to do the test but a static one, can we fix to 8.4 for example ?",
+      "revId": "6e9e65861d1ec02762744a58963994782fbab737",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
