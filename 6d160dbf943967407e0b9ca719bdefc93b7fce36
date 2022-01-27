@@ -16,6 +16,23 @@
       "message": "Working fine: https://www.distributed-ci.io/jobs/5f05ca96-2c58-4f22-a751-428fc673c273/jobStates\nI also updated the doc: https://softwarefactory-project.io/r/c/dci-rhel-agent/+/23778",
       "revId": "6d160dbf943967407e0b9ca719bdefc93b7fce36",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6fc3410_6f9cbb3c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29
+      },
+      "writtenOn": "2022-01-27T21:43:22Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "6d160dbf943967407e0b9ca719bdefc93b7fce36",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
