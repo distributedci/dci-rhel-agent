@@ -180,6 +180,7 @@ topics:
         sut_password: sut_pw
         reboot_watchdog_timeout: 14400
         install_watchdog_timeout: 28800
+        install_wait_time: 180
       - my.x86_64.system3.local
       - my.x86_64.system4.local
 beaker_lab:
@@ -372,9 +373,9 @@ For example:
 
 #### How to extend the Beaker watchdog timeout for a system deployment?
 
-If deployment of systems is timing out due to Beaker's watchdog timeout expiring, the timeout for a test system can be set to a user-specified amount in the settings file. There is a watchdog which monitors the time from reboot to system installation start (reboot_watchdog_timeout), and a watchdog which monitors the time from installation start (install_watchdog_timeout). Either or both can be modified from the settings file.
+If deployment of systems is timing out due to Beaker's watchdog timeout expiring, the timeout for a test system can be set to a user-specified amount in the settings file. There is a watchdog which monitors the time from reboot to system installation start (reboot_watchdog_timeout), and a watchdog which monitors the time from installation start (install_watchdog_timeout). Either or both can be modified from the settings file.  The amount of time the agent waits for the installation to start is defaulted to 12.5 minutes (25 retries, 30 seconds apart).  This wait time can be adjusted in the settings file (specified in minutes) to allow for more time as is sometimes needed when provisioning large VMs for example.
 
-For example, the following will set the reboot watchdog timeout to 4 hours and the install watchdog timeout to 8 hours for any deployment jobs on the my.x86_64.system.local test machine:
+For example, the following will cause the agent to wait 3 hours for the installation to start, set the reboot watchdog timeout to 4 hours and the install watchdog timeout to 8 hours (after installation begins) for any deployment jobs on the my.x86_64.system.local test machine:
 
 ```
 
@@ -382,6 +383,7 @@ For example, the following will set the reboot watchdog timeout to 4 hours and t
       - fqdn: my.x86_64.system.local
         reboot_watchdog_timeout: 14400
         install_watchdog_timeout: 28800
+        install_wait_time: 180
 ```
 
 ## Usage
@@ -416,12 +418,21 @@ It can be modified to include any task needed to run **before** the system Under
 
 ## How to run your own set of tests ?
 
-By default, `dci-rhel-agent` provides an empty Ansible list of tasks located at `/etc/dci-rhel-agent/hooks/user-tests.yml`.
-It can be modified to include any task needed to run on top of the SUT that was provisionned for the job.
+By default, `dci-rhel-agent` provides 2 hooks files you can use to run your tests:
+  - `/etc/dci-rhel-agent/hooks/tests.yml`
+  - `/etc/dci-rhel-agent/hooks/user-tests.yml`
 
-This file will not be replaced when the `dci-rhel-agent` RPM will be updated.
+Those files are kept when the `dci-rhel-agent` RPM will be updated.
 
-To use any existing Ansible roles in your tests, copy the role directory to /etc/dci-rhel-agent/hooks/roles. The role can then be imported into your user-tests.yml file and executed on your test systems.
+### tests.yml
+
+You can include any tasks that will be run on the jumpbox
+
+### user-tests.yml
+
+You can include any tasks that will be run on each SUTs
+
+To use any existing Ansible roles in your tests, copy the role directory to /etc/dci-rhel-agent/hooks/roles. The role can then be imported into your hooks file.
 
 Please note, that it is possible at this point to use DCI Ansible bindings (see in the container `/usr/share/dci/modules/`) in tasks.
 In the following example, the task uploads Junit files (your tests results) into DCI Web dashboard.
@@ -489,7 +500,7 @@ No. Due to the large size of RHEL composes, our dci-downloader tool called by th
 
 ### I would like to continue to use the same RHEL compose for testing in our Beaker lab for a while.
 
-The RHEL agent provides an option which can be supplied when it is started to skip the download of composes. By supplying the `--skip-download=true` flag to your start call of the agent, the downloader will be bypassed and you can continue to run with the most recently downloaded RHEL compose until you are ready to move on. At that point, omitting the skip-download flag will allow your agent to download the latest available composes for each topic specified in your settings file.
+The RHEL agent provides an option which can be supplied when it is started to skip the download of composes. By supplying the `--skip-download` flag to your start call of the agent, the downloader will be bypassed and you can continue to run with the most recently downloaded RHEL compose until you are ready to move on. At that point, omitting the skip-download flag will allow your agent to download the latest available composes for each topic specified in your settings file.
 
 ### My EFI system does not recognize the default "linuxefi" and "initrdefi" commands supplied in the grub.cfg by the RHEL agent.
 
