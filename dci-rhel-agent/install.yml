@@ -135,13 +135,21 @@
   shell: "bkr watchdog-extend --by {{ reboot_watchdog_timeout }} {{ bkrjobid | regex_replace('J:','R:') }}"
   when: reboot_watchdog_timeout is defined
 
-- name: Wait for installation watchdog to be available for update
+- name: Wait for default amount of time for installation watchdog to be available for update
   shell: "bkr job-logs {{ bkrjobid }}"
   register: log_list
   retries: 25
   delay: 30
   until: "'anaconda.log' in log_list.stdout"
-  when: install_watchdog_timeout is defined
+  when: install_watchdog_timeout is defined and install_wait_time is not defined
+
+- name: Wait for user defined time for installation watchdog to be available for update
+  shell: "bkr job-logs {{ bkrjobid }}"
+  register: log_list
+  retries: "{{ install_wait_time * 2 |int}}"
+  delay: 30
+  until: "'anaconda.log' in log_list.stdout"
+  when: install_watchdog_timeout is defined and install_wait_time is defined
 
 - name: Update Beaker install watchdog time if specified
   shell: "bkr watchdog-extend --by {{ install_watchdog_timeout }} {{ bkrjobid | regex_replace('J:','R:') }}"
