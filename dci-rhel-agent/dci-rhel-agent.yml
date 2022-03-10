@@ -71,7 +71,9 @@
         - include_tasks: dci-import.yml
       rescue:
         - include_tasks: failure.yml
-      when: not hostvars.localhost.tests_only
+      when:
+        - not hostvars.localhost.tests_only
+        - not hostvars.localhost.ext_bkr
 
 - name: 'Configure SUT'
   hosts: localhost
