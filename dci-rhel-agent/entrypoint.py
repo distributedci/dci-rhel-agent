@@ -35,7 +35,9 @@ topics:
       - SUT4
 """
 import ansible_runner
+import os
 import signal
+import subprocess
 import sys
 import yaml
 
@@ -50,34 +52,32 @@ def sigterm_handler(signal, frame):
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 
-def cleanup_boot_files():
+def cleanup_boot_files(cmdline):
     r = ansible_runner.run(
         private_data_dir="/usr/share/dci-rhel-agent/",
         inventory="/etc/dci-rhel-agent/inventory",
         verbosity=1,
         playbook="dci-cleanup.yml",
+        cmdline=cmdline,
         quiet=False
     )
     if r.rc != 0:
         print("Warning: Unable to remove boot files copied to tftproot by agent.")
 
 def load_settings():
-    with open('/etc/dci-rhel-agent/settings.yml', 'r') as settings:
-        try:
-            return(yaml.load(settings, Loader=yaml.SafeLoader))
-        except yaml.YAMLError as exc:
-            print(exc)
-            sys.exit(1)
+    settings = subprocess.check_output("dci-vault-dump /etc/dci-rhel-agent/settings.yml",
+                                       shell=True)
+    return(yaml.load(settings, Loader=yaml.SafeLoader))
 
-def provision_and_test(extravars):
+def provision_and_test(extravars, cmdline):
     # Path is static in the container
     # local_repo = '/var/www/html'
     # extravars['local_repo'] = local_repo
 
     if 'topic' in extravars.keys():
-        print ("Topic is %s" % extravars['topic'])
+        print("Topic is %s" % extravars['topic'])
     else:
-        print ("Error ! No topic found in settings.")
+        print("Error ! No topic found in settings.")
         sys.exit(1)
 
     # Provision and install SUT
@@ -94,10 +94,11 @@ def provision_and_test(extravars):
             verbosity=1,
             playbook="conserver.yml",
             extravars=systems,
+            cmdline=cmdline,
             quiet=False
         )
         if r.rc != 0:
-            print ("Conserver playbook failed. {}: {}".format(r.status, r.rc))
+            print("Conserver playbook failed. {}: {}".format(r.status, r.rc))
             sys.exit(1)
 
     threads_runners = {}
@@ -134,20 +135,21 @@ def provision_and_test(extravars):
                 extravars.pop('install_wait_time', None)
         else:
             extravars['fqdn'] = system
-            #Remove any install options set for previous SUTs in this topic if they exist
+            # Remove any install options set for previous SUTs in this topic if they exist
             extravars.pop('kernel_options', None)
             extravars.pop('ks_meta', None)
             extravars.pop('sol_command', None)
             extravars.pop('reboot_watchdog_timeout', None)
             extravars.pop('install_watchdog_timeout', None)
             extravars.pop('install_wait_time', None)
-        print ("Starting job for %s." % extravars['fqdn'])
+        print("Starting job for %s." % extravars['fqdn'])
         thread, runner = ansible_runner.run_async(
             private_data_dir="/usr/share/dci-rhel-agent/",
             inventory="/etc/dci-rhel-agent/inventory",
             verbosity=int(environ.get('VERBOSITY')),
             playbook="dci-rhel-agent.yml",
             extravars=extravars,
+            cmdline=cmdline,
             quiet=False
         )
         threads_runners[(thread, runner)] = extravars['fqdn']
@@ -176,6 +178,10 @@ def main():
     # Read the settings file
     sets = load_settings()
 
+    cmdline = ("--vault-id %s" %
+               os.getenv("DCI_VAULT_CLIENT",
+                         "/usr/bin/dci-vault-client"))
+
     if not tests_only:
         # Run the update playbook once before jobs.
         r = ansible_runner.run(
@@ -183,11 +189,11 @@ def main():
             inventory="/etc/dci-rhel-agent/inventory",
             verbosity=1,
             playbook="dci-update.yml",
-            extravars=sets,
+            cmdline=cmdline + " -e @/etc/dci-rhel-agent/settings.yml",
             quiet=False
         )
         if r.rc != 0:
-            print ("Update playbook failed. {}: {}".format(r.status, r.rc))
+            print("Update playbook failed. {}: {}".format(r.status, r.rc))
             sys.exit(1)
     # Check if the settings contain multiple topics and process accordingly
     if 'topics' in sets:
@@ -195,15 +201,15 @@ def main():
         jobs = sets['topics']
         # Loop over each job and provision system(s)
         for idx, current_job in enumerate(jobs):
-            print ("Beginning provision/test jobs for topic %s" % current_job['topic'])
+            print("Beginning provision/test jobs for topic %s" % current_job['topic'])
             current_job['local_repo'] = sets['local_repo']
             current_job['local_repo_ip'] = sets['local_repo_ip']
             current_job['tests_only'] = tests_only
             current_job['beaker_lab'] = sets['beaker_lab']
-            provision_and_test(current_job)
+            provision_and_test(current_job, cmdline)
             cleanup_boot_files()
     else:
-        print ('Incompatible settings file.  Topics not found. Please update settings file format.')
+        print('Incompatible settings file.  Topics not found. Please update settings file format.')
         sys.exit(1)
     sys.exit(number_of_failed_jobs)
 

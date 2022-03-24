@@ -1,5 +1,5 @@
 Name:             dci-rhel-agent
-Version:          0.3.0
+Version:          0.4.0
 Release:          1.VERS%{?dist}
 Summary:          The RHEL's DCI agent
 License:          ASL 2.0
@@ -24,8 +24,10 @@ Requires:         make
 Requires:         dci-downloader
 %if 0%{?rhel} && 0%{?rhel} < 8
 Requires:         PyYAML
+Requires:         python2-dciclient >= 2.3.0
 %else
 Requires:         python3-pyyaml
+Requires:         python3-dciclient >= 2.3.0
 %endif
 
 %description
@@ -78,6 +80,8 @@ pathfix.py -pni "%{__python3}" %{buildroot}%{_bindir}/dci-rhel-agent-ctl
 %{_sysconfdir}/dci-rhel-agent/hooks/roles/ansible-role-dci-rhel-os-tests/tasks/*
 
 %changelog
+* Thu Mar 24 2022 Frederic Lepied <flepied@redhat.com> - 0.0.4-1
+- use dci-vault-client
 * Mon Dec 06 2021 Guillaume Vincent <guillaume@oslab.fr> 0.3.0-1
 - Add os-tests role
 * Tue Jul 28 2020 Michael Burke <miburke@redhat.com> 0.2.0-2
