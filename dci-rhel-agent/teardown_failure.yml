@@ -1,0 +1,20 @@
+---
+- block:
+    - name: failure
+      delegate_to: localhost
+      dci_job:
+        id: "{{ hostvars.localhost.job_id }}"
+        status: "failure"
+      tags: dci
+
+    - name: Grab logs
+      include_tasks: logs.yml
+      tags: dci
+
+    - name: Release system
+      include_tasks: release.yml
+      tags: dci
+  always:
+    - name: Fail properly
+      fail:
+        msg: 'Something went wrong. Review the log at: https://www.distributed-ci.io/jobs/{{ hostvars.localhost.job_id }}/jobStates'

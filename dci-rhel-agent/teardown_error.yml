@@ -1,0 +1,13 @@
+---
+- block:
+    - name: error
+      delegate_to: localhost
+      dci_job:
+        id: "{{ hostvars.localhost.job_id }}"
+        status: "error"
+      tags: dci
+  always:
+    - name: Fail properly
+      fail:
+        msg: 'Something went wrong. Review the log at: https://www.distributed-ci.io/jobs/{{ hostvars.localhost.job_id }}/jobStates'
+
