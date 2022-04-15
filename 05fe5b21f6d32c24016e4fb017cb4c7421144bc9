@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebcdc2c4_4ec03c29",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 405
+      },
+      "writtenOn": "2022-04-15T10:04:49Z",
+      "side": 1,
+      "message": "inlined comments",
+      "revId": "05fe5b21f6d32c24016e4fb017cb4c7421144bc9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d016b98_f2a8e6d9",
+        "filename": "dci-rhel-agent/install.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 405
+      },
+      "writtenOn": "2022-04-15T10:04:49Z",
+      "side": 1,
+      "message": "Can we use {{ job_artifacts }} variable instead (created in create_temp_dir.yml play) ?",
+      "range": {
+        "startLine": 101,
+        "startChar": 10,
+        "endLine": 101,
+        "endChar": 19
+      },
+      "revId": "05fe5b21f6d32c24016e4fb017cb4c7421144bc9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9270d6c9_d27cd89b",
+        "filename": "dci-rhel-agent/install.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 405
+      },
+      "writtenOn": "2022-04-15T10:04:49Z",
+      "side": 1,
+      "message": "same",
+      "range": {
+        "startLine": 107,
+        "startChar": 11,
+        "endLine": 107,
+        "endChar": 20
+      },
+      "revId": "05fe5b21f6d32c24016e4fb017cb4c7421144bc9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
