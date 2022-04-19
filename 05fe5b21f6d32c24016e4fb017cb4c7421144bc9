@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "44b5d7e5_2df1f415",
+        "filename": "dci-rhel-agent/install.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 29
+      },
+      "writtenOn": "2022-04-19T02:29:01Z",
+      "side": 1,
+      "message": "same for .composeinfo ?",
+      "parentUuid": "7d016b98_f2a8e6d9",
+      "range": {
+        "startLine": 101,
+        "startChar": 10,
+        "endLine": 101,
+        "endChar": 19
+      },
+      "revId": "05fe5b21f6d32c24016e4fb017cb4c7421144bc9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9270d6c9_d27cd89b",
         "filename": "dci-rhel-agent/install.yml",
         "patchSetId": 1
