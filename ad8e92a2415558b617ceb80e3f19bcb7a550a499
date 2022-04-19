@@ -16,6 +16,24 @@
       "message": "dci-rhel-agent/module_utils/productmd is copied from upstream productmd ?\n",
       "revId": "ad8e92a2415558b617ceb80e3f19bcb7a550a499",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0108d3ea_98742d97",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-04-19T13:29:57Z",
+      "side": 1,
+      "message": "It is.  But the imports are modified to work as an ansible module from module_utils.",
+      "parentUuid": "6a5d2aa1_226c7fca",
+      "revId": "ad8e92a2415558b617ceb80e3f19bcb7a550a499",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
