@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e090e51_f4782d6b",
+        "filename": "dci-rhel-agent-ctl",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-04-19T12:58:59Z",
+      "side": 1,
+      "message": "I\u0027m not clear how these ansible arguments get passed all the way through to ansible_runner in entrypoint.py.",
+      "revId": "139fc1cd29d5180a6124e2ee6d8662c13d3e6f75",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b04c19d7_652956a2",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-04-19T12:58:59Z",
+      "side": 1,
+      "message": "I\u0027m not a huge fan of these \u0026 * shortcuts in yaml.  I would rather see the following:\n\nrescue:\n  - name: Teardown failure\n    include_tasks: plays/teardown_failure.yml\n\nIt still removes duplicate code but is much cleaner and can be used outside of this playbook.",
+      "revId": "139fc1cd29d5180a6124e2ee6d8662c13d3e6f75",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
