@@ -51,6 +51,24 @@
       "message": "I\u0027m not a huge fan of these \u0026 * shortcuts in yaml.  I would rather see the following:\n\nrescue:\n  - name: Teardown failure\n    include_tasks: plays/teardown_failure.yml\n\nIt still removes duplicate code but is much cleaner and can be used outside of this playbook.",
       "revId": "139fc1cd29d5180a6124e2ee6d8662c13d3e6f75",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89116ce2_e1bf3454",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 405
+      },
+      "writtenOn": "2022-04-20T07:58:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b04c19d7_652956a2",
+      "revId": "139fc1cd29d5180a6124e2ee6d8662c13d3e6f75",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
