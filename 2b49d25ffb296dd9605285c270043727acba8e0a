@@ -33,6 +33,24 @@
       "message": "I needed to change the gather_facts to \"yes\" to get the pip install task in install.yml to run.  It wasn\u0027t able to find the ansible_python fact",
       "revId": "2b49d25ffb296dd9605285c270043727acba8e0a",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a381bf9e_1c641279",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 11
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-05-09T20:39:42Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "91ce22c9_5dff056d",
+      "revId": "2b49d25ffb296dd9605285c270043727acba8e0a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
