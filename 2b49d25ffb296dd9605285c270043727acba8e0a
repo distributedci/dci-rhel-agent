@@ -16,6 +16,23 @@
       "message": "I will test this one my lab",
       "revId": "2b49d25ffb296dd9605285c270043727acba8e0a",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91ce22c9_5dff056d",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 11
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2022-05-09T20:35:51Z",
+      "side": 1,
+      "message": "I needed to change the gather_facts to \"yes\" to get the pip install task in install.yml to run.  It wasn\u0027t able to find the ansible_python fact",
+      "revId": "2b49d25ffb296dd9605285c270043727acba8e0a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
