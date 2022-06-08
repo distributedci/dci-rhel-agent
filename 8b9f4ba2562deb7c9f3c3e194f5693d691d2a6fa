@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83c77999_82c670c9",
+        "filename": "dci-rhel-agent/entrypoint.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-06-08T17:50:27Z",
+      "side": 1,
+      "message": "Don\u0027t we also need skip-tags download if external beaker is specified?",
+      "revId": "8b9f4ba2562deb7c9f3c3e194f5693d691d2a6fa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
