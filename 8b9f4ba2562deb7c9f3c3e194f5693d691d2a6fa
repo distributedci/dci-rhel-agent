@@ -34,6 +34,24 @@
       "parentUuid": "83c77999_82c670c9",
       "revId": "8b9f4ba2562deb7c9f3c3e194f5693d691d2a6fa",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49676e96_49b84a0a",
+        "filename": "dci-rhel-agent/entrypoint.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-06-09T12:38:30Z",
+      "side": 1,
+      "message": "You\u0027re right on that.  dci-import has the download tag as well and we don\u0027t want to run when external beaker is selected.  So maybe we need another tag?",
+      "parentUuid": "1b24e79e_e17a34ca",
+      "revId": "8b9f4ba2562deb7c9f3c3e194f5693d691d2a6fa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
