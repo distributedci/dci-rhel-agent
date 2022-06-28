@@ -78,6 +78,8 @@ pathfix.py -pni "%{__python3}" %{buildroot}%{_bindir}/dci-rhel-agent-ctl
 %dir  %{_sysconfdir}/dci-rhel-agent/hooks/roles
 %{_sysconfdir}/dci-rhel-agent/hooks/roles/ansible-role-dci-rhel-os-tests/meta/*
 %{_sysconfdir}/dci-rhel-agent/hooks/roles/ansible-role-dci-rhel-os-tests/tasks/*
+%doc beaker-setup
+%doc virtual-setup
 
 %changelog
 * Wed Jun 08 2022 Guillaume Vincent <guillaume@oslab.fr> 0.4.0-1
