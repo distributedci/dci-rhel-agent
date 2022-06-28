@@ -1,0 +1,75 @@
+---
+#
+# Tasks are included to run on beaker_server host,
+# Delegate_to: localhost when needed.
+#
+
+- name: Set topic_name variable
+  set_fact:
+    topic_name: "{{ hostvars.localhost.topic_name }}"
+    system_arch: hostvars.localhost.system_arch
+
+- name: Copy RHEL8 or RHEL9 ppc64le boot files to tftproot when provisioning a ppc64le machine
+  copy:
+    src: "{{ local_repo }}/{{ topic_name }}/compose/BaseOS/ppc64le/os/boot/grub/powerpc-ieee1275"
+    dest: "{{ item }}"
+    remote_src: yes
+  with_items:
+    - "/var/lib/tftpboot/boot/grub2/{{ fqdn }}"
+    - /var/lib/tftpboot/boot/grub
+  when:
+    - system_arch == "ppc64le"
+    - topic_name.startswith("RHEL-8") or topic_name.startswith("RHEL-9")
+
+- name: Copy RHEL7 ppc64le boot files to tftproot when provisioning a ppc64le machine
+  copy:
+    src: "{{ local_repo }}/{{ topic_name }}/compose/Server/ppc64le/os/boot/grub/powerpc-ieee1275"
+    dest: "{{ item }}"
+    remote_src: yes
+  with_items:
+    - "/var/lib/tftpboot/boot/grub2/{{ fqdn }}"
+    - /var/lib/tftpboot/boot/grub
+  when:
+    - system_arch == "ppc64le"
+    - topic_name.startswith("RHEL-7")
+
+- name: Copy RHEL7 boot files to tftproot for UEFI BIOS SUTs
+  block:
+    - name: Copy grubx64.efi
+      copy:
+        src: "{{ local_repo }}/{{ topic_name }}/compose/Server/x86_64/os/EFI/BOOT/grubx64.efi"
+        dest: /var/lib/tftpboot/grubx64.efi
+        remote_src: yes
+        owner: root
+        group: root
+        mode: 0755
+  when:
+    - system_arch == "x86_64"
+    - topic_name.startswith("RHEL-7")
+    - beaker_lab.system_inventory[fqdn].efi|default(false, true) == true
+
+- name: Copy RHEL-8/9 boot files to tftproot for UEFI BIOS SUTs
+  block:
+    - name: Copy grubx64.efi
+      copy:
+        src: "{{ local_repo }}/{{ topic_name }}/compose/BaseOS/x86_64/os/EFI/BOOT/grubx64.efi"
+        dest: /var/lib/tftpboot/grubx64.efi
+        remote_src: yes
+        owner: root
+        group: root
+        mode: 0755
+  when:
+    - system_arch == "x86_64"
+    - topic_name.startswith("RHEL-8") or topic_name.startswith("RHEL-9")
+    - beaker_lab.system_inventory[fqdn].efi|default(false, true) == true
+
+- name: Copy RHEL-8/9 aarch64 boot files to tftproot when provisioning an aarch64 SUT
+  block:
+    - name: Copy grubaa64.efi
+      copy:
+        src: "{{ local_repo }}/{{ topic_name }}/compose/BaseOS/aarch64/os/EFI/BOOT/grubaa64.efi"
+        dest: /var/lib/tftpboot/grubaa64.efi
+        remote_src: yes
+  when:
+    - system_arch == "aarch64"
+    - topic_name.startswith("RHEL-8") or topic_name.startswith("RHEL-9")

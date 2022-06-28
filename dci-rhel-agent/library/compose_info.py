@@ -24,6 +24,7 @@ class ComposeInfo(object):
         version_minor = version.split('.')[1]
         self.osmajor = "%s%s" % (name, version_major)
         self.osminor = version_minor
+        self.compose_id = self.compose_info.info.create_compose_id()
 
     def get_pxe_images(self, variant):
         pxe_images = dict()
@@ -82,6 +83,7 @@ class ComposeInfo(object):
     def results(self):
         # return data in nice format
        results = dict(boot_variants=dict())
+       results['compose_id'] = self.compose_id
        results['osmajor'] = self.osmajor
        results['osminor'] = self.osminor
        results['repos'] = self.get_repos()

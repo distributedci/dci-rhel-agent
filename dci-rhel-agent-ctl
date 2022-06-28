@@ -92,6 +92,7 @@ def main():
           '/etc/dci-rhel-agent/secrets':'/etc/dci-rhel-agent/secrets',
           '/etc/dci-rhel-agent/inventory':'/etc/dci-rhel-agent/inventory',
           settings_path:'/etc/dci-rhel-agent/settings.yml',
+          local_repo:'/data',
         }
         # if "-l" is used, we want to override container code with local code (dev mode)
         if args.local:
