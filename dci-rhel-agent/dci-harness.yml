@@ -1,0 +1,22 @@
+---
+- name: Process ComposeInfo
+  compose_info:
+    compose_path: "/data/{{ hostvars.localhost.topic_name }}"
+    arch: "{{ hostvars.localhost.system_arch }}"
+  register: results
+
+- name: Set Composeinfo
+  set_fact:
+    compose_info: "{{ results.compose_info }}"
+    os_major_modified: "{{ results.compose_info.osmajor | replace('RedHatEnterpriseLinux9', 'CentOSStream9') }}" # Use CentOSStream9 for RHEL9
+
+- name: Sync harness repo
+  shell: >
+    dnf reposync --repo=rstrnt_harness \
+      --repofrompath=rstrnt_harness,https://beaker-project.org/yum/harness/{{ os_major_modified }} \
+      --delete \
+      --download-metadata \
+      --download-path /data/beaker/harness/{{ compose_info.osmajor }}
+
+- name: Create harness repo
+  shell: createrepo -q /data/beaker/harness/{{ compose_info.osmajor }}
