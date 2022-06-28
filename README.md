@@ -56,31 +56,41 @@ We strongly advise the partners to provide Red Hat DCI's team an access to their
 The `dci-rhel-agent` is packaged and available as a RPM files.
 However,`dci-release` and `epel-release` must be installed first:
 
-```bash
-# yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-# yum -y install https://packages.distributed-ci.io/dci-release.el7.noarch.rpm
-# yum-config-manager --save --setopt=epel.exclude=nodejs*,npm
-# subscription-manager repos --enable=rhel-7-server-extras-rpms
-# subscription-manager repos --enable=rhel-7-server-optional-rpms
-# yum -y install dci-rhel-agent
-# yum -y install ansible git
-```
-
-Next, install [Beaker](https://beaker-project.org/). Red Hat DCI maintains a [dedicated Ansible role](https://docs.distributed-ci.io/ansible-playbook-dci-beaker/) to help with this task.
+For RHEL-7
 
 ```bash
-$ git clone https://github.com/redhat-cip/ansible-playbook-dci-beaker
-$ cd ansible-playbook-dci-beaker/
-$ ansible-galaxy install -r requirements.yml -p roles/
-$ vi group_vars/all
-[...]
-$ ansible-playbook -i inventory playbook.yml
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+sudo yum -y install https://packages.distributed-ci.io/dci-release.el7.noarch.rpm
+sudo yum -y install yum-utils
+sudo yum-config-manager --save --setopt=epel.exclude=nodejs*,npm
+sudo subscription-manager repos --enable=rhel-7-server-extras-rpms
+sudo subscription-manager repos --enable=rhel-7-server-optional-rpms
+sudo yum -y install dci-rhel-agent
+sudo yum -y install ansible git
+
+git clone https://github.com/redhat-cip/ansible-playbook-dci-beaker
+cd ansible-playbook-dci-beaker/
+ansible-galaxy install -r requirements.yml -p roles/
+# Edit the settings in group_vars/all
+vi group_vars/all
+ansible-playbook -i inventory playbook.yml
 ```
 
-If the **SUT** is a virtual machine, read this [notice](https://github.com/redhat-cip/ansible-playbook-dci-beaker#note-about-virtual-machines).
+For Rhel-8
 
-When you install `dci-rhel-agent` on a fresh system (or if you need to update cached Beaker Harness packages), execute the `beaker-repo-update` command.
-For more details, read the official [documentation](https://beaker-project.org/docs/admin-guide/man/beaker-repo-update.html).
+```bash
+dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+dnf -y install https://packages.distributed-ci.io/dci-release.el8.noarch.rpm
+dnf -y install centos-release-ansible-29
+dnf -y install ansible-2.9.\* git dci-rhel-agent dnf-command(versionlock)
+dnf versionlock ansible
+
+cd /usr/share/doc/dci-rhel-agent/beaker-setup
+# Edit the settings in settings.yml
+vi settings.yml
+podman login registry.redhat.io
+ansible-playbook -e @settings.yml deploy.yml
+```
 
 ## Configuration
 
@@ -149,7 +159,7 @@ Example:
 
 ```console
 local_repo_ip: 192.168.1.1
-local_repo: /var/www/html
+local_repo: /opt/beaker/dci
 topics:
   - topic: RHEL-8.1
     dci_rhel_agent_cert: false
@@ -507,6 +517,12 @@ The RHEL agent provides an option which can be supplied when it is started to sk
 The linuxefi and initrdefi commands are supplied by default in the grub.cfg constructed by the agent for EFI systems.  These can be swapped with the linux and initrd commands by supplying a boolean in the system inventory for that system:
 
     alternate_efi_boot_commands: true
+
+### My system times out waiting before install starts
+
+There is a known bug, BZ 1785663.  This can be worked around by adding rd.net.timeout.carrier=10 to that systems kernel_options
+
+    kernel_options: rd.net.timeout.carrier=10
 
 ## Create your DCI account on distributed-ci.io
 
