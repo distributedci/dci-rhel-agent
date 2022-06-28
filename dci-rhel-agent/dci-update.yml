@@ -98,7 +98,7 @@
 
     - name: Ensure Beaker is up to date on jumpbox
       yum:
-        name: beaker
+        name: beaker-client
         state: latest
 
     - name: Query systems list

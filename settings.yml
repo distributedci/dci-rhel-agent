@@ -1,6 +1,6 @@
 ---
-local_repo: /var/www/html
 local_repo_ip: 192.168.1.1
+local_repo: /opt/beaker
 topics:
   - topic: RHEL-8.*
     # variants:
