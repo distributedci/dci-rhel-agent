@@ -22,6 +22,8 @@ BuildRequires:    python3-pyyaml
 Requires:         podman
 Requires:         make
 Requires:         dci-downloader
+Requires:         ansible-collection-containers-podman
+Requires:         ansible-collection-ansible-posix
 %if 0%{?rhel} && 0%{?rhel} < 8
 Requires:         PyYAML
 %else
@@ -78,6 +80,8 @@ pathfix.py -pni "%{__python3}" %{buildroot}%{_bindir}/dci-rhel-agent-ctl
 %dir  %{_sysconfdir}/dci-rhel-agent/hooks/roles
 %{_sysconfdir}/dci-rhel-agent/hooks/roles/ansible-role-dci-rhel-os-tests/meta/*
 %{_sysconfdir}/dci-rhel-agent/hooks/roles/ansible-role-dci-rhel-os-tests/tasks/*
+%doc beaker-setup
+%doc virtual-setup
 
 %changelog
 * Wed Nov 23 2022 hguemar <hguemar@lappy> - 0.5.0-1.VERS
