@@ -14,10 +14,15 @@ RUN yum upgrade -y && \
   yum -y install gcc ansible python python2-devel python2-pip \
                  ansible-role-dci-import-keys ansible-role-dci-retrieve-component \
                  dci-ansible ansible-role-dci-rhel-certification rsync python2-ansible-runner \
-                 ansible-role-dci-rhel-cki git restraint-client python-netaddr && \
+                 ansible-role-dci-rhel-cki git restraint-client python-netaddr patch \
+                 python2-productmd createrepo_c dnf-plugins-core dci-downloader dnf && \
   yum clean all
 
 ADD dci-rhel-agent /usr/share/dci-rhel-agent/
+ADD productmd.patch /tmp/
+
+# Include new compression extension
+RUN patch -p 1 < /tmp/productmd.patch
 
 # Install dumb-init package to handle PID 1 problem and reap any zombie processes
 RUN pip install 'dumb-init==1.2.2'
