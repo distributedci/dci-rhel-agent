@@ -1,0 +1,37 @@
+---
+- name: Install required packages
+  package:
+      name:
+        - "python{% if ansible_python.version.major == 3 %}3{% endif %}-productmd"
+        - createrepo
+        - dnf-plugins-core
+        - httpd
+      state: latest
+
+- name: Enable and Start httpd
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: Process ComposeInfo
+  compose_info:
+    compose_path: "{{ hostvars.localhost.local_repo }}/{{ hostvars.localhost.topic_name }}"
+    arch: "{{ hostvars.localhost.system_arch }}"
+  register: results
+
+- name: Set Composeinfo
+  set_fact:
+    compose_info: "{{ results.compose_info }}"
+    os_major_modified: "{{ results.compose_info.osmajor | replace('RedHatEnterpriseLinux9', 'CentOSStream9') }}" # Use CentOSStream9 for RHEL9
+
+- name: Sync harness repo
+  shell: >
+    dnf reposync --repo=rstrnt_harness \
+      --repofrompath=rstrnt_harness,https://beaker-project.org/yum/harness/{{ os_major_modified }} \
+      --delete \
+      --download-metadata \
+      --download-path {{ hostvars.localhost.local_repo }}/beaker/harness/{{ compose_info.osmajor }}
+
+- name: Create harness repo
+  shell: createrepo -q {{ hostvars.localhost.local_repo }}/beaker/harness/{{ compose_info.osmajor }}
