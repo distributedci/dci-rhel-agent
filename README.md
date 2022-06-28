@@ -59,6 +59,7 @@ However,`dci-release` and `epel-release` must be installed first:
 ```bash
 # yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 # yum -y install https://packages.distributed-ci.io/dci-release.el7.noarch.rpm
+# yum -y install yum-utils
 # yum-config-manager --save --setopt=epel.exclude=nodejs*,npm
 # subscription-manager repos --enable=rhel-7-server-extras-rpms
 # subscription-manager repos --enable=rhel-7-server-optional-rpms
@@ -507,6 +508,12 @@ The RHEL agent provides an option which can be supplied when it is started to sk
 The linuxefi and initrdefi commands are supplied by default in the grub.cfg constructed by the agent for EFI systems.  These can be swapped with the linux and initrd commands by supplying a boolean in the system inventory for that system:
 
     alternate_efi_boot_commands: true
+
+### My system times out waiting before install starts
+
+There is a known bug, BZ 1785663.  This can be worked around by adding rd.net.timeout.carrier=10 to that systems kernel_options
+
+    kernel_options: rd.net.timeout.carrier=10
 
 ## Create your DCI account on distributed-ci.io
 

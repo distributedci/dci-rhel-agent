@@ -3,14 +3,23 @@
   <memory unit='KiB'>4194304</memory>
   <vcpu placement='static'>2</vcpu>
   <os>
+    {% if efi | bool %}
+    <type arch="x86_64" machine="q35">hvm</type>
+    <loader readonly="yes" type="pflash" secure="yes">/usr/share/OVMF/OVMF_CODE.secboot.fd</loader>
+    {% else %}
     <type arch='x86_64'>hvm</type>
+    {% endif %}
     <boot dev='network' />
     <boot dev='hd'/>
   </os>
   <features>
     <acpi/>
     <apic/>
+    {% if efi | bool %}
+    <smm state="on"/>
+    {% else %}
     <pae/>
+    {% endif %}
   </features>
   <cpu mode='host-passthrough'>
     <model fallback='allow' />
@@ -33,7 +42,6 @@
       <guest dev='eth0'/>
     </interface>
     <controller type='usb' index='0'/>
-    <controller type='pci' index='0' model='pci-root'/>
     <serial type='pty'>
       <target port='0'/>
     </serial>
