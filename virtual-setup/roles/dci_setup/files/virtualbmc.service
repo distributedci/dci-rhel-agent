@@ -3,7 +3,7 @@ Description=Virtual Baseboard Management Controller Emulation service
 After=syslog.target network.target
 [Service]
 Type=simple
-User=dci
+User=root
 ExecStart=/usr/bin/python3 /usr/local/bin/vbmcd --foreground
 Restart=always
 RestartSec=1
