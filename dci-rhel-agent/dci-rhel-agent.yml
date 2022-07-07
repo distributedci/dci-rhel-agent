@@ -163,8 +163,6 @@
   gather_facts: no
   tags:
     - tests
-    - beaker
-    - sut
   tasks:
     - block:
         - name: 'Launch RHEL CKI Test'
