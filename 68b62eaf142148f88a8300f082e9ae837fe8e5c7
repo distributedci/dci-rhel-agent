@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc1a6b57_c71219b7",
+        "filename": "dci-rhel-agent/dci-import.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-07-27T15:41:57Z",
+      "side": 1,
+      "message": "Does reposync and createrepo actually create this pid file?",
+      "revId": "68b62eaf142148f88a8300f082e9ae837fe8e5c7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
