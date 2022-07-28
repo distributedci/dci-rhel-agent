@@ -187,6 +187,9 @@
           include_tasks: '/etc/dci-rhel-agent/hooks/user-tests.yml'
           when: hostvars.localhost['check_user_tests_hook_file'].stat.exists
       rescue:
+        - name: Release SUT if reserved
+          include_tasks: release.yml
+
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
