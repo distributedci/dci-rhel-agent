@@ -16,6 +16,40 @@
       "message": "Getting closer..  This requires changes on the beaker server to work.",
       "revId": "ef8345bb015874c88ba9cb9962e559fb60011fef",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "267ef494_99203ac9",
+        "filename": "dci-rhel-agent/beaker_grub_workaround.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-08-31T19:42:12Z",
+      "side": 1,
+      "message": "I still need to implement a fix for this so it can go away.",
+      "revId": "ef8345bb015874c88ba9cb9962e559fb60011fef",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56bf73a4_94eb5164",
+        "filename": "dci-rhel-agent/download.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-08-31T19:42:12Z",
+      "side": 1,
+      "message": "I need to verify this will work as expected..  the paths may need to be modified since this is running inside the container.",
+      "revId": "ef8345bb015874c88ba9cb9962e559fb60011fef",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
