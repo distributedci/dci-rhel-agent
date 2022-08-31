@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e0fe20b7_681e9eeb",
+        "filename": "dci-rhel-agent/dci-harness.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-08-31T19:35:52Z",
+      "side": 1,
+      "message": "This should be resolved since I\u0027m not installing it and using it from inside the container.",
+      "parentUuid": "cdc5bb23_f4bc8e7a",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 19
+      },
+      "revId": "32acf4a4ae54f1936dbc07d5a9483b5a752b5718",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b5829b58_10e648f4",
         "filename": "dci-rhel-agent/dci-rhel-agent.yml",
         "patchSetId": 2
@@ -37,6 +61,30 @@
       "writtenOn": "2022-07-06T14:25:13Z",
       "side": 1,
       "message": "I think the download should be on the jumpbox now no ?\n\nbeaker_server is consumed as a service now no ?",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 22
+      },
+      "revId": "32acf4a4ae54f1936dbc07d5a9483b5a752b5718",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df93a3ad_09c370a2",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-08-31T19:35:52Z",
+      "side": 1,
+      "message": "I believe I have this correct now.  This should run from inside the container.",
+      "parentUuid": "b5829b58_10e648f4",
       "range": {
         "startLine": 101,
         "startChar": 0,
