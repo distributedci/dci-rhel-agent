@@ -34,6 +34,24 @@
       "parentUuid": "cc1a6b57_c71219b7",
       "revId": "68b62eaf142148f88a8300f082e9ae837fe8e5c7",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8413223_f1f9e9ed",
+        "filename": "dci-rhel-agent/dci-import.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-09-06T20:19:02Z",
+      "side": 1,
+      "message": "Well, that is a strange one..  I manually ran reposync and createrepo on a CentOS 7 box and neither command created or paid any attention to /var/run/yum.pid",
+      "parentUuid": "b0fae6b9_533d0f9a",
+      "revId": "68b62eaf142148f88a8300f082e9ae837fe8e5c7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
