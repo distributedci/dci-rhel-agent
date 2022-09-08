@@ -50,6 +50,24 @@
       "message": "I need to verify this will work as expected..  the paths may need to be modified since this is running inside the container.",
       "revId": "ef8345bb015874c88ba9cb9962e559fb60011fef",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9593e412_000ec291",
+        "filename": "dci-rhel-agent/download.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-09-08T19:23:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56bf73a4_94eb5164",
+      "revId": "ef8345bb015874c88ba9cb9962e559fb60011fef",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
