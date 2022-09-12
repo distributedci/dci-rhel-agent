@@ -35,6 +35,24 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab833825_5c924ec2",
+        "filename": "dci-rhel-agent/beaker_grub_workaround.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-09-12T21:34:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "267ef494_99203ac9",
+      "revId": "ef8345bb015874c88ba9cb9962e559fb60011fef",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "56bf73a4_94eb5164",
