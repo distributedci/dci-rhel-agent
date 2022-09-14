@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02c7f381_3304545e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-09-14T18:27:37Z",
+      "side": 1,
+      "message": "\nI have built updated beaker rpms through copr which are required for this release.\n\nhttps://copr.fedorainfracloud.org/coprs/bpeck/beaker/repo/epel-7/bpeck-beaker-epel-7.repo",
+      "revId": "51dfce303500bd403c893ed1f02059c79f7b3933",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
