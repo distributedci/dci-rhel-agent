@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "022904af_8944236d",
+        "filename": "dci-rhel-agent/dci-harness.yml",
+        "patchSetId": 13
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2022-10-03T15:10:52Z",
+      "side": 1,
+      "message": "Should this check get modified since os_major_modified is now changed above?\ncompose_info.osmajor !\u003d \"RedHatEnterpriseLinux9\"",
+      "revId": "e4b3349379b84b8303ca01d051ef9d36b30ffe7e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
