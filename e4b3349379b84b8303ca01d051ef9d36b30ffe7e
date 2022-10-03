@@ -16,6 +16,24 @@
       "message": "Should this check get modified since os_major_modified is now changed above?\ncompose_info.osmajor !\u003d \"RedHatEnterpriseLinux9\"",
       "revId": "e4b3349379b84b8303ca01d051ef9d36b30ffe7e",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe7e1e9c_e0713359",
+        "filename": "dci-rhel-agent/dci-harness.yml",
+        "patchSetId": 13
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-10-03T16:30:23Z",
+      "side": 1,
+      "message": "Nope - RHEL8 does include beakerlib so we don\u0027t have to exclude it for rhel9 now.",
+      "parentUuid": "022904af_8944236d",
+      "revId": "e4b3349379b84b8303ca01d051ef9d36b30ffe7e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
