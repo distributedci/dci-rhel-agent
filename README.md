@@ -237,6 +237,10 @@ beaker_lab:
       power_type: apc_snmp
 ```
 
+## Storing secrets
+
+You can store secrets in an encrypted manner in your settings.yml by using dci-vault to generate your encrypted secrets. Details in the [python-dciclient documentation](https://docs.distributed-ci.io/python-dciclient/#dci-vault).
+
 ## Starting the DCI RHEL Agent and Accessing Beaker
 
 Now that you have configured the DCI RHEL Agent, you need to start the service:
@@ -373,7 +377,7 @@ For example:
 
 #### How to extend the Beaker watchdog timeout for a system deployment?
 
-If deployment of systems is timing out due to Beaker's watchdog timeout expiring, the timeout for a test system can be set to a user-specified amount in the settings file. There is a watchdog which monitors the time from reboot to system installation start (reboot_watchdog_timeout), and a watchdog which monitors the time from installation start (install_watchdog_timeout). Either or both can be modified from the settings file.  The amount of time the agent waits for the installation to start is defaulted to 12.5 minutes (25 retries, 30 seconds apart).  This wait time can be adjusted in the settings file (specified in minutes) to allow for more time as is sometimes needed when provisioning large VMs for example.
+If deployment of systems is timing out due to Beaker's watchdog timeout expiring, the timeout for a test system can be set to a user-specified amount in the settings file. There is a watchdog which monitors the time from reboot to system installation start (reboot_watchdog_timeout), and a watchdog which monitors the time from installation start (install_watchdog_timeout). Either or both can be modified from the settings file. The amount of time the agent waits for the installation to start is defaulted to 12.5 minutes (25 retries, 30 seconds apart). This wait time can be adjusted in the settings file (specified in minutes) to allow for more time as is sometimes needed when provisioning large VMs for example.
 
 For example, the following will cause the agent to wait 3 hours for the installation to start, set the reboot watchdog timeout to 4 hours and the install watchdog timeout to 8 hours (after installation begins) for any deployment jobs on the my.x86_64.system.local test machine:
 
@@ -419,8 +423,9 @@ It can be modified to include any task needed to run **before** the system Under
 ## How to run your own set of tests ?
 
 By default, `dci-rhel-agent` provides 2 hooks files you can use to run your tests:
-  - `/etc/dci-rhel-agent/hooks/tests.yml`
-  - `/etc/dci-rhel-agent/hooks/user-tests.yml`
+
+- `/etc/dci-rhel-agent/hooks/tests.yml`
+- `/etc/dci-rhel-agent/hooks/user-tests.yml`
 
 Those files are kept when the `dci-rhel-agent` RPM will be updated.
 
@@ -504,7 +509,7 @@ The RHEL agent provides an option which can be supplied when it is started to sk
 
 ### My EFI system does not recognize the default "linuxefi" and "initrdefi" commands supplied in the grub.cfg by the RHEL agent.
 
-The linuxefi and initrdefi commands are supplied by default in the grub.cfg constructed by the agent for EFI systems.  These can be swapped with the linux and initrd commands by supplying a boolean in the system inventory for that system:
+The linuxefi and initrdefi commands are supplied by default in the grub.cfg constructed by the agent for EFI systems. These can be swapped with the linux and initrd commands by supplying a boolean in the system inventory for that system:
 
     alternate_efi_boot_commands: true
 

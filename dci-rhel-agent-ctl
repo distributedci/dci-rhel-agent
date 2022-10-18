@@ -27,13 +27,18 @@ def sigterm_handler(signal, frame):
 signal.signal(signal.SIGTERM, sigterm_handler)
 signal.signal(signal.SIGINT, sigterm_handler)
 
+
 def load_settings(settings_path):
+  def skip_node(loader, node):
+    return None
+  yaml.add_constructor("!vault", skip_node)
   with open(settings_path, 'r') as settings:
     try:
-      return yaml.safe_load(settings)
+      return yaml.load(settings, yaml.Loader)
     except yaml.YAMLError as exc:
       print(exc)
       sys.exit(1)
+
 
 def main():
     parser = argparse.ArgumentParser()
