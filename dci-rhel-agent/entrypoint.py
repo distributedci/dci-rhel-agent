@@ -37,9 +37,12 @@ topics:
 import ansible_runner
 import signal
 import sys
-import yaml
+import collections
 
 from os import environ
+
+from ansible.cli import CLI
+from ansible.parsing.dataloader import DataLoader
 
 number_of_failed_jobs = 0
 
@@ -61,13 +64,29 @@ def cleanup_boot_files():
     if r.rc != 0:
         print("Warning: Unable to remove boot files copied to tftproot by agent.")
 
+
+def convert_unicode_to_str(data):
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convert_unicode_to_str, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convert_unicode_to_str, data))
+    else:
+        return data
+
+
 def load_settings():
-    with open('/etc/dci-rhel-agent/settings.yml', 'r') as settings:
-        try:
-            return(yaml.load(settings, Loader=yaml.SafeLoader))
-        except yaml.YAMLError as exc:
-            print(exc)
-            sys.exit(1)
+    loader = DataLoader()
+    vault_secrets = CLI.setup_vault_secrets(
+        loader=loader,
+        vault_ids=["/usr/bin/dci-vault-client"],
+    )
+    loader.set_vault_secrets(vault_secrets)
+    return convert_unicode_to_str(
+        loader.load_from_file("/etc/dci-rhel-agent/settings.yml")
+    )
+
 
 def provision_and_test(extravars, cmdline):
     # Path is static in the container
@@ -182,6 +201,9 @@ def main():
 
     # Read the settings file
     sets = load_settings()
+
+    if 'beaker_lab' not in sets.keys():
+        print ("INFO: beaker_lab was not found in settings.yml.  Beaker server updates and SUT management will NOT be performed.")
 
     ext_bkr = True if environ.get('EXT_BKR') == 'True' else False
     if not ext_bkr:

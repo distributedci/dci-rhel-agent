@@ -6,7 +6,6 @@ import argparse
 import subprocess
 import signal
 import sys
-import yaml
 import os
 
 # dci-rhel-agent-ctl default values
@@ -26,14 +25,6 @@ def sigterm_handler(signal, frame):
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 signal.signal(signal.SIGINT, sigterm_handler)
-
-def load_settings(settings_path):
-  with open(settings_path, 'r') as settings:
-    try:
-      return yaml.safe_load(settings)
-    except yaml.YAMLError as exc:
-      print(exc)
-      sys.exit(1)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -68,10 +59,6 @@ def main():
         entrypoint = "/bin/bash"
 
     if args.start:
-        settings = load_settings(settings_path)
-        if 'beaker_lab' not in settings.keys():
-            print ("INFO: beaker_lab was not found in settings.yml.  Beaker server updates and SUT management will NOT be performed.")
-
         # If agent is NOT in dev/debug mode, update DCI packages automatically.
         if args.debug is False and args.local is False:
           # Start dci package update
