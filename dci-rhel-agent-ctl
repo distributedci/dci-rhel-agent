@@ -69,11 +69,6 @@ def main():
 
     if args.start:
         settings = load_settings(settings_path)
-        if 'local_repo' in settings.keys():
-            local_repo = settings['local_repo']
-        else:
-            print ("INFO: local_repo is NOT set in %s. Using default value." % default_value['local_repo'])
-            local_repo = default_value['local_repo']
         if 'beaker_lab' not in settings.keys():
             print ("INFO: beaker_lab was not found in settings.yml.  Beaker server updates and SUT management will NOT be performed.")
 
