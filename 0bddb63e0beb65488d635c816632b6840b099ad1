@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4581a5a0_974f264e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2022-11-02T15:15:03Z",
+      "side": 1,
+      "message": "As Mike mentioned we use local_repo in https://softwarefactory-project.io/r/c/dci-rhel-agent/+/25374 so I would prefer we left this if the user wants to be able to change it.",
+      "revId": "0bddb63e0beb65488d635c816632b6840b099ad1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
