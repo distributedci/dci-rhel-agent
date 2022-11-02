@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6401dac_af569efd",
+        "filename": "dci-rhel-agent-ctl",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2022-11-02T15:01:16Z",
+      "side": 0,
+      "message": "As of now, the \u0027local_repo\u0027 variable will be used in the Beaker container patch.  The \u0027local_repo\u0027 will be mapped to /data in the agent container when it is started by this script.  Perhaps we can wait to merge this until we see what the \"final\" Beaker container patch looks like.",
+      "revId": "e7a4ffb0c888825bb64971ab67a01aae109aee82",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
