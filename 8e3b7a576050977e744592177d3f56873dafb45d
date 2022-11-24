@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "8e3b7a576050977e744592177d3f56873dafb45d",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa0970dc_1dd7273e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2022-11-24T14:45:23Z",
+      "side": 1,
+      "message": "EL9 job passed.",
+      "revId": "8e3b7a576050977e744592177d3f56873dafb45d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
