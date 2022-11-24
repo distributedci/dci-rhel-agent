@@ -1,0 +1,9 @@
+Code-Review+2: François Charlier <francois.charlier@redhat.com>
+Code-Review+1: Guillaume Vincent <gvincent@redhat.com>
+Workflow+1: Haïkel Guémar <hguemar@fedoraproject.org>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Thu, 24 Nov 2022 14:55:18 +0000
+Reviewed-on: https://softwarefactory-project.io/r/c/dci-rhel-agent/+/26790
+Project: dci-rhel-agent
+Branch: refs/heads/master
