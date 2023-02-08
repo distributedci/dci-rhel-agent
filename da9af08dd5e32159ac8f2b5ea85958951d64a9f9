@@ -16,6 +16,97 @@
       "message": "recheck",
       "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a0ee0cb_4ad172cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-02-08T08:22:42Z",
+      "side": 1,
+      "message": "I successfully did the first part of the review \\o/ Very well done Bill.\nMy comment inlined to make it work out of a new el8 box.\n\nWe also need to describe the transition process.\nDo we want to build this one for el7 and the existing partner? If yes, then we/I should test it on a RHEL 7 hardware.\n\nWe also need to build the different containers in the CI and push them on quay.\nWe can add a temp job on the infra to build beaker containers on check.\n\n",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6614b68_07a45417",
+        "filename": "README.md",
+        "patchSetId": 19
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-02-08T08:22:42Z",
+      "side": 1,
+      "message": "Ok so this is not working like this today because ansible using python 3.9 modules.\n\nSo we need to be more specific to install ansible. Add the ansible 2.9 repo, then install ansible-2.9\n\n    yum install centos-release-ansible-29\n    yum install ansible-2.9.\\*\n\nThen we need those ansible modules to be installed also:\n\n    ansible-collection-containers-podman\n    python3-firewall or ansible-collection-ansible-posix (see my other comment)",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a44c6776_79f48896",
+        "filename": "README.md",
+        "patchSetId": 19
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-02-08T08:22:42Z",
+      "side": 1,
+      "message": "Before running this, the user should also be authenticated on registry.redhat.io\n\nWe should ask the partner to podman login\n\n`podman login registry.redhat.io`",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08634fd8_f882385e",
+        "filename": "beaker-setup/roles/setup_beaker/tasks/main.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-02-08T08:22:42Z",
+      "side": 1,
+      "message": "Here you use firewalld and in configure_firewall.yml, you use ansible.posix.firewalld.\n\nSo we need ansible-collection-ansible-posix rpm for configure_firewall.yml and python3-firewall rpm for this one.\n\nCan we use the same module ?",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b04fa06f_ac17f2f5",
+        "filename": "beaker-setup/settings.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-02-08T08:22:42Z",
+      "side": 1,
+      "message": "I was struggling to understand if I should change those variable or not.\n\nCan we specify that data_dir will container beaker files and also RHEL composes.\n\nCan we specify that dns_servers is for beaker to know how to reach SUT during the installation ?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 3,
+        "endChar": 16
+      },
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
