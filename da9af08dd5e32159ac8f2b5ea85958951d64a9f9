@@ -52,6 +52,24 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f648de8_be77e203",
+        "filename": "README.md",
+        "patchSetId": 19
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-02-08T16:41:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6614b68_07a45417",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a44c6776_79f48896",
@@ -65,6 +83,24 @@
       "writtenOn": "2023-02-08T08:22:42Z",
       "side": 1,
       "message": "Before running this, the user should also be authenticated on registry.redhat.io\n\nWe should ask the partner to podman login\n\n`podman login registry.redhat.io`",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52728ad9_a70bcf6e",
+        "filename": "README.md",
+        "patchSetId": 19
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-02-08T16:41:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a44c6776_79f48896",
       "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
@@ -86,6 +122,24 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61786b3d_5478771d",
+        "filename": "beaker-setup/roles/setup_beaker/tasks/main.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-02-08T16:41:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08634fd8_f882385e",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b04fa06f_ac17f2f5",
@@ -99,6 +153,30 @@
       "writtenOn": "2023-02-08T08:22:42Z",
       "side": 1,
       "message": "I was struggling to understand if I should change those variable or not.\n\nCan we specify that data_dir will container beaker files and also RHEL composes.\n\nCan we specify that dns_servers is for beaker to know how to reach SUT during the installation ?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 3,
+        "endChar": 16
+      },
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "402cbbd1_c53f8ba3",
+        "filename": "beaker-setup/settings.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-02-08T16:41:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b04fa06f_ac17f2f5",
       "range": {
         "startLine": 1,
         "startChar": 0,
