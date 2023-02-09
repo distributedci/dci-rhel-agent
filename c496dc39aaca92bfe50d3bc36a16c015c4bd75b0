@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "c496dc39aaca92bfe50d3bc36a16c015c4bd75b0",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b0cc1e8_ac1c0bcd",
+        "filename": "dci-rhel-agent.spec",
+        "patchSetId": 20
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-02-09T11:59:23Z",
+      "side": 1,
+      "message": "those rpms doesn\u0027t exists on el7\n\nI think we can add them in the README of beaker in a container instead of the spec file. Those are not required to run the agent.",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 50
+      },
+      "revId": "c496dc39aaca92bfe50d3bc36a16c015c4bd75b0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
