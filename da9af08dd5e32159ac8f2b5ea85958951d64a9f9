@@ -107,6 +107,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a805544_f7408119",
+        "filename": "beaker-setup/roles/setup_beaker/tasks/configure_firewall.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-02-10T22:08:40Z",
+      "side": 1,
+      "message": "See my other comment regarding firewall.  \n\nCan we add the \"public\" default zone here also?  If the firewall is turned on, these ports will be blocked in the public zone and connectivity to bare metal SUTs is lost based on my testing.",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77d76ae7_84bc27c1",
+        "filename": "beaker-setup/roles/setup_beaker/tasks/main.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-02-10T22:08:40Z",
+      "side": 1,
+      "message": "If the user is not running a firewall, this task will cause beaker setup to fail.  Should we ignore failures or leave as-is and require a firewall?",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08634fd8_f882385e",
         "filename": "beaker-setup/roles/setup_beaker/tasks/main.yml",
         "patchSetId": 19
