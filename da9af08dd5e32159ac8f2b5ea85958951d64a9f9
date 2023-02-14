@@ -122,6 +122,24 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf0669d6_9eddf97b",
+        "filename": "beaker-setup/roles/setup_beaker/tasks/configure_firewall.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-02-14T20:51:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a805544_f7408119",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77d76ae7_84bc27c1",
@@ -135,6 +153,24 @@
       "writtenOn": "2023-02-10T22:08:40Z",
       "side": 1,
       "message": "If the user is not running a firewall, this task will cause beaker setup to fail.  Should we ignore failures or leave as-is and require a firewall?",
+      "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c53b21ec_6cce6217",
+        "filename": "beaker-setup/roles/setup_beaker/tasks/main.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-02-14T20:51:37Z",
+      "side": 1,
+      "message": "There is now a firewall_enabled variable that defaults to true.",
+      "parentUuid": "77d76ae7_84bc27c1",
       "revId": "da9af08dd5e32159ac8f2b5ea85958951d64a9f9",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
