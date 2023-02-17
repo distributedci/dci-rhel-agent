@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "7fcbc51ce109cb8317af0b1754ea69ce78d2ea9b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98929a05_049fd9a8",
+        "filename": "dci-rhel-agent/dci-update.yml",
+        "patchSetId": 25
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-02-17T21:50:52Z",
+      "side": 1,
+      "message": "beaker-client repo needs to be enabled on jumpbox ahead of time:\nhttps://beaker-project.org/yum/client/RedHatEnterpriseLinux$releasever/\n\nAlso, beaker-client needs a client.conf in /etc/beaker on jumpbox after install.",
+      "revId": "7fcbc51ce109cb8317af0b1754ea69ce78d2ea9b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f8253a7_77d61ff0",
+        "filename": "dci-rhel-agent/templates/beaker.conf.j2",
+        "patchSetId": 25
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-02-17T21:50:52Z",
+      "side": 1,
+      "message": "omit doesn\u0027t omit the variable, it leaves some garbage placeholder text when the var is not defined",
+      "revId": "7fcbc51ce109cb8317af0b1754ea69ce78d2ea9b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
