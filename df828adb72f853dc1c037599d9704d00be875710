@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f3064ac_6efad57c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-02-23T08:34:13Z",
+      "side": 1,
+      "message": "Hey Bill,\nin order to make rpm publish work, you probably want to build the rpm no ?",
+      "revId": "df828adb72f853dc1c037599d9704d00be875710",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
