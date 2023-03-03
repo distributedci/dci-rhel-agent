@@ -50,6 +50,24 @@
       "message": "omit doesn\u0027t omit the variable, it leaves some garbage placeholder text when the var is not defined",
       "revId": "7fcbc51ce109cb8317af0b1754ea69ce78d2ea9b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6721f5d_8258b7ad",
+        "filename": "dci-rhel-agent/templates/beaker.conf.j2",
+        "patchSetId": 25
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-03-03T19:58:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f8253a7_77d61ff0",
+      "revId": "7fcbc51ce109cb8317af0b1754ea69ce78d2ea9b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
