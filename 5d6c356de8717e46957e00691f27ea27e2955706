@@ -33,6 +33,24 @@
       "message": "/etc/dci-rhel-agent/secrets needs an selinux policy so it can be written to when creating the SSH config for SUTs in sut.yml",
       "revId": "5d6c356de8717e46957e00691f27ea27e2955706",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "767bfdfe_2d9594cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 34
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-03-03T19:57:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a1574ba_03bf42cd",
+      "revId": "5d6c356de8717e46957e00691f27ea27e2955706",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
