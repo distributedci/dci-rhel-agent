@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94932461_de06cee1",
+        "filename": "dci-rhel-agent/dci-update.yml",
+        "patchSetId": 36
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-03-03T21:32:39Z",
+      "side": 1,
+      "message": "ansible.posix module not installed by default",
+      "revId": "cf88f643b247298c2fbf9c32d369a99994c73d2d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
