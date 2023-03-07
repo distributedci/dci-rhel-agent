@@ -58,6 +58,30 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90105b6f_6a01c10a",
+        "filename": "beaker-setup/roles/setup_beaker/tasks/main.yml",
+        "patchSetId": 33
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-03-07T00:44:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b60e270b_4add3ed1",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 37
+      },
+      "revId": "ea4b1e942db71d5eca75f7928cc550ce9eb34d35",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8bef1f29_b07ff399",
