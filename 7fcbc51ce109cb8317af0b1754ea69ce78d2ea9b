@@ -35,6 +35,24 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5c2dc91_9c757439",
+        "filename": "dci-rhel-agent/dci-update.yml",
+        "patchSetId": 25
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-03-13T15:38:02Z",
+      "side": 1,
+      "message": "I added the beaker-client repo to the install directions.\n\nThe beaker-setup playbook will configure the client.conf",
+      "parentUuid": "98929a05_049fd9a8",
+      "revId": "7fcbc51ce109cb8317af0b1754ea69ce78d2ea9b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f8253a7_77d61ff0",
