@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c5b6fcd_bf2893d1",
+        "filename": "beaker-setup/roles/setup_beaker/tasks/main.yml",
+        "patchSetId": 45
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-03-21T20:09:48Z",
+      "side": 1,
+      "message": "To fix the apc_snmp power script issue in Westford, I modified it to ssh to the jumphost and run the command from there.  The script:\n\n#!/bin/sh\nset -e\nif [ \"$power_mode\" \u003d\u003d interrupt ] ; then\n    echo \"interrupt not supported by apc_snmp\" \u003e\u00262\n    exit 1\nfi\n# Handle one or more plug numbers\n# power_id must be a whitespace delimited list\nfor plug in $power_id; do\n    ssh \"$JUMPHOST\" fence_apc_snmp -a \"$power_address\" -n $plug -o \"$power_mode\"\ndone\n\n\nIn order for this to work, there must be a key created on the lab controller container and copied to the jumphost prior to running, and the power script added to Beaker\u0027s database with the script copied to\n\n/usr/lib/python2.7/site-packages/bkr/labcontroller/powerscripts\n\nThis playbook seems like the appropriate place to set this up.\n\nIf there\u0027s a better alternative that\u0027s fine, but this at least is simple and works.",
+      "revId": "3420b6f3e81da6e90b8ec517d0450b23d130dda2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
