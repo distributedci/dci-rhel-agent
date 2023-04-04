@@ -60,6 +60,10 @@
         name: beaker-client
         state: latest
 
+    - name: Ensure Beaker URL is accessible
+      uri:
+        url: "http://{{ hostvars.localhost.beaker_lab.labcontroller_fqdn }}/bkr/"
+
     - name: Query systems list
       command: bkr system-list
       register: bkr_systems
