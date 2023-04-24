@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac7adafd_af7587fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-04-24T18:33:16Z",
+      "side": 1,
+      "message": "I came across this while testing the external beaker and being selective in what variants we download.",
+      "revId": "3d9031626df4caf2683f9b5761af84882600c6f4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
