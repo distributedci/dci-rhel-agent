@@ -11,6 +11,7 @@
       topic_name: "{{ hostvars.localhost.topic_name }}"
       efi_boot_command: "efi"
       system_arch: "{{ hostvars.localhost.system_arch }}"
+      ssh_public_key: "{{ lookup('file', '/etc/dci-rhel-agent/secrets/id_rsa.pub') }}"
   block:
     - include_vars: /etc/dci-rhel-agent/settings.yml
 
