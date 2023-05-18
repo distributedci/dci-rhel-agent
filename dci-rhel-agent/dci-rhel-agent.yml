@@ -122,6 +122,9 @@
     - beaker
   tasks:
     - block:
+        - name: 'Release SUT in Beaker, if necessary'
+          include_tasks: release.yml
+
         - name: 'Create temp dir'
           include_tasks: create_temp_dir.yml
 
