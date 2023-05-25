@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "3e68dd5f6224caa87d0491dc40edd76a352b4797",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e6eb8e5_9c4ff644",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-05-25T18:38:19Z",
+      "side": 1,
+      "message": "you need to update master and rebase this on top of master",
+      "revId": "3e68dd5f6224caa87d0491dc40edd76a352b4797",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
