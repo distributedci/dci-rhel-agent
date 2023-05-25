@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4033c3e7_4398cdcb",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-05-25T19:17:55Z",
+      "side": 1,
+      "message": "This is the only piece of your PR that I\u0027m not sure about.  Should we update the job to only reserve if the recipe aborts? and not automatically return it here?\n\nhttps://beaker-project.org/docs/user-guide/system-reservation.html#using-the-reservesys-element\n\n\u003creservesys when\u003d\"onabort\"/\u003e",
+      "revId": "92f82d85c356b78bf434af382dffba07071fa3aa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
