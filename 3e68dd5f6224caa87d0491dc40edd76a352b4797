@@ -33,6 +33,24 @@
       "message": "you need to update master and rebase this on top of master",
       "revId": "3e68dd5f6224caa87d0491dc40edd76a352b4797",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dbf8dd1_eb353c98",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-05-25T18:50:31Z",
+      "side": 1,
+      "message": "thanks!",
+      "parentUuid": "3e6eb8e5_9c4ff644",
+      "revId": "3e68dd5f6224caa87d0491dc40edd76a352b4797",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
