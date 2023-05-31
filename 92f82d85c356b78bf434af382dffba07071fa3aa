@@ -16,6 +16,24 @@
       "message": "This is the only piece of your PR that I\u0027m not sure about.  Should we update the job to only reserve if the recipe aborts? and not automatically return it here?\n\nhttps://beaker-project.org/docs/user-guide/system-reservation.html#using-the-reservesys-element\n\n\u003creservesys when\u003d\"onabort\"/\u003e",
       "revId": "92f82d85c356b78bf434af382dffba07071fa3aa",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3060b12b_2880d74a",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-05-31T12:49:49Z",
+      "side": 1,
+      "message": "I think the point was to not reserve the machine.  If a job aborts and the partner tries to run again, currently they have to manually release the machine in Beaker.\n\nIf for some reason it gets reserved at the end of an aborted job and the partner would like to investigate, it will stay reserved until they run another job with the agent and the machine gets returned here.",
+      "parentUuid": "4033c3e7_4398cdcb",
+      "revId": "92f82d85c356b78bf434af382dffba07071fa3aa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
