@@ -34,6 +34,24 @@
       "parentUuid": "4033c3e7_4398cdcb",
       "revId": "92f82d85c356b78bf434af382dffba07071fa3aa",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f23782a6_fe455fe2",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-06-05T16:30:34Z",
+      "side": 1,
+      "message": "I think based on my changes in the other commit we should drop this piece.",
+      "parentUuid": "3060b12b_2880d74a",
+      "revId": "92f82d85c356b78bf434af382dffba07071fa3aa",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
