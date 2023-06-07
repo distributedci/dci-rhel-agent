@@ -18,6 +18,24 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c5e927d_039b5039",
+        "filename": "docs/support.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-06-07T09:54:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4635f8ff_5bd02265",
+      "revId": "6be79e6324ce96dabdfe47089cda61c50a821846",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3334c91d_86566313",
@@ -35,6 +53,24 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "722107c9_4eab6e77",
+        "filename": "docs/support.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-06-07T09:54:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3334c91d_86566313",
+      "revId": "6be79e6324ce96dabdfe47089cda61c50a821846",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50860830_cfaf6ea4",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-06-06T13:57:41Z",
       "side": 1,
       "message": "\"We also disable a RHEL topic...\"\nOR\n\"We also disable RHEL topics...\"",
+      "revId": "6be79e6324ce96dabdfe47089cda61c50a821846",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8740c16_b220ce58",
+        "filename": "docs/support.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-06-07T09:54:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50860830_cfaf6ea4",
       "revId": "6be79e6324ce96dabdfe47089cda61c50a821846",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
