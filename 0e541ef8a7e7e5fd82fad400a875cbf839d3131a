@@ -16,6 +16,24 @@
       "message": "ssh_public_key variable is defined on localhost (agent container) but used on the beaker_server container (produces undefined variable error)",
       "revId": "0e541ef8a7e7e5fd82fad400a875cbf839d3131a",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae0e37d5_6906f13c",
+        "filename": "dci-rhel-agent/templates/recipeSet.xml.j2",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-06-07T15:03:26Z",
+      "side": 1,
+      "message": "Sorry, reverse the comment.  Variable is defined on beaker_server in install.yml but used on localhost in the \u0027Prepare the Distro and Harness\u0027 task",
+      "parentUuid": "70270c7c_fd7a2159",
+      "revId": "0e541ef8a7e7e5fd82fad400a875cbf839d3131a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
