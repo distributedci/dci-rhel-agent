@@ -34,6 +34,24 @@
       "parentUuid": "a1342dee_c67ed80e",
       "revId": "30da7535c9741f4c76250b0b33f50914938771c3",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3524c6b_0578ee7a",
+        "filename": "dci-rhel-agent/process_recipe.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-06-08T19:04:02Z",
+      "side": 1,
+      "message": "Thanks, that was it.  I didn\u0027t realize that setting moved.",
+      "parentUuid": "be20fb1e_1d272159",
+      "revId": "30da7535c9741f4c76250b0b33f50914938771c3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
