@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdd7b90c_f4771044",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-06-14T19:48:29Z",
+      "side": 1,
+      "message": "This is needed for cki and other tests that would need to connect to the SUT.",
+      "revId": "aa371a6d9f16c2c837f045297172086c0c009e8f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
