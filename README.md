@@ -54,7 +54,7 @@ We strongly advise the partners to provide Red Hat DCI's team an access to their
 ## Installation of DCI Rhel Agent
 
 The `dci-rhel-agent` is packaged and available as a RPM files.
-However,`dci-release` and `epel-release` must be installed first and for RHEL you need to subscribe to the ansible-2.9 repo:
+However,`dci-release` and `epel-release` must be installed first.
 
 ```bash
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
@@ -65,53 +65,9 @@ ssh-keygen -t rsa -N "" -f /etc/dci-rhel-agent/secrets/id_rsa
 ssh-copy-id -i /etc/dci-rhel-agent/secrets/id_rsa.pub root@localhost
 ```
 
-## Install ansible for either Virtual systems or Beaker containers
-
-```bash
-# For CentOS
-dnf -y install centos-release-ansible-29
-# For RHEL
-subscription-manager repos --enable ansible-2.9-for-rhel-8-x86_64-rpms
-
-dnf -y install ansible-2.9.\* dnf-command\(versionlock\)
-dnf versionlock ansible
-```
-
-## Installation Of Virtual systems
-
-It can be helpful to setup virtual hosts to verify that your setup is working as expected.  Since the virtual setup is self contained it can uncover issues with the main installation before adding in external hosts.  External hosts present their own issues.
-
-```bash
-dnf -y install ansible-collection-community-libvirt ansible-collection-community-general \
-               python3-netaddr ansible-collection-ansible-posix
-cd /usr/share/doc/dci-rhel-agent/virtual-setup
-# Edit the inventory, by default it creates two Systems Under Test
-# make sure images_dir points to a location with enough disk space
-vi group_vars/all.yml
-ansible-playbook site.yml -v
-```
-
-## Installation Of Beaker
-
-You can install and run beaker externally to DCI but we provide containers that allow it to run from the jumphost.
-
-```bash
-dnf -y install ansible-collection-containers-podman ansible-collection-ansible-posix
-cd /usr/share/doc/dci-rhel-agent/beaker-setup
-# Edit the settings in settings.yml
-# It's important that the dns is correct, the containers need to be able to resolve the host names of the SUT's
-vi settings.yml
-podman login registry.redhat.io
-ansible-playbook -e @settings.yml deploy.yml
-```
+The ssh-keygen and ssh-copy-id commands setup authentication so that the containers have permission to run commands on the jumphost.
 
 ## Configuration
-
-In order to ensure the agent is able to connect to all applicable hosts, please copy the ssh key located in /etc/dci-rhel-agent/secrets/id_rsa to the hosts running Beaker and dnsmasq. Normally, these will be on the same machine running the agent.
-
-```console
-ssh-copy-id -i /etc/dci-rhel-agent/secrets/id_rsa <user>@<host>
-```
 
 There are two configuration files for `dci-rhel-agent`: `/etc/dci-rhel-agent/dcirc.sh` and `/etc/dci-rhel-agent/settings.yml`.
 
@@ -148,10 +104,15 @@ The possible values are:
 | dci_configuration                      | False    | String         | String representing the configuration of the job                                                                                    |
 | dci_comment                            | False    | String         | Comment to associate with the job                                                                                                   |
 | dci_url                                | False    | URL            | URL to associate with the job                                                                                                       |
-| local_repo_ip                          | True     | IP             | DCI jumpbox static network IP.                                                                                                      |
-| local_repo                             | True     | String         | Path to store DCI artefacts (Local RHEL mirror that will be exposed to SUT by `httpd`). Default is `/var/www/html`.                 |
+| jumpbox                                | False    | String         | Hostname of DCI jumpbox.                                                                                                                |
+| domain                                 | False    | String         | Domain of DCI jumpbox.                                                                                                                |
+| local_repo                             | True     | String         | Path to store DCI artefacts (Local RHEL mirror that will be exposed to SUT by `httpd`). Default is `/opt/dci`.                      |
+| libvirt_images_dir                     | False    | String         | Path to store libvirt images for virtual hosts. Default is `/opt/libvirt/images`.                      |
+| beaker_dir                             | True     | String         | Path to store the beaker data files. Default is '/opt/beaker'                                                                       |
 | dci_rhel_agent_cert                    | True     | True/False     | Enable or disable the HW certification tests suite.                                                                                 |
 | dci_rhel_agent_cki                     | True     | True/False     | Enable or disable the CKI tests suite.                                                                                              |
+| sut_interface                          | True     | String         | Network interface where all your Systems Under Test will be connected.                                                              |
+| machine_network_cidr                   | True     | String         | The private network to use for your Systems Under Test,  This is managed by dci.  The default should be fine.                       |
 | systems                                | False    | List of Dict   | List of all systems that will be deployed using RHEL from DCI.                                                                      |
 | systems[].fqdn                         | True     | String         | Fully qualified Domain name of System under Test.                                                                                   |
 | systems[].efi                          | False    | True/False     | Use efi netboot images instead of pxelinux.0                                                                                        |
@@ -170,8 +131,6 @@ The possible values are:
 | beaker_lab.domain                      | False    | String         | Domain to append to hosts                                                                                                           |
 | beaker_lab.dhcp_start                  | False    | IP             | Starting IP address range to assign to DCI test systems via DHCP.                                                                   |
 | beaker_lab.dhcp_end                    | False    | IP             | Ending IP address range to assigne to DCI test systems via DHCP.                                                                    |
-| beaker_lab.jumpbox_fqdn                | False    | FQDN           | FQDN of DCI jumpbox.                                                                                                                |
-| beaker_lab.labcontroller_fqdn          | False    | FQDN           | Public interface FQDN of Beaker lab controller.                                                                                     |
 | beaker_lab.router                      | False    | IP             | Gateway address                                                                                                                     |
 | system_inventory                       | False    | various        | List of all DCI tests systems and corresponding Beaker information                                                                  |
 
@@ -179,7 +138,7 @@ Example:
 
 ```console
 local_repo_ip: 192.168.1.1
-local_repo: /opt/beaker/dci
+local_repo: /opt/dci
 topics:
   - topic: RHEL-8.1
     dci_rhel_agent_cert: false
@@ -223,10 +182,9 @@ beaker_lab:
   external_dns: True
   dns_server: 192.168.1.1
   ntp_server : 192.168.1.1
-  domain: sample.domain.com
 
-  jumpbox_fqdn: dci-jumpbox
-  labcontroller_fqdn: dell-pet410-wdci-01.khw2.lab.eng.bos.redhat.com
+  jumpbox: dci-jumpbox
+  domain: dci.local
 
   system_inventory:
     test.x86.sut1:
@@ -268,6 +226,21 @@ beaker_lab:
       power_password: p_pass5
       #power_id:
       power_type: apc_snmp
+```
+
+## Setup of Containerized beaker and example virtual systems
+
+The dci-rhel-agent-setup program will read your /etc/dci-rhel-agent/settings.yml file and setup the beaker containers and two virtual systems.  This will give you a fully working environment capable of downloading RHEL components from DCI and installing them on the virtual systems.
+
+Setting the sut_interface to the network interface that hosts your systems under test will allow you to test bare metal systems.  You will need to add entries for every test system under the beaker_lab section of the settings.yml file.  This includes mandatory fields like ip address, mac address, ipmi settings for power cycling.  There are also some optional settings.  Please see the table above for a complete list.
+
+Since the virtual setup is self contained it can uncover issues with the main installation before adding in external hosts.  External hosts present their own issues.
+
+# Edit the inventory, by default it creates two Systems Under Test
+# make sure libvirt_images_dir points to a location with enough disk space
+
+```bash
+dci-rhel-agent-setup
 ```
 
 ## Starting the DCI RHEL Agent and Accessing Beaker
@@ -514,7 +487,7 @@ The DCI team is reachable via distributed-ci@redhat.com. When contacting DCI reg
 
 ### My job is hanging at the dci-downloader task.
 
-There could be .lock files in your local_repo (usually /var/www/html unless overridden in settings) which are not being cleared. Check in your local_repo/<topic_name> and manually delete any .lock files if present.
+There could be .lock files in your local_repo (usually /opt/dci unless overridden in settings) which are not being cleared. Check in your local_repo/<topic_name> and manually delete any .lock files if present.
 
 ### I have a new test system I would like to add to my DCI Beaker Lab.
 
