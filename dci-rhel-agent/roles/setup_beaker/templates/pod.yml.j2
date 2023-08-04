@@ -26,6 +26,8 @@ spec:
       volumeMounts:
         - mountPath: "/data:z"
           name: beaker-data-volume
+        - mountPath: "/data/dci:z"
+          name: dci-data-volume
         - mountPath: "/config:z"
           name: config-volume
     - image: "{{ beaker_lab_image }}"
@@ -49,15 +51,19 @@ spec:
   volumes:
     - name: db-volume
       hostPath:
-        path:  "{{ data_dir }}/mysql"
+        path: "{{ beaker_dir }}/mysql"
+        type: Directory
+    - name: dci-data-volume
+      hostPath:
+        path: "{{ local_repo }}"
         type: Directory
     - name: beaker-data-volume
       hostPath:
-        path:  "{{ data_dir }}/beaker"
+        path: "{{ beaker_dir }}/data"
         type: Directory
     - name: config-volume
       hostPath:
-        path: "{{ data_dir }}/config"
+        path: "{{ beaker_dir }}/config"
         type: Directory
     - name: tftp-volume
       hostPath:

@@ -22,7 +22,7 @@
 - name: Upload Beaker default tasks
   shell: bkr task-add /tmp/{{ item }}
   args:
-    creates: "{{ data_dir }}/beaker/rpms/{{ item }}"
+    creates: "{{ beaker_dir }}/rpms/{{ item }}"
   become: true
   with_items: '{{ rpms }}'
   ignore_errors: true

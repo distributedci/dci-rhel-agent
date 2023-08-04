@@ -37,9 +37,9 @@
     mode: 0777
     recurse: yes
   loop:
-    - "{{ data_dir }}/mysql"
-    - "{{ data_dir }}/beaker/dci"
-    - "{{ data_dir }}/config"
+    - "{{ beaker_dir }}/mysql"
+    - "{{ beaker_dir }}/config"
+    - "{{ beaker_dir }}/data"
 
 - name: Gather info about specific pods
   containers.podman.podman_pod_info:
@@ -162,5 +162,5 @@
     - apc_snmp_container
     - redfish
 
-- name: Import beaker tasks
-  include_tasks: beaker_tasks.yml
+#- name: Import beaker tasks
+#  include_tasks: beaker_tasks.yml

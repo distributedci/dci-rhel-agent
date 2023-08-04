@@ -3,7 +3,7 @@
 """
 Entrypoint for dci-rhel-agent.
 Example for settings.yml:
-local_repo: /var/www/html
+local_repo: /opt/dci
 local_repo_ip: 192.168.1.1
 topics:
   - topic: RHEL-7.9
@@ -60,7 +60,7 @@ def load_settings():
 
 def provision_and_test(extravars, cmdline):
     # Path is static in the container
-    # local_repo = '/var/www/html'
+    # local_repo = '/opt/dci'
     # extravars['local_repo'] = local_repo
 
     if 'topic' in extravars.keys():

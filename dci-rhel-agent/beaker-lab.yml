@@ -1,5 +1,5 @@
 ---
-- name: Update Beaker server config
+- name: Update Beaker server Containers
   hosts: beaker_server
   gather_facts: false
   tags:

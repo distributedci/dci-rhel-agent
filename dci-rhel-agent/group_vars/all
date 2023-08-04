@@ -1,5 +1,5 @@
 repo_url: https://repo.distributed-ci.io/
-local_repo: /var/www/html
+local_repo: /opt/dci
 local_repo_ip: localhost
 dci_components: []
 dci_components_by_query: []

@@ -17,6 +17,9 @@ RUN yum upgrade -y && \
                  python2-productmd createrepo_c dnf-plugins-core dci-downloader dnf && \
   yum clean all
 
+RUN ansible-galaxy collection install containers.podman && \
+    ansible-galaxy collection install ansible.posix
+
 ADD dci-rhel-agent /usr/share/dci-rhel-agent/
 
 # Install dumb-init package to handle PID 1 problem and reap any zombie processes

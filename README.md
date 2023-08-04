@@ -54,7 +54,7 @@ We strongly advise the partners to provide Red Hat DCI's team an access to their
 ## Installation of DCI Rhel Agent
 
 The `dci-rhel-agent` is packaged and available as a RPM files.
-However,`dci-release` and `epel-release` must be installed first and for RHEL you need to subscribe to the ansible-2.9 repo:
+However,`dci-release` and `epel-release` must be installed first.
 
 ```bash
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
@@ -65,53 +65,9 @@ ssh-keygen -t rsa -N "" -f /etc/dci-rhel-agent/secrets/id_rsa
 ssh-copy-id -i /etc/dci-rhel-agent/secrets/id_rsa.pub root@localhost
 ```
 
-## Install ansible for either Virtual systems or Beaker containers
-
-```bash
-# For CentOS
-dnf -y install centos-release-ansible-29
-# For RHEL
-subscription-manager repos --enable ansible-2.9-for-rhel-8-x86_64-rpms
-
-dnf -y install ansible-2.9.\* dnf-command\(versionlock\)
-dnf versionlock ansible
-```
-
-## Installation Of Virtual systems
-
-It can be helpful to setup virtual hosts to verify that your setup is working as expected.  Since the virtual setup is self contained it can uncover issues with the main installation before adding in external hosts.  External hosts present their own issues.
-
-```bash
-dnf -y install ansible-collection-community-libvirt ansible-collection-community-general \
-               python3-netaddr ansible-collection-ansible-posix
-cd /usr/share/doc/dci-rhel-agent/virtual-setup
-# Edit the inventory, by default it creates two Systems Under Test
-# make sure images_dir points to a location with enough disk space
-vi group_vars/all.yml
-ansible-playbook site.yml -v
-```
-
-## Installation Of Beaker
-
-You can install and run beaker externally to DCI but we provide containers that allow it to run from the jumphost.
-
-```bash
-dnf -y install ansible-collection-containers-podman ansible-collection-ansible-posix
-cd /usr/share/doc/dci-rhel-agent/beaker-setup
-# Edit the settings in settings.yml
-# It's important that the dns is correct, the containers need to be able to resolve the host names of the SUT's
-vi settings.yml
-podman login registry.redhat.io
-ansible-playbook -e @settings.yml deploy.yml
-```
+The ssh-keygen and ssh-copy-id commands setup authentication so that the containers have permission to run commands on the jumphost.
 
 ## Configuration
-
-In order to ensure the agent is able to connect to all applicable hosts, please copy the ssh key located in /etc/dci-rhel-agent/secrets/id_rsa to the hosts running Beaker and dnsmasq. Normally, these will be on the same machine running the agent.
-
-```console
-ssh-copy-id -i /etc/dci-rhel-agent/secrets/id_rsa <user>@<host>
-```
 
 There are two configuration files for `dci-rhel-agent`: `/etc/dci-rhel-agent/dcirc.sh` and `/etc/dci-rhel-agent/settings.yml`.
 
@@ -149,7 +105,8 @@ The possible values are:
 | dci_comment                            | False    | String         | Comment to associate with the job                                                                                                   |
 | dci_url                                | False    | URL            | URL to associate with the job                                                                                                       |
 | local_repo_ip                          | True     | IP             | DCI jumpbox static network IP.                                                                                                      |
-| local_repo                             | True     | String         | Path to store DCI artefacts (Local RHEL mirror that will be exposed to SUT by `httpd`). Default is `/var/www/html`.                 |
+| local_repo                             | True     | String         | Path to store DCI artefacts (Local RHEL mirror that will be exposed to SUT by `httpd`). Default is `/opt/dci`.                      |
+| beaker_dir                             | True     | String         | Path to store the beaker data files. Default is '/opt/beaker'                                                                       |
 | dci_rhel_agent_cert                    | True     | True/False     | Enable or disable the HW certification tests suite.                                                                                 |
 | dci_rhel_agent_cki                     | True     | True/False     | Enable or disable the CKI tests suite.                                                                                              |
 | systems                                | False    | List of Dict   | List of all systems that will be deployed using RHEL from DCI.                                                                      |
@@ -179,7 +136,7 @@ Example:
 
 ```console
 local_repo_ip: 192.168.1.1
-local_repo: /opt/beaker/dci
+local_repo: /opt/dci
 topics:
   - topic: RHEL-8.1
     dci_rhel_agent_cert: false
@@ -268,6 +225,25 @@ beaker_lab:
       power_password: p_pass5
       #power_id:
       power_type: apc_snmp
+```
+
+## Installation Of Virtual systems
+
+It can be helpful to setup virtual hosts to verify that your setup is working as expected.  Since the virtual setup is self contained it can uncover issues with the main installation before adding in external hosts.  External hosts present their own issues.
+
+# Edit the inventory, by default it creates two Systems Under Test
+# make sure images_dir points to a location with enough disk space
+
+```bash
+dci-rhel-agent-ctl --virtual-setup
+```
+
+## Installation Of Beaker
+
+Specify the location for the local_repo and beaker_dir in /etc/dci-rhel-agent/settings.yml before setting up the beaker containers.
+
+```bash
+dci-rhel-agent-ctl --beaker-setup
 ```
 
 ## Starting the DCI RHEL Agent and Accessing Beaker
@@ -514,7 +490,7 @@ The DCI team is reachable via distributed-ci@redhat.com. When contacting DCI reg
 
 ### My job is hanging at the dci-downloader task.
 
-There could be .lock files in your local_repo (usually /var/www/html unless overridden in settings) which are not being cleared. Check in your local_repo/<topic_name> and manually delete any .lock files if present.
+There could be .lock files in your local_repo (usually /opt/dci unless overridden in settings) which are not being cleared. Check in your local_repo/<topic_name> and manually delete any .lock files if present.
 
 ### I have a new test system I would like to add to my DCI Beaker Lab.
 
