@@ -65,16 +65,6 @@
         path: '/etc/dci-rhel-agent/hooks/user-tests.yml'
       register: check_user_tests_hook_file
 
-- import_playbook: beaker-lab.yml
-  when:
-    - beaker_lab is defined
-    - beaker_lab | length > 0
-
-- import_playbook: conserver.yml
-  when:
-    - beaker_lab is defined
-    - beaker_lab | length > 0
-
 - name: 'Prepare the jumpbox'
   hosts: localhost
   gather_facts: no
@@ -99,6 +89,24 @@
         - name: 'Run the pre-run hook if present'
           include_tasks: '/etc/dci-rhel-agent/hooks/pre-run.yml'
           when: check_pre_run.stat.exists
+      rescue:
+        - name: Teardown error
+          include_tasks: teardown_error.yml
+
+- name: 'Setup http store'
+  hosts: beaker_server
+  tags:
+    - install
+    - beaker
+  tasks:
+    - block:
+        - name: Install and http_store service
+          include_role:
+            name: setup_http_store
+          vars:
+            http_data_dir: "{{ local_repo }}"
+            http_port: "{{ http_store_port }}"
+            http_store_container_name: "dci-store"
       rescue:
         - name: Teardown error
           include_tasks: teardown_error.yml

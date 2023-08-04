@@ -45,6 +45,7 @@ install -p -D -m 644 hooks/user-tests.yml %{buildroot}%{_sysconfdir}/dci-rhel-ag
 install -p -D -m 644 hooks/tests.yml %{buildroot}%{_sysconfdir}/dci-rhel-agent/hooks/tests.yml
 install -p -D -m 644 hooks/pre-run.yml %{buildroot}%{_sysconfdir}/dci-rhel-agent/hooks/pre-run.yml
 install -p -D -m 755 dci-rhel-agent-ctl %{buildroot}%{_bindir}/dci-rhel-agent-ctl
+install -p -D -m 755 dci-rhel-agent-setup %{buildroot}%{_bindir}/dci-rhel-agent-setup
 mkdir %{buildroot}%{_sysconfdir}/dci-rhel-agent/secrets
 mkdir %{buildroot}%{_sysconfdir}/dci-rhel-agent/hooks/roles
 cp -r hooks/roles/ansible-role-dci-rhel-os-tests/ %{buildroot}%{_sysconfdir}/dci-rhel-agent/hooks/roles/
