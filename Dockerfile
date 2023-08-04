@@ -17,10 +17,19 @@ RUN yum upgrade -y && \
                  python2-productmd createrepo_c dnf-plugins-core dci-downloader dnf && \
   yum clean all
 
+RUN ansible-galaxy collection install 'containers.podman:<1.10.3' && \
+    ansible-galaxy collection install ansible.posix && \
+    ansible-galaxy collection install community.general && \
+    ansible-galaxy collection install community.libvirt && \
+    ansible-galaxy collection install ansible.utils && \
+    rm /root/.ansible/collections/ansible_collections/ansible/utils/plugins/filter/param_list_compare.py \
+       /root/.ansible/collections/ansible_collections/ansible/utils/plugins/filter/validate.py
+
 ADD dci-rhel-agent /usr/share/dci-rhel-agent/
 
 # Install dumb-init package to handle PID 1 problem and reap any zombie processes
-RUN pip install 'dumb-init==1.2.2'
+RUN pip install 'dumb-init==1.2.2' && \
+    pip install xmltodict
 
 # Ansible-runner bug: https://github.com/ansible/ansible-runner/issues/219
 RUN cp /usr/share/dci/callback/dci.py /usr/lib/python2.7/site-packages/ansible_runner/callbacks
