@@ -1,0 +1,35 @@
+---
+- name: Firewall Enabled
+  block:
+    - name: Install firewalld Packages
+      package:
+        name:
+          - firewalld
+        state: present
+
+    - name: Manage firewalld service
+      systemd:
+        name: firewalld
+        state: "started"
+        enabled: "true"
+
+    - name: Open tcp ports via firewalld
+      ansible.posix.firewalld:
+        port: "{{ item[0] }}/tcp"
+        permanent: yes
+        immediate: yes
+        state: enabled
+        zone: "{{ item[1] }}"
+      loop: "{{ tcp_ports | product(firewall_zones) | list }}"
+
+    - name: Open udp ports via firewalld
+      ansible.posix.firewalld:
+        port: "{{ item[0] }}/udp"
+        permanent: yes
+        immediate: yes
+        state: enabled
+        zone: "{{ item[1] }}"
+      loop: "{{ udp_ports | product(firewall_zones) | list }}"
+
+  when: firewall_enabled
+...
