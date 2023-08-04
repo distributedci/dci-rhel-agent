@@ -1,8 +1,7 @@
 ---
 - name: Setup Beaker
-  hosts: localhost
+  hosts: beaker_server
   gather_facts: true
-  become: true
   tasks:
     - name: "Setup beaker"
       include_role:
