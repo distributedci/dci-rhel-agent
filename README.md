@@ -54,64 +54,19 @@ We strongly advise the partners to provide Red Hat DCI's team an access to their
 ## Installation of DCI Rhel Agent
 
 The `dci-rhel-agent` is packaged and available as a RPM files.
-However,`dci-release` and `epel-release` must be installed first and for RHEL you need to subscribe to the ansible-2.9 repo:
+However,`dci-release` and `epel-release` must be installed first.
 
 ```bash
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf -y install https://packages.distributed-ci.io/dci-release.el8.noarch.rpm
-curl -o /etc/yum.repos.d/beaker-client.repo https://beaker-project.org/yum/beaker-client-RedHatEnterpriseLinux.repo
-dnf -y install dci-rhel-agent beaker-client
+dnf -y install dci-rhel-agent
 ssh-keygen -t rsa -N "" -f /etc/dci-rhel-agent/secrets/id_rsa
 ssh-copy-id -i /etc/dci-rhel-agent/secrets/id_rsa.pub root@localhost
 ```
 
-## Install ansible for either Virtual systems or Beaker containers
-
-```bash
-# For CentOS
-dnf -y install centos-release-ansible-29
-# For RHEL
-subscription-manager repos --enable ansible-2.9-for-rhel-8-x86_64-rpms
-
-dnf -y install ansible-2.9.\* dnf-command\(versionlock\)
-dnf versionlock ansible
-```
-
-## Installation Of Virtual systems
-
-It can be helpful to setup virtual hosts to verify that your setup is working as expected.  Since the virtual setup is self contained it can uncover issues with the main installation before adding in external hosts.  External hosts present their own issues.
-
-```bash
-dnf -y install ansible-collection-community-libvirt ansible-collection-community-general \
-               python3-netaddr ansible-collection-ansible-posix
-cd /usr/share/doc/dci-rhel-agent/virtual-setup
-# Edit the inventory, by default it creates two Systems Under Test
-# make sure images_dir points to a location with enough disk space
-vi group_vars/all.yml
-ansible-playbook site.yml -v
-```
-
-## Installation Of Beaker
-
-You can install and run beaker externally to DCI but we provide containers that allow it to run from the jumphost.
-
-```bash
-dnf -y install ansible-collection-containers-podman ansible-collection-ansible-posix
-cd /usr/share/doc/dci-rhel-agent/beaker-setup
-# Edit the settings in settings.yml
-# It's important that the dns is correct, the containers need to be able to resolve the host names of the SUT's
-vi settings.yml
-podman login registry.redhat.io
-ansible-playbook -e @settings.yml deploy.yml
-```
+The ssh-keygen and ssh-copy-id commands setup authentication so that the containers have permission to run commands on the jumphost.
 
 ## Configuration
-
-In order to ensure the agent is able to connect to all applicable hosts, please copy the ssh key located in /etc/dci-rhel-agent/secrets/id_rsa to the hosts running Beaker and dnsmasq. Normally, these will be on the same machine running the agent.
-
-```console
-ssh-copy-id -i /etc/dci-rhel-agent/secrets/id_rsa <user>@<host>
-```
 
 There are two configuration files for `dci-rhel-agent`: `/etc/dci-rhel-agent/dcirc.sh` and `/etc/dci-rhel-agent/settings.yml`.
 
@@ -148,10 +103,13 @@ The possible values are:
 | dci_configuration                      | False    | String         | String representing the configuration of the job                                                                                    |
 | dci_comment                            | False    | String         | Comment to associate with the job                                                                                                   |
 | dci_url                                | False    | URL            | URL to associate with the job                                                                                                       |
-| local_repo_ip                          | True     | IP             | DCI jumpbox static network IP.                                                                                                      |
-| local_repo                             | True     | String         | Path to store DCI artefacts (Local RHEL mirror that will be exposed to SUT by `httpd`). Default is `/var/www/html`.                 |
+| jumpbox                                | False    | String         | Hostname of DCI jumpbox. This is the name of the jumpbox on the SUT network.  The default should be fine.                           |
+| domain                                 | False    | String         | Domain of DCI jumpbox. This is the name of the domain on the SUT network.  The default should be fine.                              |
+| local_repo                             | True     | String         | Path to store DCI artefacts (Local RHEL mirror that will be exposed to SUT by `httpd`). Default is `/opt/dci`.                      |
+| libvirt_images_dir                     | False    | String         | Path to store libvirt images for virtual hosts. Default is `/opt/libvirt/images`.                      |
 | dci_rhel_agent_cert                    | True     | True/False     | Enable or disable the HW certification tests suite.                                                                                 |
 | dci_rhel_agent_cki                     | True     | True/False     | Enable or disable the CKI tests suite.                                                                                              |
+| machine_network_cidr                   | True     | String         | The private network to use for your Systems Under Test,  This is managed by dci.  The default should be fine.                       |
 | systems                                | False    | List of Dict   | List of all systems that will be deployed using RHEL from DCI.                                                                      |
 | systems[].fqdn                         | True     | String         | Fully qualified Domain name of System under Test.                                                                                   |
 | systems[].efi                          | False    | True/False     | Use efi netboot images instead of pxelinux.0                                                                                        |
@@ -164,22 +122,24 @@ The possible values are:
 | variants                               | False    | List of string | List of RHEL 8.x variant to enable (AppStream, BaseOS, CRB, HighAvailability, NFV, RT, ResilientStorage, SAP, SAPHANA and unified). |
 | archs                                  | False    | List of string | CPU arch to enable (aarch64, ppc64le, s390x and x86_64).                                                                            |
 | with_debug                             | False    | True/False     | Use RPM with debug symbols.                                                                                                         |
-| beaker_lab.external_dns                | False    | True/False     | Boolean representing whether an external DNS server is in use.                                                                      |
+| beaker_lab.beaker_dir                  | True     | String         | Path to store the beaker data files. Default is '/opt/beaker'                                                                       |
+| beaker_lab.network_config              | False    | String         | Network config where all your SUT's will be connected.  Example provided in settings.                                               |
 | beaker_lab.dns_server                  | False    | IP             | IP address of DNS server to specify in beaker.conf (dnsmasq config)                                                                 |
 | beaker_lab.ntp_server                  | False    | IP             | IP address of NTP server to specify in beaker.conf (dnsmasq config)                                                                 |
 | beaker_lab.domain                      | False    | String         | Domain to append to hosts                                                                                                           |
 | beaker_lab.dhcp_start                  | False    | IP             | Starting IP address range to assign to DCI test systems via DHCP.                                                                   |
 | beaker_lab.dhcp_end                    | False    | IP             | Ending IP address range to assigne to DCI test systems via DHCP.                                                                    |
-| beaker_lab.jumpbox_fqdn                | False    | FQDN           | FQDN of DCI jumpbox.                                                                                                                |
-| beaker_lab.labcontroller_fqdn          | False    | FQDN           | Public interface FQDN of Beaker lab controller.                                                                                     |
 | beaker_lab.router                      | False    | IP             | Gateway address                                                                                                                     |
 | system_inventory                       | False    | various        | List of all DCI tests systems and corresponding Beaker information                                                                  |
 
 Example:
 
 ```console
-local_repo_ip: 192.168.1.1
-local_repo: /opt/beaker/dci
+local_repo: /opt/dci
+jumpbox: dci-jumpbox
+domain: dci.local
+machine_network_cidr: 10.60.0.0/24
+machine_network_ip: "{{ machine_network_cidr | nthhost(190) }}"
 topics:
   - topic: RHEL-8.1
     dci_rhel_agent_cert: false
@@ -192,10 +152,10 @@ topics:
       - ppc64le
     with_debug: false
     systems:
-      - fqdn: my.x86_64.system.local
+      - fqdn: sut1.{{ domain }}
         efi: true
         alternate_efi_boot_commands: true
-      - fqdn: my.ppc64le.system.local
+      - fqdn: sut3.{{ domain }}
         petitboot: true
   - topic: RHEL-7.8
     dci_rhel_agent_cert: false
@@ -206,7 +166,7 @@ topics:
       - x86_64
     with_debug: false
     systems:
-      - fqdn: my.x86_64.system2.local
+      - fqdn: sut1.{{ domain }}
         kernel_options: "rd.iscsi.ibft=1"
         ks_meta: "ignoredisk=--only-use=sda"
         sol_command: "ipmitool -I lanplus -U root -P calvin -H my.x86_64.system2.local sol activate"
@@ -214,44 +174,79 @@ topics:
         reboot_watchdog_timeout: 14400
         install_watchdog_timeout: 28800
         install_wait_time: 180
-      - fqdn: my.x86_64.system3.local
-      - fqdn: my.x86_64.system4.local
-beaker_lab:
-  dhcp_start: 192.168.1.20
-  dhcp_end: 192.168.1.30
-  dhcp_netmask: 255.255.255.0
-  external_dns: True
-  dns_server: 192.168.1.1
-  ntp_server : 192.168.1.1
-  domain: sample.domain.com
+      - fqdn: sut2.{{ domain }}
+      - fqdn: sut3.{{ domain }}
 
-  jumpbox_fqdn: dci-jumpbox
-  labcontroller_fqdn: dell-pet410-wdci-01.khw2.lab.eng.bos.redhat.com
+beaker_lab:
+  beaker_dir: /opt/beaker
+  dns_server: "{{ machine_network_ip }}"
+  router: "{{ machine_network_ip }}"
+  dhcp_start: "{{ machine_network_cidr | ipaddr('20') | ipaddr('address') }}"
+  dhcp_end: "{{ machine_network_cidr | ipaddr('100') | ipaddr('address') }}"
+
+  # This is the network that will be used for the Systems Under test (SUT's)
+  # Update eno2 to the interface where your physical SUT's will be connected.
+  # If you are only using this for testing and have no physical network you
+  # can remove "port" and "name" from this config and it will only setup the
+  # virtual network for virtual machines.
+  network_config:
+    interfaces:
+      - type: linux-bridge
+        name: "{{ bridge_name }}"
+        addresses:
+          ipv4:
+            - ip: "{{ machine_network_ip }}"
+              prefix: "{{ machine_network_cidr | ipaddr('prefix') }}"
+        bridge:
+          stp: True
+          port:
+            name: "eno2"
 
   system_inventory:
-    test.x86.sut1:
-      ip_address: 192.168.1.20
-      mac: aa:bb:cc:dd:ee:ff
+    sut1:
+      ip_address: 10.60.0.51
+      mac: "52:54:00:EF:C0:2C"
       arch: x86_64
-      power_address: sut1.power.address
-      power_user: p_user1
-      power_password: p_pass1
-      # Power ID depends on which power type is selected.  Typically this field identifies
-      # a particular plug, socket, port, or virtual guest name. Defaults to fqdn when not
-      # specified here
-      #power_id:
-      power_type: ipmilan
-    test.x86.sut2
-      ip_address: 192.168.1.21
-      mac: ff:ee:dd:cc:bb:aa
+      mode: efi
+      power_address: "{{ jumpbox }}.{{ domain }}"
+      power_user: admin
+      power_password: password
+      power_id: 6230
+      power_type: ipmitool_lanplus
+      type: virtual
+      disks:
+        main: 150
+      memory: "16384"
+      vcpu: "4"
+
+    sut2:
+      ip_address: 10.60.0.52
+      mac: "52:54:00:EF:C0:2D"
       arch: x86_64
-      power_address: sut2.power.address
-      power_user: p_user2
-      power_password: p_pass2
+      mode: legacy
+      power_address: "{{ jumpbox }}.{{ domain }}"
+      power_user: admin
+      power_password: password
+      power_id: 6231
+      power_type: ipmitool_lanplus
+      type: virtual
+      disks:
+        main: 150
+      memory: "16384"
+      vcpu: "4"
+
+    sut3:
+      ip_address: 10.60.0.53
+      mac: aa:cc:bb:dd:ee:ff
+      arch: ppc64le
+      power_address: sut3.power.address
+      power_user: p_user3
+      power_password: p_pass3
       #power_id:
-      power_type: wti
-    test.ppc.sut3
-      ip_address: 192.168.1.23
+      power_type: apc_snmp
+
+    sut4:
+      ip_address: 10.60.0.54
       mac: aa:cc:bb:dd:ee:ff
       arch: ppc64le
       power_address: sut4.power.address
@@ -259,15 +254,21 @@ beaker_lab:
       power_password: p_pass4
       #power_id:
       power_type: apc_snmp
-    test.ppc.sut4
-      ip_address: 192.168.1.24
-      mac: aa:cc:bb:dd:ee:ff
-      arch: ppc64le
-      power_address: sut5.power.address
-      power_user: p_user5
-      power_password: p_pass5
-      #power_id:
-      power_type: apc_snmp
+```
+
+## Setup of Containerized beaker and example virtual systems
+
+The dci-rhel-agent-setup program will read your /etc/dci-rhel-agent/settings.yml file and setup the beaker containers and two virtual systems.  This will give you a fully working environment capable of downloading RHEL components from DCI and installing them on the virtual systems.
+
+Setting the sut_interface to the network interface that hosts your systems under test will allow you to test bare metal systems.  You will need to add entries for every test system under the beaker_lab section of the settings.yml file.  This includes mandatory fields like ip address, mac address, ipmi settings for power cycling.  There are also some optional settings.  Please see the table above for a complete list.
+
+Since the virtual setup is self contained it can uncover issues with the main installation before adding in external hosts.  External hosts present their own issues.
+
+# Edit the inventory, by default it creates two Systems Under Test
+# make sure libvirt_images_dir points to a location with enough disk space
+
+```bash
+dci-rhel-agent-setup
 ```
 
 ## Starting the DCI RHEL Agent and Accessing Beaker
@@ -382,11 +383,11 @@ For example:
 
 ```
     systems:
-      - fqdn: my.x86_64.system2.local
+      - fqdn: x86_64_2.dci.local
         kernel_options: "rd.iscsi.ibft=1"
         ks_meta: "ignoredisk=--only-use=sda"
-      - fqdn: my.x86_64.system3.local
-      - fqdn: my.x86_64.system4.local
+      - fqdn: x86_64_3.dci.local
+      - fqdn: x86_64_4.dci.local
 ```
 
 #### How to enable conserver ?
@@ -397,11 +398,11 @@ For example:
 
 ```
     systems:
-      - fqdn: my.x86_64.system2.local
+      - fqdn: x86_64_2.dci.local
         kernel_options: "console=ttyS1,115200n8"
-        sol_command: "ipmitool -I lanplus -U root -P calvin -H my.x86_64.system2.local sol activate"
-      - fqdn: my.x86_64.system3.local
-      - fqdn: my.x86_64.system4.local
+        sol_command: "ipmitool -I lanplus -U root -P calvin -H console_2.dci.local sol activate"
+      - fqdn: x86_64_3.dci.local
+      - fqdn: x86_64_4.dci.local
 ```
 
 #### How to extend the Beaker watchdog timeout for a system deployment?
@@ -413,7 +414,7 @@ For example, the following will cause the agent to wait 3 hours for the installa
 ```
 
     systems:
-      - fqdn: my.x86_64.system.local
+      - fqdn: x86_64_2.dci.local
         reboot_watchdog_timeout: 14400
         install_watchdog_timeout: 28800
         install_wait_time: 180
@@ -514,7 +515,7 @@ The DCI team is reachable via distributed-ci@redhat.com. When contacting DCI reg
 
 ### My job is hanging at the dci-downloader task.
 
-There could be .lock files in your local_repo (usually /var/www/html unless overridden in settings) which are not being cleared. Check in your local_repo/<topic_name> and manually delete any .lock files if present.
+There could be .lock files in your local_repo (usually /opt/dci unless overridden in settings) which are not being cleared. Check in your local_repo/<topic_name> and manually delete any .lock files if present.
 
 ### I have a new test system I would like to add to my DCI Beaker Lab.
 
