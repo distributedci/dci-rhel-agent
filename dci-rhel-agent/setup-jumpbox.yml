@@ -1,0 +1,36 @@
+---
+- name: Setup DCI JumpBox
+  hosts: jumpbox
+  gather_facts: true
+  vars:
+    jumpbox_fqdn: "{{ jumpbox }}.{{ domain }}"
+  tasks:
+    - name: Setup DCI Web Server
+      include_role:
+        name: setup_http_store
+      vars:
+        http_data_dir: "{{ local_repo }}"
+        http_port: "{{ http_store_port }}"
+        http_store_container_name: "dci-store"
+
+    - name: Setup SUT Network
+      include_tasks: setup-sut.yml
+      vars:
+        network_config: "{{ beaker_lab.network_config }}"
+      when:
+        - beaker_lab is defined
+        - beaker_lab | length > 0
+        - beaker_lab.network_config is defined
+
+    - name: Setup Virtual SUT's
+      include_tasks: setup-virtual.yml
+      when:
+        - beaker_lab is defined
+        - beaker_lab | length > 0
+
+    - name: "Setup Beaker Provisioner"
+      include_role:
+        name: setup_beaker
+      when:
+        - beaker_lab is defined
+        - beaker_lab | length > 0
