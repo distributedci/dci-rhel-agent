@@ -1,9 +1,25 @@
 repo_url: https://repo.distributed-ci.io/
-local_repo: /var/www/html
-local_repo_ip: localhost
+local_repo: /opt/dci
 dci_components: []
 dci_components_by_query: []
 dci_config_file: /etc/dci-rhel-agent/settings.yml
 dci_tags: ['debug']
 dci_rhel_agent_cert: false
 dci_rhel_agent_cki: false
+http_store_port: 8080
+bridge_name: "br-dci"
+bridge_zone: libvirt
+libvirt_images_dir: /opt/libvirt/images
+
+network_config:
+  interfaces:
+    - type: linux-bridge
+      name: "{{ bridge_name }}"
+      addresses:
+        ipv4:
+          - ip: "{{ machine_network_ip }}"
+            prefix: "{{ machine_network_cidr | ipaddr('prefix') }}"
+      bridge:
+        stp: True
+        port:
+          name: "{{ sut_interface }}"
