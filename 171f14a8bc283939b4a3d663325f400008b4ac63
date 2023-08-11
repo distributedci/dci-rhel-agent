@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4459ef0b_66bc5a8e",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-08-11T18:12:01Z",
+      "side": 1,
+      "message": "Lenovo mentioned that user-tests.yml was not executed when --tests-only was used, just tests.yml.  It\u0027s being skipped because of the \"sut\" and \"beaker\" tags here.\n\nDo we want to eliminate tests.yml or include user-tests.yml in the block where tests.yml is executed?",
+      "revId": "171f14a8bc283939b4a3d663325f400008b4ac63",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
