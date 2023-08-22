@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b38c759_473a9e62",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 642
+      },
+      "writtenOn": "2023-08-22T15:37:27Z",
+      "side": 1,
+      "message": "\"msg\": \"The task includes an option with an undefined variable. The error was: \u0027version\u0027 is undefined\nYou will have to specify the version also at the project side for both build-container-job.",
+      "revId": "1509ed7561563d1b384297f2ec61ac068b639291",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
