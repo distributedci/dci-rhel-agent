@@ -16,6 +16,24 @@
       "message": "So it won\u0027t push {{ version }}??  Don\u0027t we want to push latest-8 here?",
       "revId": "242e47d9af850cdab23544c5741ba67bf0b0c09f",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a61491a9_fe47e222",
+        "filename": "zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 648
+      },
+      "writtenOn": "2023-08-23T16:25:23Z",
+      "side": 1,
+      "message": "it will push {{ version }}, it won\u0027t push \"stable\", the push_stable_tag flag means to re-tag as \"stable\" on top of whatever version you define.",
+      "parentUuid": "4837e251_f23623e3",
+      "revId": "242e47d9af850cdab23544c5741ba67bf0b0c09f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
