@@ -34,6 +34,24 @@
       "parentUuid": "4837e251_f23623e3",
       "revId": "242e47d9af850cdab23544c5741ba67bf0b0c09f",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "352e853c_45a0208b",
+        "filename": "zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 648
+      },
+      "writtenOn": "2023-08-23T16:29:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a61491a9_fe47e222",
+      "revId": "242e47d9af850cdab23544c5741ba67bf0b0c09f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
