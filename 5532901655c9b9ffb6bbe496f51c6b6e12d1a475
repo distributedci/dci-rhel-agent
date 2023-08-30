@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d687462_59266ff2",
+        "filename": "dci-rhel-agent/validate_settings.yml",
+        "patchSetId": 22
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-08-30T15:29:33Z",
+      "side": 1,
+      "message": "I think you have the wrong when clause here.  I used the one in my first comment and it worked.",
+      "revId": "5532901655c9b9ffb6bbe496f51c6b6e12d1a475",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
