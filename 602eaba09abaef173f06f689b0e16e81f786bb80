@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c42b035d_9ccd6c70",
+        "filename": "README.md",
+        "patchSetId": 23
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-08-31T14:34:14Z",
+      "side": 1,
+      "message": "\"The default is ...\" is probably better",
+      "range": {
+        "startLine": 106,
+        "startChar": 149,
+        "endLine": 106,
+        "endChar": 177
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5598ae36_34e6d83d",
+        "filename": "README.md",
+        "patchSetId": 23
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-08-31T14:34:14Z",
+      "side": 1,
+      "message": "same, what is the default value ?",
+      "range": {
+        "startLine": 107,
+        "startChar": 146,
+        "endLine": 107,
+        "endChar": 174
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b94de2fd_4e71730d",
+        "filename": "README.md",
+        "patchSetId": 23
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-08-31T14:34:14Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 112,
+        "startChar": 153,
+        "endLine": 112,
+        "endChar": 181
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5410c8a0_4a1ecce7",
+        "filename": "README.md",
+        "patchSetId": 23
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-08-31T14:34:14Z",
+      "side": 1,
+      "message": "We will discuss later on how to improve the documentation.\nThe default settings should be working for virtualized systems.\nThen we should add a advanced settings section where we cover real hardware.\n\nAlso here sut3 and sut4 are both ppc64le, there is no diff, we could keep only one.",
+      "range": {
+        "startLine": 238,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 26
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3c202f5_ee7384e1",
+        "filename": "README.md",
+        "patchSetId": 23
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-08-31T14:34:14Z",
+      "side": 1,
+      "message": "titles (#) at the beginning of the lines can be removed",
+      "range": {
+        "startLine": 267,
+        "startChar": 0,
+        "endLine": 268,
+        "endChar": 112
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d8cc8bd_36629a7d",
+        "filename": "README.md",
+        "patchSetId": 23
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-08-31T14:34:14Z",
+      "side": 1,
+      "message": "DCI RHEL migrate here?",
+      "range": {
+        "startLine": 288,
+        "startChar": 0,
+        "endLine": 298,
+        "endChar": 207
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9592468_4e503f52",
+        "filename": "dci-rhel-agent-setup",
+        "patchSetId": 23
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-08-31T14:34:14Z",
+      "side": 1,
+      "message": "we should probably use --config value no ?",
+      "range": {
+        "startLine": 56,
+        "startChar": 42,
+        "endLine": 56,
+        "endChar": 74
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8944abba_d39ae752",
+        "filename": "dci-rhel-agent-setup",
+        "patchSetId": 23
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1440
+      },
+      "writtenOn": "2023-08-31T14:34:14Z",
+      "side": 1,
+      "message": "I\u0027m wondering if this another hardcoded value is ok",
+      "range": {
+        "startLine": 56,
+        "startChar": 78,
+        "endLine": 56,
+        "endChar": 107
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
