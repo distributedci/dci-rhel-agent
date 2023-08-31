@@ -183,6 +183,54 @@
       },
       "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08157643_83c0ebf1",
+        "filename": "dci-rhel-agent-setup",
+        "patchSetId": 23
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-08-31T15:20:34Z",
+      "side": 1,
+      "message": "This is running form inside the container so it\u0027s ok.",
+      "parentUuid": "8944abba_d39ae752",
+      "range": {
+        "startLine": 56,
+        "startChar": 78,
+        "endLine": 56,
+        "endChar": 107
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55298a40_945e94ef",
+        "filename": "dci-rhel-agent-setup",
+        "patchSetId": 23
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-08-31T15:20:34Z",
+      "side": 1,
+      "message": "--config has already made the config available at /etc/dci-rhel-agent/settings.yml inside the container.  See line 64 below.",
+      "parentUuid": "b9592468_4e503f52",
+      "range": {
+        "startLine": 56,
+        "startChar": 42,
+        "endLine": 56,
+        "endChar": 74
+      },
+      "revId": "602eaba09abaef173f06f689b0e16e81f786bb80",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
