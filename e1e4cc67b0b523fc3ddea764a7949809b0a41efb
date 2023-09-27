@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "e1e4cc67b0b523fc3ddea764a7949809b0a41efb",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04d0cda4_118f8fb6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2023-09-27T18:55:59Z",
+      "side": 1,
+      "message": "I think we can abandon this since this is now installed in the container.",
+      "revId": "e1e4cc67b0b523fc3ddea764a7949809b0a41efb",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
