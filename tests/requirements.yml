@@ -1,2 +1,6 @@
-- src: https://github.com/redhat-cip/ansible-role-dci-rhel-certification
-  name: dci-rhel-certification
+---
+roles:
+  - src: https://github.com/redhat-cip/ansible-role-dci-rhel-certification
+    name: dci-rhel-certification
+
+collections:
