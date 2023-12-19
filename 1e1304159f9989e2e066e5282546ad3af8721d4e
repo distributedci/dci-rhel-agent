@@ -16,6 +16,24 @@
       "message": "LGTM - Have you tested it?",
       "revId": "1e1304159f9989e2e066e5282546ad3af8721d4e",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dec7a30c_a7b62d41",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-12-19T22:05:16Z",
+      "side": 1,
+      "message": "Yes",
+      "parentUuid": "28db90a7_5ad348a6",
+      "revId": "1e1304159f9989e2e066e5282546ad3af8721d4e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
