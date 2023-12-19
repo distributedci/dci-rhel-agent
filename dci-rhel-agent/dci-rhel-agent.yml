@@ -187,7 +187,7 @@
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
-- name: 'Launch tests on SUTs'
+- name: 'Configure and launch tests on SUTs'
   hosts: beaker_sut
   gather_facts: no
   tags:
@@ -195,6 +195,20 @@
     - sut
   tasks:
     - block:
+        - name: 'Update sshd config to prohibit root pw logins if necessary'
+          ansible.builtin.lineinfile:
+            path: /etc/ssh/sshd_config.d/50-redhat.conf
+            line: PermitRootLogin prohibit-password
+          register: ssh_conf_update
+          when:
+            - disable_root_login_pw | default(false, true) | bool
+
+        - name: 'Restart sshd service if config was updated'
+          ansible.builtin.service:
+            name: sshd
+            state: restarted
+          when: ssh_conf_update.changed
+
         - name: 'Launch RHEL CKI Test'
           ignore_errors: yes
           import_role:
