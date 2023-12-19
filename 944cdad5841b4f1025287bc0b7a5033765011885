@@ -16,6 +16,24 @@
       "message": "Hi Mike,\n\nWhile this is good I think we could do this in the kickstart %post section via the recipe temaplete.  This way we remove that short window where the system has been installed but this task hasn\u0027t been executed on the SUT.  Also, if the playbook fails after the install is triggered it may never run.\n\nI can provide an example of how to do it this way if you like?",
       "revId": "944cdad5841b4f1025287bc0b7a5033765011885",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5f69f2b_bf25a9fc",
+        "filename": "dci-rhel-agent/dci-rhel-agent.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2023-12-19T19:02:33Z",
+      "side": 1,
+      "message": "Makes sense.  I\u0027ll take a quick crack at it.",
+      "parentUuid": "555c3be4_c0bdd04f",
+      "revId": "944cdad5841b4f1025287bc0b7a5033765011885",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
