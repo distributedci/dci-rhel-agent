@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "383017da_54ea8e35",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2024-02-07T17:11:40Z",
+      "side": 1,
+      "message": "Is there another PR with negative test cases?  I can\u0027t get ansible-inventory to fail if I break the inventory file...\n\nAlso - For the rhel agent the inventory file is rarely changed, it\u0027s the settings.yml file which is modified.  Can we lint that file as well?",
+      "revId": "1609247c33d09adcd696aeb56f9232d156d83df9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
