@@ -70,6 +70,23 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8d7fe45_01e94f8a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2024-02-07T21:12:30Z",
+      "side": 1,
+      "message": "Maybe I didn\u0027t use the right wording but how the ansible-inventory tool is written, most errors it detects are just shown on the stderr\nhttps://github.com/ansible/ansible/blob/devel//lib/ansible/cli/inventory.py\n\nIf that\u0027s not answering the initial request, I\u0027m sincerely lost and need more input than I have in the ticket.",
+      "revId": "1609247c33d09adcd696aeb56f9232d156d83df9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3c4ad5e_320205c2",
