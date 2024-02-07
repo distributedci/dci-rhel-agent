@@ -39,8 +39,10 @@ import sys
 import yaml
 
 from os import environ
+from subprocess import Popen, PIPE
 
 number_of_failed_jobs = 0
+DCI_RHEL_AGENT_INVENTORY = "/etc/dci-rhel-agent/inventory"
 
 def sigterm_handler(signal, frame):
     # This does NOT work with ansible_runner.run_async().
@@ -88,7 +90,7 @@ def provision_and_test(extravars, cmdline):
     print ("Starting job for %s." % extravars['topic'])
     r = ansible_runner.run(
         private_data_dir="/usr/share/dci-rhel-agent/",
-        inventory="/etc/dci-rhel-agent/inventory",
+        inventory=DCI_RHEL_AGENT_INVENTORY,
         verbosity=int(environ.get('VERBOSITY')),
         playbook="dci-rhel-agent.yml",
         extravars=extravars,
@@ -101,6 +103,18 @@ def provision_and_test(extravars, cmdline):
     if r.rc != 0:
         print("Job for %s failed, rc: %s, status: %s " % (extravars['topic'], r.rc, r.status))
         number_of_failed_jobs += 1
+
+def inventory_check():
+    # ansible_runner only add the get_inventory interface starting 2.0.0 alpha, this is workaround for older versions
+    # running on python 2
+    if sys.version_info[0] == 2:
+        p = Popen(["ansible-inventory", "--list", "-i", DCI_RHEL_AGENT_INVENTORY], stderr=PIPE, stdout=PIPE)
+        error, response = p.communicate()
+    else:
+        response, error = ansible_runner.get_inventory(
+            "list", [DCI_RHEL_AGENT_INVENTORY]
+        )
+    return error
 
 
 def main():
@@ -118,6 +132,12 @@ def main():
 
     # Read the settings file
     sets = load_settings()
+
+    # check inventory
+    error = inventory_check()
+    if error:
+        print("Inventory error: check your inventory\nERROR: %s\n" % error)
+        sys.exit(1)
 
     # Check if the settings contain multiple topics and process accordingly
     if 'topics' in sets:
