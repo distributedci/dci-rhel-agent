@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b660576_6a861955",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2024-02-07T16:10:50Z",
+      "side": 1,
+      "message": "Good catch, I looked at ansible_runner repo, this method was introduced in commit 7b2f1ca7faeff6ff3c795272c7ce929053c878ec BUT git tag --contains has shown that it was introduced in 2.0.0 alpha.\n\nSo I suggest to wrap the command-line for python 2 and keep existing code if we decide to upgrade ansible/python versions",
+      "revId": "bf90f50edcb314f7dd16cdd47c0a4beff818f2a2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93faa14d_9a5743c9",
