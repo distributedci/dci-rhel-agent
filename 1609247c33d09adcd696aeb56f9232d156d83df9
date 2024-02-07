@@ -68,6 +68,24 @@
       "message": "I don\u0027t know if this acts differently with the ansible_runner.get_inventory method.  But the above ansible-inventory command doesn\u0027t return a non-zero on error\n\n```\n[root@okd-master-0 ~]# ansible-inventory --list -i /etc/dci-rhel-agent/inventory \n[WARNING]:  * Failed to parse /etc/dci-rhel-agent/inventory with yaml plugin: We were unable to read either as JSON\nnor YAML, these are the errors we got from each: JSON: Expecting value: line 1 column 1 (char 0)  Syntax Error while\nloading YAML.   found unexpected \u0027:\u0027  The error appears to be in \u0027/etc/dci-rhel-agent/inventory\u0027: line 7, column 12,\nbut may be elsewhere in the file depending on the exact syntax problem.  The offending line appears to be:\n[beaker_sut:foo]            ^ here\n[WARNING]:  * Failed to parse /etc/dci-rhel-agent/inventory with ini plugin: /etc/dci-rhel-agent/inventory:7: Section\n[beaker_sut:foo] has unknown type: foo\n[WARNING]: Unable to parse /etc/dci-rhel-agent/inventory as an inventory source\n[WARNING]: No inventory was parsed, only implicit localhost is available\n{\n    \"_meta\": {\n        \"hostvars\": {\n            \"jumpbox\": {\n                \"ansible_host\": \"localhost\",\n                \"ansible_ssh_private_key_file\": \"/etc/dci-rhel-agent/secrets/id_rsa\",\n                \"ansible_user\": \"root\"\n            }\n        }\n    },\n    \"all\": {\n        \"children\": [\n            \"ungrouped\"\n        ]\n    },\n    \"ungrouped\": {\n        \"hosts\": [\n            \"jumpbox\"\n        ]\n    }\n}\n[root@okd-master-0 ~]# echo $?\n0\n\n```\n\nWhich is why I asked if you had a negative test case for this PR.",
       "revId": "1609247c33d09adcd696aeb56f9232d156d83df9",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76a7a11d_96725727",
+        "filename": "dci-rhel-agent/entrypoint.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 166
+      },
+      "writtenOn": "2024-02-07T20:52:46Z",
+      "side": 1,
+      "message": "I disagree, the example does not contradict what the PR states to do :(\n1. I never said it returned a non-zero code, but it prints an error message on stderr\n2. the code returns an error if there\u0027s an error message on stderr.\n3. the ansible_runner wrapper does not check the return code, but returns stdout and stderr\nhttps://github.com/ansible/ansible-runner/blob/devel/src/ansible_runner/interface.py#L715\n4. Hence, the code checks the stderr output, not return code since upstream doesn\u0027t use it (IMHO, bad design but we have to deal with it)\n\nAnsible-inventory is limited in what kind of errors it can detect and I\u0027m aware of that. If we want to detect more advanced error, we need a more advanced tool like ansible-lint, or write a specific inventory linting tool.",
+      "parentUuid": "b3c4ad5e_320205c2",
+      "revId": "1609247c33d09adcd696aeb56f9232d156d83df9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
