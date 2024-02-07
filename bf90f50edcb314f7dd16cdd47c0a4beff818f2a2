@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93faa14d_9a5743c9",
+        "filename": "dci-rhel-agent/entrypoint.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2024-02-07T13:21:55Z",
+      "side": 1,
+      "message": "The version of ansible_runner in the dci-rhel-agent container is 1.4.7 which doesn\u0027t have get_inventory method.\n\nPython 2.7.5 (default, Nov 14 2023, 16:14:06) \n[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)] on linux2\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\n\u003e\u003e\u003e import ansible_runner\n\u003e\u003e\u003e dir(ansible_runner)\n[\u0027AnsibleRunnerException\u0027, \u0027CallbackError\u0027, \u0027ConfigurationError\u0027, \u0027Runner\u0027, \u0027RunnerConfig\u0027, \u0027__builtins__\u0027, \u0027__doc__\u0027, \u0027__file__\u0027, \u0027__name__\u0027, \u0027__package__\u0027, \u0027__path__\u0027, \u0027exceptions\u0027, \u0027interface\u0027, \u0027loader\u0027, \u0027output\u0027, \u0027pkg_resources\u0027, \u0027plugins\u0027, \u0027run\u0027, \u0027run_async\u0027, \u0027runner\u0027, \u0027runner_config\u0027, \u0027utils\u0027]",
+      "revId": "bf90f50edcb314f7dd16cdd47c0a4beff818f2a2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
