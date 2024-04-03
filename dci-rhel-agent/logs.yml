@@ -7,13 +7,14 @@
   when: hostvars.jumpbox.bkrjobid is defined
   block:
     - name: Get Job Results
-      command:
-        cmd: "bkr job-results --format=beaker-results-xml {{ hostvars.jumpbox.bkrjobid }}"
+      uri:
+        url: "http://localhost/bkr/jobs/{{ hostvars.jumpbox.bkrjobid.split(':')[1:][0] }}.xml"
+        return_content: true
       register: job_results
 
     - name: Process XML
       set_fact:
-          job_xml: "{{ job_results.stdout | ansible.utils.from_xml }}"
+          job_xml: "{{ job_results.content | ansible.utils.from_xml }}"
 
     - name: Get Recipe
       set_fact:
