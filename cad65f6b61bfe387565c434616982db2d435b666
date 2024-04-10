@@ -16,6 +16,24 @@
       "message": "I think you should allow for a variable so if they are using an external beaker from the jumpbox it will still work.\n\n{{ bkr_url | default(\u0027http://localhost/bkr\u0027) }}/jobs{{ hostvars......",
       "revId": "cad65f6b61bfe387565c434616982db2d435b666",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf19a11b_2dc1c121",
+        "filename": "dci-rhel-agent/logs.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2024-04-10T19:46:21Z",
+      "side": 1,
+      "message": "Do you want to revert this back to bkr client command?",
+      "parentUuid": "6904eef7_a5cec091",
+      "revId": "cad65f6b61bfe387565c434616982db2d435b666",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
