@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17974cd5_828e34cb",
+        "filename": "dci-rhel-agent/process_recipe.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 648
+      },
+      "writtenOn": "2024-04-18T21:01:16Z",
+      "side": 1,
+      "message": "is this proper YAML? I don\u0027t know if you need the `\u003e` block scalar here",
+      "revId": "8cd40dac4655af8ef9e9656161fe4ab76ca2ba36",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "568cf7b0_e43ac3d7",
+        "filename": "dci-rhel-agent/process_recipe.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 648
+      },
+      "writtenOn": "2024-04-18T21:01:16Z",
+      "side": 1,
+      "message": "it is better if you add a single rule `compose_info.major not in [...]`",
+      "revId": "8cd40dac4655af8ef9e9656161fe4ab76ca2ba36",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
