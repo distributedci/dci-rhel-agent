@@ -34,6 +34,24 @@
       "parentUuid": "6904eef7_a5cec091",
       "revId": "cad65f6b61bfe387565c434616982db2d435b666",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0755c5ea_dc537f83",
+        "filename": "dci-rhel-agent/logs.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2024-04-23T13:37:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf19a11b_2dc1c121",
+      "revId": "cad65f6b61bfe387565c434616982db2d435b666",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
