@@ -36,6 +36,24 @@
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ce5d398_bf333219",
+        "filename": "dci-rhel-agent/process_recipe.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2024-05-01T13:57:30Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "bcada727_2de4afa3",
+      "revId": "8cd40dac4655af8ef9e9656161fe4ab76ca2ba36",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "568cf7b0_e43ac3d7",
