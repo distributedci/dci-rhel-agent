@@ -23,7 +23,8 @@
 
 - name: 'Register SUT CPU arch variable'
   set_fact:
-    system_arch: "{{ supported_arch_info.matches[0].values().pop() }}"
+    system_arch: "{{ item.value }}"
+  with_dict: "{{ supported_arch_info.matches[0] }}"
 
 - name: 'Arch tags'
   set_fact:
@@ -42,7 +43,7 @@
 - name: Set os_major_modified and harness
   set_fact:
     os_major_modified: "{{ compose_info.osmajor }}"
-    harness: "restraint"
+    harness: restraint
 
 - name: Use RHEL8 harness for RHEL9 and RHEL10
   set_fact:
@@ -51,13 +52,13 @@
     - compose_info.osmajor == "RedHatEnterpriseLinux9" or
       compose_info.osmajor == "RedHatEnterpriseLinux10"
 
-- name: Don't add beakerlib for RHEL-9, CentOS-9, RHEL-10, or CentOS-10
+- name: Don't add beakerlib for RHEL-9, CentOS 9, RHEL-10, or CentOS-10
   set_fact:
     harness: "{{ harness }} beakerlib"
   when:
-    - compose_info.osmajor not in ["CentOSStream9", "CentOSStream10",
-                                   "RedHatEnterpriseLinux9",
-                                   "RedHatEnterpriseLinux10"]
+    - os_major_modified not in ["CentOSStream9", "CentOSStream10",
+                                "RedHatEnterpriseLinux9",
+                                "RedHatEnterpriseLinux10"]
 
 - name: Alternate EFI
   set_fact:
@@ -89,4 +90,3 @@
 - name: Create Beaker RecipeSet from template
   set_fact:
     recipeSets: "{{ recipeSets| default([]) + [ lookup('template', 'recipeSet.xml.j2') ] }}"
-...
