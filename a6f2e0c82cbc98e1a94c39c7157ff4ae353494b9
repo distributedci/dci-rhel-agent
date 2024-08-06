@@ -16,6 +16,24 @@
       "message": "os_major_modified has already been modified on line 50 above.  So this condition is wrong.",
       "revId": "a6f2e0c82cbc98e1a94c39c7157ff4ae353494b9",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f4a1a49_15c57bf4",
+        "filename": "dci-rhel-agent/process_recipe.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2024-08-06T17:06:25Z",
+      "side": 1,
+      "message": "What about RHEL-7?  os_major_modified will not be set on line 50 in that case.",
+      "parentUuid": "3fb9806f_2c1cd142",
+      "revId": "a6f2e0c82cbc98e1a94c39c7157ff4ae353494b9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
