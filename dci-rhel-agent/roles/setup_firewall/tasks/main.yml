@@ -39,7 +39,7 @@
         enabled: "true"
       loop:
         - "http_store"
-        - "beaker"
+        - "dci-provisioner"
 
   when: firewall_enabled
 ...

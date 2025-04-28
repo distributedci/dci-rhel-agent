@@ -1,0 +1,17 @@
+#jinja2:trim_blocks: True, lstrip_blocks: True
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  RQ_QUEUE: {{ jumpbox }}.{{ domain }}
+  RQ_JOBS_TIMEOUT: 10h
+  IMAGE_FETCH_TIMEOUT: 120
+  REDIS_HOST: {{ jumpbox }}.{{ domain }}
+  REDIS_PORT: 6379
+  PROVISIONER_PORT: 8000
+  LAB_HOST: {{ jumpbox }}.{{ domain }}
+  LAB_PORT: 8008
+  {% for k, v in extra_config.items() %}
+  {{ k }}: {{ v }}
+  {% endfor %}
