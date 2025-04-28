@@ -1,70 +1,10 @@
 ---
 #
-# Tasks are included to run on jumpbox host,
+# Tasks are included to run on localhost,
 # Delegate_to: localhost when needed.
 #
 - name: Collect and Upload logs
-  when: hostvars.jumpbox.bkrjobid is defined
   block:
-    - name: Get Job Results
-      command:
-        cmd: "bkr job-results --format=beaker-results-xml {{ hostvars.jumpbox.bkrjobid }}"
-      register: job_results
-
-    - name: Process XML
-      set_fact:
-          job_xml: "{{ job_results.stdout | ansible.utils.from_xml }}"
-
-    - name: Get Recipe
-      set_fact:
-        recipes: "{{ [job_xml.job.recipeSet.recipe] }}"
-      when:
-        - job_xml.job.recipeSet is not string
-        - job_xml.job.recipeSet is iterable
-        - job_xml.job.recipeSet is mapping
-
-    - name: Get Recipes
-      set_fact:
-        recipes: "{{ job_xml.job.recipeSet | map(attribute='recipe') | list}}"
-      when:
-        - job_xml.job.recipeSet is not string
-        - job_xml.job.recipeSet is iterable
-        - job_xml.job.recipeSet is not mapping
-
-    - name: Build recipes map table
-      set_fact:
-        recipe_to_host: "{{ recipe_to_host| default({})|combine({ 'recipes_' ~ item['@id']: item['@system']})}}"
-      loop: "{{ recipes }}"
-
-    - name: List all logs files available for the Beaker Job
-      shell: 'bkr job-logs {{ hostvars.jumpbox.bkrjobid }}'
-      register: bkr_files
-      become: true
-
-    - name: Download all logs files to Beaker server
-      get_url:
-        url: "{{ item }}"
-        dest: "{{ hostvars.jumpbox.job_logs.path }}/{{ local_file }}"
-        use_proxy: false
-      loop: "{{ bkr_files.stdout_lines }}"
-      delegate_to: localhost
-      vars:
-        recipe: "{{ item | regex_replace('.*\\/recipes\\/(\\d+)\\/.*','\\1') }}"
-        local_file: "{{ item.split('/bkr/')[1].replace('/','_').replace('recipes_' + recipe, recipe_to_host['recipes_' + recipe]) }}"
-
-    - name: Download JUnit results to Beaker server
-      # The output of the bkr job-results command is a binary raw value.
-      # This script escape the output into a proper xml value.
-      script: ./workaround/get_beaker_result.py --bkrjobid {{ hostvars.jumpbox.bkrjobid }}
-      become: true
-      register: bkr_results
-
-    - name: Record Beaker results
-      copy:
-        content: "{{ bkr_results.stdout }}"
-        dest: "{{ hostvars.jumpbox.job_artifacts.path }}/beaker-results.xml"
-      delegate_to: localhost
-
     - name: Check if ansible log exists
       stat:
         path: /var/log/ansible.log
@@ -74,7 +14,7 @@
     #When Ansible verbosity is at levels 3 or 4, ansible copy module has checksum error due
     #to file changing between generation of initial checksum and final checksum after copy
     - name: Copy ansible.log file to logs directory
-      shell: 'cp /var/log/ansible.log {{ hostvars.jumpbox.job_logs.path }}'
+      shell: 'cp /var/log/ansible.log {{ job_logs.path }}'
       delegate_to: localhost
       when: ansible_log_check.stat.exists
 
@@ -90,25 +30,12 @@
         job_id: '{{ hostvars.localhost.job_id }}'
       with_fileglob:
         - '{{ hostvars.localhost.job_logs.path }}/*'
-        - '{{ hostvars.localhost.job_artifacts.path }}/*.log'
+        - '/logs/provisioner/*'
+        - '/logs/lab/*'
 
-    - name: Upload artifacts directory to DCI Control Server
-      delegate_to: localhost
-      environment:
-        - DCI_CLIENT_ID: "{{ hostvars.localhost.dci_client_id }}"
-        - DCI_API_SECRET: "{{ hostvars.localhost.dci_api_secret }}"
-        - DCI_CS_URL: "{{ hostvars.localhost.dci_cs_url }}"
-      dci_file:
-        path: '{{ item }}'
-        name: "{{ item | basename | regex_replace('^(.*\\.cli\\.)?(.*).xml$','\\2') }}"
-        job_id: '{{ hostvars.localhost.job_id }}'
-        mime: 'application/junit'
-      with_fileglob: '{{ hostvars.localhost.job_artifacts.path }}/*.xml'
-
-    - name: Delete tmp logs directory from Beaker server
+    - name: Delete tmp logs directory
       file:
         state: absent
         path: "{{ item }}"
       with_items:
-        - "{{ hostvars.jumpbox.job_logs.path }}"
-        - "{{ hostvars.jumpbox.job_artifacts.path }}"
+        - "{{ job_logs.path }}"
