@@ -1,0 +1,209 @@
+- name: Create directory to hold files
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ file_owner }}"
+    group: "{{ file_group }}"
+    mode: 0777
+    recurse: yes
+  loop:
+    - "{{ provisioner_dir }}/redis"
+    - "{{ provisioner_dir }}/tftpboot"
+    - "{{ provisioner_dir }}/templates"
+
+- name: Stop container-provisioner.service
+  systemd:
+    name: container-provisioner
+    state: stopped
+
+- name: Destroy provisioner container
+  containers.podman.podman_container:
+    name: "dci-provisioner"
+    state: absent
+
+- name: Remove provisioner image
+  containers.podman.podman_image:
+    name: "{{ dci_provisioner_image }}"
+    state: absent
+
+- name: Create provisioner container
+  containers.podman.podman_container:
+    name: "dci-provisioner"
+    image: "{{ dci_provisioner_image }}"
+    state: stopped
+    expose:
+      - "8000"
+    network: host
+    env:
+      REDIS_HOST: "{{ jumpbox }}.{{ domain }}"
+      REDIS_PORT: 6379
+      PROVISIONER_PORT: 8000
+  register: provisioner_container_info
+
+- name: Setting facts about container
+  set_fact:
+    container_provisioner_name: "{{ provisioner_container_info.container.Name }}"
+    container_provisioner_pidfile: "{{ provisioner_container_info.container.ConmonPidFile }}"
+
+- name: Copy the systemd service file
+  copy:
+    content: |
+      [Unit]
+      Description=Podman container-provisioner.service
+      [Service]
+      Restart=on-failure
+      ExecStart=/usr/bin/podman start {{ container_provisioner_name }}
+      ExecStop=/usr/bin/podman stop -t 10 {{ container_provisioner_name }}
+      KillMode=none
+      Type=forking
+      PIDFile={{ container_provisioner_pidfile }}
+      [Install]
+      WantedBy=default.target
+    dest: "/etc/systemd/system/container-provisioner.service"
+    mode: 0644
+
+- name: Stop container-lab.service
+  systemd:
+    name: container-lab
+    state: stopped
+
+- name: Destroy lab container
+  containers.podman.podman_container:
+    name: "dci-lab"
+    state: absent
+
+- name: Remove lab image
+  containers.podman.podman_image:
+    name: "{{ dci_lab_image }}"
+    state: absent
+
+- name: Create lab container
+  containers.podman.podman_container:
+    name: "dci-lab"
+    image: "{{ dci_lab_image }}"
+    state: stopped
+    expose:
+      - "69"
+      - "8008"
+    network: host
+    volumes:
+      - "{{ provisioner_dir }}/tftpboot:/opt/tftpboot:z"
+      - "{{ provisioner_dir }}/templates:/opt/templates:z"
+    env:
+      RQ_QUEUE: "{{ jumpbox }}.{{ domain }}"
+      RQ_JOBS_TIMEOUT: 10h
+      IMAGE_FETCH_TIMEOUT: 120
+      REDIS_HOST: "{{ jumpbox }}.{{ domain }}"
+      REDIS_PORT: 6379
+      LAB_HOST: "{{ jumpbox }}.{{ domain }}"
+      LAB_PORT: 8008
+  register: lab_container_info
+
+- name: Setting facts about container
+  set_fact:
+    container_lab_name: "{{ lab_container_info.container.Name }}"
+    container_lab_pidfile: "{{ lab_container_info.container.ConmonPidFile }}"
+
+- name: Copy the systemd service file
+  copy:
+    content: |
+      [Unit]
+      Description=Podman container-lab.service
+      [Service]
+      Restart=on-failure
+      ExecStart=/usr/bin/podman start {{ container_lab_name }}
+      ExecStop=/usr/bin/podman stop -t 10 {{ container_lab_name }}
+      KillMode=none
+      Type=forking
+      PIDFile={{ container_lab_pidfile }}
+      [Install]
+      WantedBy=default.target
+    dest: "/etc/systemd/system/container-lab.service"
+    mode: 0644
+
+- name: Stop container-redis.service
+  systemd:
+    name: container-redis
+    state: stopped
+
+- name: Destroy redis container
+  containers.podman.podman_container:
+    name: "redis"
+    state: absent
+
+- name: Remove redis Image
+  containers.podman.podman_image:
+    name: "{{ redis_image }}"
+    state: absent
+
+- name: Create redis container
+  containers.podman.podman_container:
+    name: "redis"
+    image: "{{ redis_image }}"
+    state: stopped
+    expose: "6379"
+    network: host
+    command: ['--dir', '/data']
+    volumes:
+      - "{{ provisioner_dir }}/redis:/data:z"
+  register: redis_container_info
+
+- name: Setting facts about container
+  set_fact:
+    container_redis_name: "{{ redis_container_info.container.Name }}"
+    container_redis_pidfile: "{{ redis_container_info.container.ConmonPidFile }}"
+
+- name: Copy the systemd service file
+  copy:
+    content: |
+      [Unit]
+      Description=Podman container-redis.service
+      [Service]
+      Restart=on-failure
+      ExecStart=/usr/bin/podman start {{ container_redis_name }}
+      ExecStop=/usr/bin/podman stop -t 10 {{ container_redis_name }}
+      KillMode=none
+      Type=forking
+      PIDFile={{ container_redis_pidfile }}
+      [Install]
+      WantedBy=default.target
+    dest: "/etc/systemd/system/container-redis.service"
+    mode: 0644
+
+- name: Reload systemd service
+  systemd:
+    daemon_reexec: yes
+    scope: system
+
+- name: Enable container-provisioner.service
+  systemd:
+    name: container-provisioner
+    enabled: yes
+    scope: system
+
+- name: Start container-provisioner.service
+  systemd:
+    name: container-provisioner
+    state: started
+
+- name: Enable container-lab.service
+  systemd:
+    name: container-lab
+    enabled: yes
+    scope: system
+
+- name: Start container-lab.service
+  systemd:
+    name: container-lab
+    state: started
+
+- name: Enable container-redis.service
+  systemd:
+    name: container-redis
+    enabled: yes
+    scope: system
+
+- name: Start container-redis.service
+  systemd:
+    name: container-redis
+    state: started
