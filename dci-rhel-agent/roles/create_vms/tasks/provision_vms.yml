@@ -13,7 +13,7 @@
         dest: /var/lib/libvirt/qemu/nvram/{{ item.key }}_VARS.fd
         mode: 0755
         remote_src: true
-      loop: "{{ q('dict', beaker_lab.system_inventory | default({})) }}"
+      loop: "{{ q('dict', lab.system_inventory | default({})) }}"
       when:
         - item.value.virt is defined
         - item.value.virt.mode| default('') == 'efi'
@@ -26,14 +26,14 @@
         dest: "{{ temp_dir.path }}/{{ item.key }}_setup_vm.sh"
         lstrip_blocks: true
         mode: 0774
-      loop: "{{ q('dict', beaker_lab.system_inventory | default({})) }}"
+      loop: "{{ q('dict', lab.system_inventory | default({})) }}"
       when:
         - item.value.virt is defined
 
     - name: Run vm creation_scripts
       shell: 
         cmd: "/bin/bash {{ temp_dir.path }}/{{ item.key }}_setup_vm.sh"
-      loop: "{{ q('dict', beaker_lab.system_inventory | default({})) }}"
+      loop: "{{ q('dict', lab.system_inventory | default({})) }}"
       when:
         - item.value.virt is defined
 
