@@ -18,15 +18,15 @@
 
     - name: Populate network_config
       set_fact:
-        network_config: "{{ beaker_lab.network_config }}"
+        network_config: "{{ lab.network_config }}"
       when:
-        beaker_lab.network_config is defined
+        lab.network_config is defined
 
     - name: Populate bridge_interface
       set_fact:
-        bridge_interface: "{{ beaker_lab.bridge_interface }}"
+        bridge_interface: "{{ lab.bridge_interface }}"
       when:
-        beaker_lab.bridge_interface is defined
+        lab.bridge_interface is defined
 
     - name: Setup SUT Network
       include_tasks: setup-sut.yml
@@ -34,31 +34,31 @@
         bridge_ip: "{{ machine_network_ip }}"
         bridge_prefix: "{{ machine_network_cidr | ipaddr('prefix') }}"
       when:
-        - beaker_lab is defined
-        - beaker_lab | length > 0
-        - beaker_lab.build_bridge | default(false)
+        - lab is defined
+        - lab | length > 0
+        - lab.build_bridge | default(false)
 
-    - name: "Setup Beaker Provisioner"
+    - name: "Setup Provisioner"
       include_role:
-        name: setup_beaker
+        name: setup_provisioner
       when:
-        - beaker_lab is defined
-        - beaker_lab | length > 0
+        - lab is defined
+        - lab | length > 0
 
     - name: Check for Virtual SUT's
       set_fact:
         virtual_sut: true
-      loop: "{{ q('dict', beaker_lab.system_inventory | default({})) }}"
+      loop: "{{ q('dict', lab.system_inventory | default({})) }}"
       when:
-        - beaker_lab is defined
-        - beaker_lab | length > 0
+        - lab is defined
+        - lab | length > 0
         - item.value.virt is defined
 
     - name: Setup Virtual SUT's
       include_tasks: setup-virtual.yml
       when:
-        - beaker_lab is defined
-        - beaker_lab | length > 0
+        - lab is defined
+        - lab | length > 0
         - virtual_sut
 
     - name: "Setup Firewall"

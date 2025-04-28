@@ -13,16 +13,14 @@ topics:
     # archs:
     #   - x86_64
     # with_debug: false
-    # dci_rhel_agent_cert: false
-    # dci_rhel_agent_cki: false
     systems:
       - fqdn: "sut1.{{ domain }}"
         efi: true
       - fqdn: "sut2.{{ domain }}"
         efi: false
 
-beaker_lab:
-  beaker_dir: /opt/beaker
+lab:
+  provisioner_dir: /opt/dci-provisioner
   dns_server: "{{ machine_network_ip }}"
   router: "{{ machine_network_ip }}"
   dhcp_start: "{{ machine_network_cidr | ipaddr('20') | ipaddr('address') }}"
