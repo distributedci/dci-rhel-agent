@@ -47,9 +47,39 @@ As the files on this system are NOT persistent between each `dci-rhel-agent` job
 - SUTs network should be fully isolated, to prevent conflicts with other networks.
 - SUTs network bandwidth can be impaired since the `dci-rhel-agent` will download RHEL snapshots (=~ 4GB each) once in a while.
 
+### DCI RHEL Agent Inbound/Outbound Ports
+
+#### Protocols Used:
+- TCP
+- UDP
+- HTTP
+- HTTPS
+
+#### Required Inbound Ports:
+- 67/UDP (DHCP)
+- 68/UDP (DHCP)
+- 69/UDP (PXE/TFTP)
+- 4011/TCP (PXE)
+	
+#### Required Outbound Ports:
+- 22/TCP (SSH)
+- 623/UDP (IPMI)
+- 80/TCP (HTTP)
+- 423/TCP (HTTPS)
+- 4011/TCP (PXE)
+	
+#### Destination Servers/Endpoints:
+- https://api.distributed-ci.io
+- https://packages.distributed-ci.io
+- https://repo.distributed-ci.io
+- https://dl.fedoraproject.org/pub/epel/
+- https://quay.io
+
 ### Optional
 
 We strongly advise the partners to provide Red Hat DCI's team an access to their jumpbox. This way, Red Hat engineers can help with initial setup and troubleshooting.
+
+
 
 ## Installation of DCI Rhel Agent
 
