@@ -65,7 +65,7 @@
         path: '/etc/dci-rhel-agent/hooks/user-tests.yml'
       register: check_user_tests_hook_file
 
-- name: 'Prepare the jumpbox'
+- name: 'Prepare'
   hosts: localhost
   gather_facts: no
   tags:
@@ -104,7 +104,6 @@
   gather_facts: yes
   tags:
     - pre-run
-    - beaker
   tasks:
     - block:
         - name: 'Download RHEL'
@@ -114,60 +113,57 @@
               tags: download
           tags: always
 
-        - name: 'Process Recipes'
-          include_tasks: process_recipe.yml
-          loop: "{{ systems | dict2items }}"
-          loop_control:
-            loop_var: system
+        - name: 'Process Compose'
+          include_tasks: process_compose.yml
 
         - name: 'Download harness'
           include_tasks: dci-harness.yml
+
       rescue:
         - name: Teardown error
           include_tasks: teardown_error.yml
 
 - name: 'Launch install'
-  hosts: jumpbox
+  hosts: localhost
   tags:
     - install
-    - beaker
   tasks:
     - block:
-        - name: 'Create temp dir'
-          include_tasks: create_temp_dir.yml
-
-        - name: Debug Jumpbox collected facts
-          debug:
-            var: hostvars[inventory_hostname]
-
         - name: 'Add job state running'
-          delegate_to: localhost
           dci_job:
             id: "{{ hostvars.localhost.job_id }}"
             status: "running"
 
-        - name: 'Install RHEL on SUT'
+        - name: 'Install on SUT(s)'
           include_tasks: install.yml
+          loop: "{{ systems | dict2items }}"
+          loop_control:
+            loop_var: system
+
+        - name: 'Tag job with SUT(s) arches'
+          dci_job:
+            id: "{{ job_id }}"
+            tags: '{{ arch_tags | unique }}'
+
       rescue:
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
-- name: 'Monitor SUTs Install'
-  hosts: beaker_sut
+- name: 'Wait for Install'
+  hosts: sut
   gather_facts: False
   strategy: free
   tags:
     - install
-    - beaker
   tasks:
     - block:
         - name: 'Monitor SUT'
-          include_tasks: monitor_suts.yml
+          include_tasks: wait_suts.yml
       rescue:
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
-- name: 'Launch tests on the jumpbox'
+- name: 'Launch tests'
   hosts: localhost
   gather_facts: yes
   tags:
@@ -188,7 +184,7 @@
           include_tasks: teardown_failure.yml
 
 - name: 'Launch tests on SUTs'
-  hosts: beaker_sut
+  hosts: sut
   gather_facts: no
   tags:
     - tests
@@ -219,21 +215,19 @@
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
-- name: 'Grab logs and release SUTs'
-  hosts: jumpbox
+- name: 'Grab logs'
+  hosts: localhost
   gather_facts: no
   tags:
     - post-run
-    - beaker
   tasks:
     - block:
         - name: 'Add job state post-run'
-          delegate_to: localhost
           dci_job:
             id: "{{ hostvars.localhost.job_id }}"
             status: "post-run"
 
-        - name: 'Upload Beaker logs to DCI Control server'
+        - name: 'Upload logs to DCI Control server'
           include_tasks: logs.yml
 
       rescue:
