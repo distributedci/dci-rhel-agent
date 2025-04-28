@@ -1,0 +1,14 @@
+---
+- name: Get SUT details
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ system.value.fqdn }}"
+    method: GET
+  register: system_details
+
+- name: 'Register SUT CPU arch variable'
+  set_fact:
+    system_arch: "{{ system_details.json[system.value.fqdn].arch }}"
+
+- name: 'Arch tags'
+  set_fact:
+    arch_tags: "{{ arch_tags| default([]) + [ system_arch ] }}"
