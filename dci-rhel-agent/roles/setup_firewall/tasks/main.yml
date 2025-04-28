@@ -39,7 +39,9 @@
         enabled: "true"
       loop:
         - "http_store"
-        - "beaker"
+        - "container-provisioner"
+        - "container-lab"
+        - "container-redis"
 
   when: firewall_enabled
 ...

@@ -11,8 +11,6 @@ topics:
       - ppc64le
     variants:
       - Server
-    dci_rhel_agent_cert: false
-    dci_rhel_agent_cki: false
     systems:
       - fqdn: labvm-1.novalocal
         kernel_options: "rd.iscsi.ibft=1"
@@ -27,8 +25,6 @@ topics:
     variants:
       - BaseOS
       - AppStream
-    dci_rhel-agent_cert: false
-    dci_rhel-agent_cki: false
     systems:
       - SUT3
       - SUT4
@@ -37,6 +33,7 @@ import ansible_runner
 import signal
 import sys
 import yaml
+import jinja2
 
 from os import environ
 
@@ -77,7 +74,10 @@ def provision_and_test(extravars, cmdline):
     _systems = dict()
     for system in extravars['systems']:
         if type(system) is dict and 'fqdn' in system:
-            _systems[system['fqdn']] = system
+            environment = jinja2.Environment()
+            template = environment.from_string(system['fqdn'])
+            fqdn = template.render(**extravars)
+            _systems[fqdn] = system
         else:
             _systems[system] = dict(fqdn=system)
     extravars['systems'] = _systems
