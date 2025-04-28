@@ -1,0 +1,64 @@
+---
+- name: Wait for provisioner to be available
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/site-map"
+    method: GET
+    status_code:
+      - 200
+  until: uri_output.status == 200
+  retries: 24 # Retries for 24 * 5 seconds = 120 seconds = 2 minutes
+  delay: 5 # Every 5 seconds
+  register: uri_output
+
+- name: Query systems list
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems"
+    method: GET
+  register: systems
+
+- debug:
+    msg: "Current Systems: {{ systems.json.systems }}"
+
+- name: Update power settings for each existing test system
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ item.key.split('.')| first }}.{{ domain }}"
+    method: PATCH
+    body:
+      arch: "{{ item.value.arch }}"
+      lab: "{{ jumpbox }}.{{ domain }}"
+      bmc_type: "{{ item.value.power_type }}"
+      bmc_address: "{{ item.value.power_address }}"
+      bmc_user: "{{ item.value.power_user }}"
+      bmc_password: "{{ item.value.power_password }}"
+      bmc_port: "{{ item.value.power_id| default('') }}"
+    body_format: json
+    headers:
+      Accept: application/json
+      Content-Type: application/json
+    status_code: [200]
+  when:
+    - item.key.split('.')[0] + "." + domain in systems.json.systems
+  become: true
+  loop: "{{ q('dict', lab.system_inventory | default({})) }}"
+
+- name: Create any systems which were not already present
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ item.key.split('.')| first }}.{{ domain }}"
+    method: POST
+    body:
+      arch: "{{ item.value.arch }}"
+      ip_address: "{{ item.value.ip_address }}"
+      lab: "{{ jumpbox }}.{{ domain }}"
+      bmc_type: "{{ item.value.power_type }}"
+      bmc_address: "{{ item.value.power_address }}"
+      bmc_user: "{{ item.value.power_user }}"
+      bmc_password: "{{ item.value.power_password }}"
+      bmc_port: "{{ item.value.power_id| default('') }}"
+    body_format: json
+    headers:
+      Accept: application/json
+      Content-Type: application/json
+    status_code: [201, 409]
+  when:
+    - item.key.split('.')[0] + "." + domain not in systems.json.systems
+  loop: "{{ q('dict', lab.system_inventory | default({})) }}"
