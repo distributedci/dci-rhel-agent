@@ -5,6 +5,8 @@ dci_tags: ['debug']
 dci_rhel_agent_cert: false
 dci_rhel_agent_cki: false
 http_store_port: 8080
+provision_port: 8000
+lab_port: 8008
 bridge_name: "br-dci"
 bridge_zone: libvirt
 libvirt_images_dir: /var/lib/libvirt/images

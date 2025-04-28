@@ -63,7 +63,7 @@
 - name: Remove sut from VirtualBMC
   shell: >
     /usr/local/bin/vbmc delete {{ item.key }}
-  loop: "{{ q('dict', beaker_lab.system_inventory | default({})) }}"
+  loop: "{{ q('dict', lab.system_inventory | default({})) }}"
   ignore_errors: yes
   when:
     - item.value.virt is defined
@@ -74,13 +74,13 @@
     --address {{ jumpbox }}.{{ domain }}
     --port {{ item.value.power_id }} --libvirt-uri qemu:///system
     && /usr/local/bin/vbmc start {{ item.key }}
-  loop: "{{ q('dict', beaker_lab.system_inventory | default({})) }}"
+  loop: "{{ q('dict', lab.system_inventory | default({})) }}"
   when:
     - item.value.virt is defined
 
 - name: power off sut
   shell: >
     /usr/bin/ipmitool -I lanplus -U admin -P password -p {{ item.value.power_id }} -H {{ jumpbox }}.{{ domain }} power off
-  loop: "{{ q('dict', beaker_lab.system_inventory | default({})) }}"
+  loop: "{{ q('dict', lab.system_inventory | default({})) }}"
   when:
     - item.value.virt is defined

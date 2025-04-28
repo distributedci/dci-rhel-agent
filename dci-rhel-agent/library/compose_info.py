@@ -17,8 +17,6 @@ class ComposeInfo(object):
     def __init__(self, params):
         # params from AnsibleModule argument_spec below
         self.compose_path = params['compose_path']
-        self.arch = params['arch']
-        self.variant = params['variant']
 
         self.compose_info = compose.Compose(self.compose_path)
 
@@ -31,14 +29,14 @@ class ComposeInfo(object):
         self.osminor = version_minor
         self.compose_id = self.compose_info.info.create_compose_id()
 
-    def find_image(self, os_path):
+    def find_image(self, os_path, arch):
         image = None
         arch_images = dict( x86_64='grubx64.efi',
                             aarch64='grubaa64.efi',
                             ppc64le='core.elf')
 
-        if self.arch in arch_images:
-            arch_image = arch_images[self.arch]
+        if arch in arch_images:
+            arch_image = arch_images[arch]
             image_path = find(arch_image, os_path)
 
         if image_path:
@@ -47,36 +45,36 @@ class ComposeInfo(object):
         return image
 
 
-    def get_pxe_images(self, variant):
+    def get_pxe_images(self, variant, arch):
         pxe_images = dict()
 
         compose_path = self.compose_info.compose_path
         variant_info = self.compose_info.info.variants.variants[variant]
-        os_path = variant_info.paths.os_tree[self.arch]
+        os_path = variant_info.paths.os_tree[arch]
         tree_info_path = os.path.join(compose_path, os_path, ".treeinfo")
 
         try:
             tree_info = treeinfo.TreeInfo()
             tree_info.load(tree_info_path)
 
-            pxe_images['kernel'] = tree_info.images.images[self.arch]['kernel']
-            pxe_images['initrd'] = tree_info.images.images[self.arch]['initrd']
-            pxe_images['image'] = self.find_image(os.path.join(compose_path, os_path))
+            pxe_images['kernel'] = tree_info.images.images[arch]['kernel']
+            pxe_images['initrd'] = tree_info.images.images[arch]['initrd']
+            pxe_images['image'] = self.find_image(os.path.join(compose_path, os_path), arch)
         except (IOError, OSError):
             pass
 
         return pxe_images
 
-    def get_repos(self):
+    def get_repos(self, arch):
         repos = dict()
 
         compose_path = self.compose_info.compose_path
         variants = self.compose_info.info.variants.variants
         for variant in variants:
-            if self.arch in variants[variant].paths.os_tree:
+            if arch in variants[variant].paths.os_tree:
                 try:
                     repo_path = os.path.join(compose_path,
-                            variants[variant].paths.os_tree[self.arch])
+                            variants[variant].paths.os_tree[arch])
                     os.stat(os.path.join(repo_path,'repodata','repomd.xml'))
                     repos[variant] = repo_path
                 except (IOError, OSError):
@@ -84,47 +82,48 @@ class ComposeInfo(object):
 
         return repos
 
-    def get_variant_path(self, variant):
+    def get_variant_path(self, variant, arch):
         compose_path = self.compose_info.compose_path
         variant = self.compose_info.info.variants.variants[variant]
-        variant_path = variant.paths.os_tree[self.arch]
+        variant_path = variant.paths.os_tree[arch]
         return os.path.join(compose_path, variant_path, '')
 
-    def get_boot_variants(self):
-        # find bootable variants
-        variants = set()
-        images = self.compose_info.images.images
-        for variant in images:
-            if self.arch in images[variant]:
-                for image in images[variant][self.arch]:
+    def find_bootable_images(self):
+        # find bootable image
+        boot_images = dict()
+        for variant, arches in self.compose_info.images.images.items():
+            for arch, images in arches.items():
+                for image in images:
                     if image.bootable:
-                        variants.add(variant)
-        return list(variants)
-
+                        if variant in boot_images:
+                            boot_images[variant].add(arch)
+                        else:
+                            boot_images[variant] = set({arch})
+        return boot_images
 
     def results(self):
         # return data in nice format
-       results = dict(boot_variants=dict())
-       results['compose_id'] = self.compose_id
-       results['osmajor'] = self.osmajor
-       results['osminor'] = self.osminor
-       results['repos'] = self.get_repos()
-       variants = self.get_boot_variants()
-       for variant in variants:
-           pxe_images = self.get_pxe_images(variant)
-           if pxe_images:
-               results['boot_variants'][variant] = dict(
-                       os_tree = self.get_variant_path(variant),
-                       pxe_images = pxe_images)
-
-       return results
+        boot_images = self.find_bootable_images()
+        results = dict(boot_variants=dict())
+        results['compose_id'] = self.compose_id
+        results['osmajor'] = self.osmajor
+        results['osminor'] = self.osminor
+        for variant, arches in boot_images.items():
+            results['boot_variants'][variant] = dict()
+            for arch in arches:
+                repos = self.get_repos(arch)
+                pxe_images = self.get_pxe_images(variant, arch)
+                os_tree = self.get_variant_path(variant, arch)
+                if bool(pxe_images) is True:
+                    results['boot_variants'][variant][arch] = dict(repos=repos,
+                                                                   pxe_images=pxe_images,
+                                                                   os_tree=os_tree)
+        return results
 
 def main():
 
     module_args = dict(
         compose_path=dict(type='str', required=True),
-        arch=dict(type='str', required=True),
-        variant=dict(type='str', required=False),
     )
 
     result = dict(
