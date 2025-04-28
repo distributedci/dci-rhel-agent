@@ -1,0 +1,33 @@
+---
+# Do not assume the inventory_hostname is resolvable and delay 10 seconds at start
+- name: Wait up to an hour for port 22 to become open and contain "OpenSSH"
+  ansible.builtin.wait_for:
+    port: 22
+    host: '{{ inventory_hostname }}'
+    search_regex: OpenSSH
+    delay: 10
+    timeout: 3600
+  delegate_to: localhost
+
+- name: Read breadcrumb
+  ansible.builtin.slurp:
+    src: /root/.breadcrumb
+  register: breadcrumb_encoded
+
+- name: Decode breadcrumb
+  ansible.builtin.set_fact:
+    breadcrumb_remote: "{{ breadcrumb_encoded['content'] | b64decode }}"
+
+- name: Check remote breadcrumb
+  debug:
+    var: breadcrumb_remote
+
+- name: Check local breadcrumb
+  debug:
+    var: breadcrumb
+
+- name: Verify Install happened
+  assert:
+    that:
+      - breadcrumb == breadcrumb_remote
+...

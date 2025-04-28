@@ -124,14 +124,14 @@ The possible values are:
 | variants                               | False    | List of string | List of RHEL 8.x variant to enable (AppStream, BaseOS, CRB, HighAvailability, NFV, RT, ResilientStorage, SAP, SAPHANA and unified). |
 | archs                                  | False    | List of string | CPU arch to enable (aarch64, ppc64le, s390x and x86_64).                                                                            |
 | with_debug                             | False    | True/False     | Use RPM with debug symbols.                                                                                                         |
-| beaker_lab.beaker_dir                  | True     | String         | Path to store the beaker data files. Default is '/opt/beaker'                                                                       |
-| beaker_lab.build_bridge                | False    | True/False     | Whether or not to setup the bridge network, defaults to True.                                                                       |
-| beaker_lab.bridge_interface            | False    | String         | Network interface where all your SUT's will be connected.  Example provided in settings.                                            |
-| beaker_lab.dns_server                  | False    | IP             | IP address of DNS server to specify in beaker.conf (dnsmasq config)                                                                 |
-| beaker_lab.ntp_server                  | False    | IP             | IP address of NTP server to specify in beaker.conf (dnsmasq config)                                                                 |
-| beaker_lab.dhcp_start                  | False    | IP             | Starting IP address range to assign to DCI test systems via DHCP.                                                                   |
-| beaker_lab.dhcp_end                    | False    | IP             | Ending IP address range to assigne to DCI test systems via DHCP.                                                                    |
-| beaker_lab.router                      | False    | IP             | Gateway address                                                                                                                     |
+| lab.provisioner_dir                  | True     | String         | Path to store the beaker data files. Default is '/opt/beaker'                                                                       |
+| lab.build_bridge                | False    | True/False     | Whether or not to setup the bridge network, defaults to True.                                                                       |
+| lab.bridge_interface            | False    | String         | Network interface where all your SUT's will be connected.  Example provided in settings.                                            |
+| lab.dns_server                  | False    | IP             | IP address of DNS server to specify in beaker.conf (dnsmasq config)                                                                 |
+| lab.ntp_server                  | False    | IP             | IP address of NTP server to specify in beaker.conf (dnsmasq config)                                                                 |
+| lab.dhcp_start                  | False    | IP             | Starting IP address range to assign to DCI test systems via DHCP.                                                                   |
+| lab.dhcp_end                    | False    | IP             | Ending IP address range to assigne to DCI test systems via DHCP.                                                                    |
+| lab.router                      | False    | IP             | Gateway address                                                                                                                     |
 | system_inventory                       | False    | various        | List of all DCI tests systems and corresponding Beaker information                                                                  |
 
 Example:
@@ -184,8 +184,8 @@ topics:
       - fqdn: sut2.{{ domain }}
       - fqdn: sut3.{{ domain }}
 
-beaker_lab:
-  beaker_dir: /opt/beaker
+lab:
+  provisioner_dir: /opt/beaker
   dns_server: "{{ machine_network_ip }}"
   router: "{{ machine_network_ip }}"
   dhcp_start: "{{ machine_network_cidr | ipaddr('20') | ipaddr('address') }}"
@@ -247,12 +247,12 @@ beaker_lab:
 
 The dci-rhel-agent-setup program will read your /etc/dci-rhel-agent/settings.yml file and setup the beaker containers and two virtual systems.  This will give you a fully working environment capable of downloading RHEL components from DCI and installing them on the virtual systems.
 
-Setting the port.name under beaker_lab.network_config to the network interface that hosts your systems under test will allow you to test bare metal systems.  You will need to add entries for every test system under the beaker_lab section of the settings.yml file.  This includes mandatory fields like ip address, mac address, ipmi settings for power cycling.  There are also some optional settings.  Please see the table above for a complete list.
+Setting the port.name under lab.network_config to the network interface that hosts your systems under test will allow you to test bare metal systems.  You will need to add entries for every test system under the lab section of the settings.yml file.  This includes mandatory fields like ip address, mac address, ipmi settings for power cycling.  There are also some optional settings.  Please see the table above for a complete list.
 
 Since the virtual setup is self contained it can uncover issues with the main installation before adding in external hosts.  External hosts present their own issues.
 
 Edit the inventory, by default it creates two Systems Under Test
-make sure libvirt_images_dir, local_repo and beaker_lab.beaker_dir points to a location with enough disk space
+make sure libvirt_images_dir, local_repo and lab.provisioner_dir points to a location with enough disk space
 
 ```bash
 dci-rhel-agent-setup
@@ -280,7 +280,7 @@ The following settings in /etc/dci-rhel-agent/settings.yml have changed:
 
 local_repo_ip has been replaced with machine_network_ip.
 
-Both beaker_lab.jumpbox_fqdn and beaker_lab.labcontroller_fqdn have been dropped.
+Both lab.jumpbox_fqdn and lab.labcontroller_fqdn have been dropped.
 
 The dnsmasq configuration for the Test Network is now stored in /etc/dnsmasq.d  The playbooks will create the new config automatically but you will need to remove the entries in /etc/NetworkManager/dnsmasq.d
 
@@ -495,7 +495,7 @@ There could be .lock files in your local_repo (usually /opt/dci unless overridde
 
 ### I have a new test system I would like to add to my DCI Beaker Lab.
 
-Adding new SUT to your DCI Beaker Lab can all be handled in your settings file. Each settings file contains a "beaker_lab" section which describes various network configs for your SUT, along with a list of all SUTs and their relevant information. Add any new systems to this list, and run the dci-rhel-agent-setup as usual. The agent will see that there are SUTs in your settings file which are not integrated into your DCI Beaker lab and will make the appropriate changes to add them to the SUTs network, and include them in Beaker. New systems can be added to your topics..systems section to be used with the agent now. See the RHEL agent documentation above for settings file structure.
+Adding new SUT to your DCI Beaker Lab can all be handled in your settings file. Each settings file contains a "lab" section which describes various network configs for your SUT, along with a list of all SUTs and their relevant information. Add any new systems to this list, and run the dci-rhel-agent-setup as usual. The agent will see that there are SUTs in your settings file which are not integrated into your DCI Beaker lab and will make the appropriate changes to add them to the SUTs network, and include them in Beaker. New systems can be added to your topics..systems section to be used with the agent now. See the RHEL agent documentation above for settings file structure.
 
 ### Can I use virtual machines as test systems in my DCI lab?
 
