@@ -132,15 +132,15 @@ The possible values are:
 | variants                      | False    | List of string | List of RHEL 8.x variant to enable (AppStream, BaseOS, CRB, HighAvailability, NFV, RT, ResilientStorage, SAP, SAPHANA and unified). |
 | archs                         | False    | List of string | CPU arch to enable (aarch64, ppc64le, s390x and x86_64).                                                                            |
 | with_debug                    | False    | True/False     | Use RPM with debug symbols.                                                                                                         |
-| beaker_lab.external_dns       | False    | True/False     | Boolean representing whether an external DNS server is in use.                                                                      |
-| beaker_lab.dns_server         | False    | IP             | IP address of DNS server to specify in beaker.conf (dnsmasq config)                                                                 |
-| beaker_lab.ntp_server         | False    | IP             | IP address of NTP server to specify in beaker.conf (dnsmasq config)                                                                 |
-| beaker_lab.domain             | False    | String         | Domain to append to hosts                                                                                                           |
-| beaker_lab.dhcp_start         | False    | IP             | Starting IP address range to assign to DCI test systems via DHCP.                                                                   |
-| beaker_lab.dhcp_end           | False    | IP             | Ending IP address range to assigne to DCI test systems via DHCP.                                                                    |
-| beaker_lab.jumpbox_fqdn       | False    | FQDN           | FQDN of DCI jumpbox.                                                                                                                |
-| beaker_lab.labcontroller_fqdn | False    | FQDN           | Public interface FQDN of Beaker lab controller.                                                                                     |
-| beaker_lab.router             | False    | IP             | Gateway address                                                                                                                     |
+| lab.external_dns              | False    | True/False     | Boolean representing whether an external DNS server is in use.                                                                      |
+| lab.dns_server                | False    | IP             | IP address of DNS server to specify in beaker.conf (dnsmasq config)                                                                 |
+| lab.ntp_server                | False    | IP             | IP address of NTP server to specify in beaker.conf (dnsmasq config)                                                                 |
+| lab.domain                    | False    | String         | Domain to append to hosts                                                                                                           |
+| lab.dhcp_start                | False    | IP             | Starting IP address range to assign to DCI test systems via DHCP.                                                                   |
+| lab.dhcp_end                  | False    | IP             | Ending IP address range to assigne to DCI test systems via DHCP.                                                                    |
+| lab.jumpbox_fqdn              | False    | FQDN           | FQDN of DCI jumpbox.                                                                                                                |
+| lab.labcontroller_fqdn        | False    | FQDN           | Public interface FQDN of Beaker lab controller.                                                                                     |
+| lab.router                    | False    | IP             | Gateway address                                                                                                                     |
 | system_inventory              | False    | various        | List of all DCI tests systems and corresponding Beaker information                                                                  |
 
 Example:
@@ -181,7 +181,7 @@ topics:
         install_wait_time: 180
       - my.x86_64.system3.local
       - my.x86_64.system4.local
-beaker_lab:
+lab:
   dhcp_start: 192.168.1.20
   dhcp_end: 192.168.1.30
   dhcp_netmask: 255.255.255.0
@@ -486,7 +486,7 @@ There could be .lock files in your local_repo (usually /var/www/html unless over
 
 ### I have a new test system I would like to add to my DCI Beaker Lab.
 
-Adding new SUT to your DCI Beaker Lab can all be handled in your settings file. Each settings file contains a "beaker_lab" section which describes various network configs for your SUT, along with a list of all SUTs and their relevant information. Add any new systems to this list, and run the agent as usual. The agent will see that there are SUTs in your settings file which are not integrated into your DCI Beaker lab and will make the appropriate changes to add them to the SUTs network, and include them in Beaker. New systems can be added and provisioned in a single run given they are configured appropriately in your settings file. See the RHEL agent documentation above for settings file structure.
+Adding new SUT to your DCI Beaker Lab can all be handled in your settings file. Each settings file contains a "lab" section which describes various network configs for your SUT, along with a list of all SUTs and their relevant information. Add any new systems to this list, and run the agent as usual. The agent will see that there are SUTs in your settings file which are not integrated into your DCI Beaker lab and will make the appropriate changes to add them to the SUTs network, and include them in Beaker. New systems can be added and provisioned in a single run given they are configured appropriately in your settings file. See the RHEL agent documentation above for settings file structure.
 
 ### Can I use virtual machines as test systems in my DCI lab?
 
