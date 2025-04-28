@@ -1,0 +1,11 @@
+jumpbox: "{{ ansible_hostname }}"
+pod_name: dci-provisioner
+provisioner_dir: "{{ lab.provisioner_dir }}"
+dci_provisioner_image: quay.io/p3ck/dci-provisioner:latest
+dci_lab_image: quay.io/p3ck/dci-lab:latest
+redis_image: docker.io/redislabs/redismod:latest
+hooktftp_image: quay.io/p3ck/hooktftp:latest
+file_owner: "{{ ansible_env.USER }}"
+file_group: "{{ file_owner }}"
+dns_servers: []
+extra_config: {}
