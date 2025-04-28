@@ -1,0 +1,11 @@
+---
+# Do not assume the inventory_hostname is resolvable and delay 10 seconds at start
+- name: Wait up to an hour for port 22 to become open and contain "OpenSSH"
+  ansible.builtin.wait_for:
+    port: 22
+    host: '{{ inventory_hostname }}'
+    search_regex: OpenSSH
+    delay: 10
+    timeout: 3600
+  delegate_to: localhost
+...

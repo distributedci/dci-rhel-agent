@@ -1,77 +1,98 @@
 ---
-#
-# Tasks are included to run on jumpbox host,
-# Delegate_to: localhost when needed.
-#
-- name: Populate the Beaker XML job from template
-  environment:
-    - DCI_CLIENT_ID: "{{ hostvars.localhost.dci_client_id }}"
-    - DCI_API_SECRET: "{{ hostvars.localhost.dci_api_secret }}"
-    - DCI_CS_URL: "{{ hostvars.localhost.dci_cs_url }}"
-  vars:
-      compose_info: "{{ hostvars.localhost.compose_info }}"
-      topic_name: "{{ hostvars.localhost.topic_name }}"
-      system_arch: "{{ hostvars.localhost.system_arch }}"
-      components: "{{ hostvars.localhost.components }}"
-      recipeSets: "{{ hostvars.localhost.recipeSets }}"
-      arch_tags: "{{ hostvars.localhost.arch_tags }}"
-  block:
-    - name: Verify correct component is downloaded
-      assert:
-        that:
-          - compose_info.compose_id == item.display_name
-      when: item.type == 'compose'
-      loop: "{{ components }}"
+- name: 'Default to linuxefi'
+  set_fact:
+    use_boot_image: false
+    efi_boot_command: "efi"
 
-    - name: 'Tag job with SUT arch'
-      delegate_to: localhost
-      dci_job:
-        id: "{{ hostvars.localhost.job_id }}"
-        tags: '{{ arch_tags | unique }}'
+- name: Get SUT details
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ system.value.fqdn }}"
+    method: GET
+  register: system_details
 
-    - name: Populate the Beaker XML job from template
-      block:
-        - name: Create a temporary file
-          tempfile:
-            state: file
-            suffix: xml
-          register: job_xml
+- name: 'Register SUT CPU arch variable'
+  set_fact:
+    system_arch: "{{ system_details.json[system.value.fqdn].arch }}"
 
-        - name: Create Beaker job.xml from template
-          template:
-            src: job.xml.j2
-            dest: "{{ job_xml.path }}"
+- name: 'Arch tags'
+  set_fact:
+    arch_tags: "{{ arch_tags| default([]) + [ system_arch ] }}"
 
-        - name: Configure fact to use XML from template
-          set_fact:
-            beaker_xml: "{{ job_xml.path }}"
-      when: beaker_xml is not defined
+- name: Alternate EFI
+  set_fact:
+    efi_boot_command: ""
+  when:
+    - system.value.alternate_efi_boot_commands| default(false, true) | bool
 
-    - name: Fetch beaker_xml local
-      fetch:
-        src: "{{ beaker_xml }}"
-        dest: "/tmp/{{ hostvars.localhost.job_id }}_beaker_xml"
-        mode: 0755
-        flat: true
+- name: Use EFI bootloader image (x86 and aarch64)
+  set_fact:
+    use_boot_image: true
+  when:
+    - system_arch == 'x86_64' or system_arch == 'aarch64'
+    - system.value.efi | default(False, true) | bool
 
-    - name: Upload job.xml to DCI Control Server
-      delegate_to: localhost
-      dci_file:
-        path: "/tmp/{{ hostvars.localhost.job_id }}_beaker_xml"
-        name: 'job.xml'
-        mime: 'text/xml'
-        job_id: '{{ hostvars.localhost.job_id }}'
+- name: Use powerpc-ieee1275 bootloader image (ppc64le)
+  set_fact:
+    use_boot_image: true
+  when:
+    - system_arch == 'ppc64le'
+    - not system.value.petitboot | default(False, true) | bool
 
-    - name: Launch Beaker install
-      shell: "bkr job-submit {{ beaker_xml }}"
-      register: bkr_jobid
-      become: true
+- name: Get First Variant
+  set_fact:
+    boot_variant: "{{ compose_info.boot_variants.keys()| first }}"
 
-    - name: Register Beaker Job ID
-      set_fact:
-        bkrjobid: "{{ bkr_jobid.stdout | regex_replace(\".*\\s\\[\\'(.*)\\'\\]\",'\\1') }}"
+- name: Get Variant Compose
+  set_fact:
+    boot: "{{ compose_info.boot_variants[boot_variant] }}"
 
-    - name: 'debug bkr_job_id'
-      debug:
-        msg: bkr_job_id:"{{ bkrjobid }}"
-...
+- name: Generate base URL
+  ansible.builtin.set_fact:
+    base_url: "http://{{ jumpbox }}.{{ domain }}:{{ http_store_port }}"
+
+- name: Generate tree_url
+  ansible.builtin.set_fact:
+    tree_url: "{{ base_url }}/{{ boot[system_arch].os_tree |replace('/data','') }}"
+
+- name: Update repos
+  ansible.builtin.set_fact:
+    repos_url: "{{ repos_url | default({}) |combine({ item.key: base_url + '/' + item.value | replace('/data','')}) }}"
+  loop: "{{ boot[system_arch].repos| dict2items }}"
+
+- name: Provision System
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ system.value.fqdn }}/actions"
+    method: POST
+    body:
+      action: "provision"
+      kernel_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.kernel }}"
+      initrd_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.initrd }}"
+      image_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.image }}"
+      use_boot_image: "{{ use_boot_image }}"
+      kernel_options: "grub2_postfix={{ efi_boot_command }} {{ system.value.kernel_options | default(kernel_options| default('')) }}"
+      ks_meta:
+        osmajor: "{{ compose_info.osmajor }}"
+        osminor: "{{ compose_info.osminor }}"
+        tree_url: "{{ tree_url }}"
+        repos: "{{ repos_url }}"
+        ssh_pub_keys:
+          - "{{ lookup('file', '/etc/dci-rhel-agent/secrets/id_rsa.pub') }}"
+        compose_id: "{{ compose_info.compose_id }}"
+    body_format: json
+    headers:
+      Accept: application/json
+      Content-Type: application/json
+    status_code: [201, 409]
+  changed_when: provision.status == 201
+  register: provision
+
+- name: Wait for Install job to initiate
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/jobs/{{ provision.json.job }}"
+    method: GET
+    status_code:
+      - 200
+  until: uri_output.status == 200
+  retries: 24 # Retries for 24 * 5 seconds = 120 seconds = 2 minutes
+  delay: 5 # Every 5 seconds
+  register: uri_output
