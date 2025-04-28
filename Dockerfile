@@ -14,7 +14,7 @@ RUN yum upgrade -y && \
   yum-config-manager --setopt=beaker-project.org_yum_harness_RedHatEnterpriseLinux8.gpgcheck=0 --save && \
   yum -y install sshpass gcc python3 python3-devel python3-pip python3-lxml \
                  rsync restraint-client python3-netaddr patch python3-productmd openssh-clients \
-                 dci-downloader dnf ansible-role-dci-rhel-cki-0.0.3 ansible-role-dci-rhel-certification && \
+                 dci-downloader dnf && \
   yum clean all
 
 RUN pip3 install -U pip && \

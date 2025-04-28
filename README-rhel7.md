@@ -125,22 +125,20 @@ The possible values are:
 | dci_url                       | False    | URL            | URL to associate with the job                                                                                                       |
 | local_repo_ip                 | True     | IP             | DCI jumpbox static network IP.                                                                                                      |
 | local_repo                    | True     | String         | Path to store DCI artefacts (Local RHEL mirror that will be exposed to SUT by `httpd`). Default is `/var/www/html`.                 |
-| dci_rhel_agent_cert           | True     | True/False     | Enable or disable the HW certification tests suite.                                                                                 |
-| dci_rhel_agent_cki            | True     | True/False     | Enable or disable the CKI tests suite.                                                                                              |
 | systems                       | False    | List of string | List of all systems that will be deployed using RHEL from DCI.                                                                      |
 | beaker_xml                    | False    | String         | Path to a custom XML file to use with Beaker job.                                                                                   |
 | variants                      | False    | List of string | List of RHEL 8.x variant to enable (AppStream, BaseOS, CRB, HighAvailability, NFV, RT, ResilientStorage, SAP, SAPHANA and unified). |
 | archs                         | False    | List of string | CPU arch to enable (aarch64, ppc64le, s390x and x86_64).                                                                            |
 | with_debug                    | False    | True/False     | Use RPM with debug symbols.                                                                                                         |
-| beaker_lab.external_dns       | False    | True/False     | Boolean representing whether an external DNS server is in use.                                                                      |
-| beaker_lab.dns_server         | False    | IP             | IP address of DNS server to specify in beaker.conf (dnsmasq config)                                                                 |
-| beaker_lab.ntp_server         | False    | IP             | IP address of NTP server to specify in beaker.conf (dnsmasq config)                                                                 |
-| beaker_lab.domain             | False    | String         | Domain to append to hosts                                                                                                           |
-| beaker_lab.dhcp_start         | False    | IP             | Starting IP address range to assign to DCI test systems via DHCP.                                                                   |
-| beaker_lab.dhcp_end           | False    | IP             | Ending IP address range to assigne to DCI test systems via DHCP.                                                                    |
-| beaker_lab.jumpbox_fqdn       | False    | FQDN           | FQDN of DCI jumpbox.                                                                                                                |
-| beaker_lab.labcontroller_fqdn | False    | FQDN           | Public interface FQDN of Beaker lab controller.                                                                                     |
-| beaker_lab.router             | False    | IP             | Gateway address                                                                                                                     |
+| lab.external_dns              | False    | True/False     | Boolean representing whether an external DNS server is in use.                                                                      |
+| lab.dns_server                | False    | IP             | IP address of DNS server to specify in beaker.conf (dnsmasq config)                                                                 |
+| lab.ntp_server                | False    | IP             | IP address of NTP server to specify in beaker.conf (dnsmasq config)                                                                 |
+| lab.domain                    | False    | String         | Domain to append to hosts                                                                                                           |
+| lab.dhcp_start                | False    | IP             | Starting IP address range to assign to DCI test systems via DHCP.                                                                   |
+| lab.dhcp_end                  | False    | IP             | Ending IP address range to assigne to DCI test systems via DHCP.                                                                    |
+| lab.jumpbox_fqdn              | False    | FQDN           | FQDN of DCI jumpbox.                                                                                                                |
+| lab.labcontroller_fqdn        | False    | FQDN           | Public interface FQDN of Beaker lab controller.                                                                                     |
+| lab.router                    | False    | IP             | Gateway address                                                                                                                     |
 | system_inventory              | False    | various        | List of all DCI tests systems and corresponding Beaker information                                                                  |
 
 Example:
@@ -150,8 +148,6 @@ local_repo_ip: 192.168.1.1
 local_repo: /opt/beaker/dci
 topics:
   - topic: RHEL-8.1
-    dci_rhel_agent_cert: false
-    dci_rhel_agent_cki: false
     variants:
       - AppStream
       - BaseOS
@@ -163,8 +159,6 @@ topics:
       - my.x86_64.system.local
       - my.ppc64le.system.local
   - topic: RHEL-7.8
-    dci_rhel_agent_cert: false
-    dci_rhel_agent_cki: false
     variants:
       - Server
     archs:
@@ -181,7 +175,7 @@ topics:
         install_wait_time: 180
       - my.x86_64.system3.local
       - my.x86_64.system4.local
-beaker_lab:
+lab:
   dhcp_start: 192.168.1.20
   dhcp_end: 192.168.1.30
   dhcp_netmask: 255.255.255.0
@@ -277,36 +271,6 @@ systems:
 Please note that all FQDN must resolve locally on the DCI jumpbox. If you don't have proper DNS records, please update `/etc/hosts` then reload `dnsmasq` service. Also, the supported architecture of the systems must be entered in Beaker in order for the agent to properly provision a system with the correct architecture.
 
 Please also note that the RHEL agent does not currently support concurrent provisioning of different topics. All provision jobs in the same topic will run concurrently, but each topic will run consecutively. Running two instances of the agent simultaneously will cause installation issues on the systems under test. This feature will be added in the near future and this readme will be updated to reflect the support.
-
-#### Red Hat HW Certification tests
-
-The DCI RHEL agent offers a suite of tests from the Red Hat HW certification tests. These tests can be enabled via `settings.yml` file by adding `dci_rhel_agent_cert: true`. The tests will be run after the test system is provisioned. Test results will be uploaded to DCI and are available to both the partner and Red Hat. By enabling these tests a partner is able to catch any errors they may need to address before participating in the official HW certification process through Red Hat and get a head start on any formal HW certification plans that a partner may have. This test suite will be updated regularly and is a subset of the full test suite which would be required for official certification, which depends on the type of hardware to be certified. The DCI cert test suite contains a set of tests applicable to all hardware. Currently, the suite of tests includes:
-
-Non-interactive tests:
-
-- memory
-- core
-- cpuscaling
-- fv_core
-- fv_memory
-- fv_cpu_pinning
-- hw_profiler
-- sw_profiler
-
-Storage tests:
-
-- STORAGE
-- SATA
-- SATA_SSD
-- SAS
-
-In addition to these tests, the info, self-check, and sosreport tests are mandatory and will execute every test run.
-
-Further information the tests noted can be found at: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_hardware_certification/7.18/html-single/test_suite_user_guide/index#sect-User_Guide-Appendixes-Hardware_Test_Procedures
-
-#### How to skip Red Hat CKI tests ?
-
-Some users might want to skip the cki tests suite. This can be done via `settings.yml` file by adding `dci_rhel_agent_cki: false`.
 
 #### How to add tags to a job ?
 
@@ -486,7 +450,7 @@ There could be .lock files in your local_repo (usually /var/www/html unless over
 
 ### I have a new test system I would like to add to my DCI Beaker Lab.
 
-Adding new SUT to your DCI Beaker Lab can all be handled in your settings file. Each settings file contains a "beaker_lab" section which describes various network configs for your SUT, along with a list of all SUTs and their relevant information. Add any new systems to this list, and run the agent as usual. The agent will see that there are SUTs in your settings file which are not integrated into your DCI Beaker lab and will make the appropriate changes to add them to the SUTs network, and include them in Beaker. New systems can be added and provisioned in a single run given they are configured appropriately in your settings file. See the RHEL agent documentation above for settings file structure.
+Adding new SUT to your DCI Beaker Lab can all be handled in your settings file. Each settings file contains a "lab" section which describes various network configs for your SUT, along with a list of all SUTs and their relevant information. Add any new systems to this list, and run the agent as usual. The agent will see that there are SUTs in your settings file which are not integrated into your DCI Beaker lab and will make the appropriate changes to add them to the SUTs network, and include them in Beaker. New systems can be added and provisioned in a single run given they are configured appropriately in your settings file. See the RHEL agent documentation above for settings file structure.
 
 ### Can I use virtual machines as test systems in my DCI lab?
 
