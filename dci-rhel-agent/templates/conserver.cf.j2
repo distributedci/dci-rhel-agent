@@ -7,6 +7,12 @@ default * {
         rw *;
         # enable logging
         logfile /var/consoles/&;
+        # log file size limit (10MB per file)
+        logfilemax 10485760;
+        # rotate logs automatically
+        logfile-rotate 5;
+        # sync logs to disk immediately
+        logfile-sync yes;
 }
 
 {% for system_key, system in systems.items() %}

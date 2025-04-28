@@ -1,21 +1,28 @@
 ---
-- name: Configure conserver
-  hosts: jumpbox
-  become: yes
-  gather_facts: no
-  tags: conserver
-  tasks:
+# Console server setup tasks
+# These tasks install and configure conserver for console logging collection
+
+- name: Setup conserver for console logging
+  block:
     - name: Install required packages
       package:
         name:
           - conserver
           - conserver-client
         state: present
+      become: yes
+      delegate_to: jumpbox
+
     - name: Create /var/consoles if it does not exist
       file:
         path: /var/consoles
         state: directory
         mode: '0755'
+        owner: root
+        group: root
+      become: yes
+      delegate_to: jumpbox
+
     - name: Create conserver.cf file
       template:
         src: conserver.cf.j2
@@ -23,10 +30,37 @@
         owner: root
         group: root
         mode: 0644
-      notify:
-        - restart conserver
-  handlers:
-    - name: restart conserver
+      become: yes
+      delegate_to: jumpbox
+      register: conserver_config
+
+    - name: Start and enable conserver service
+      service:
+        name: conserver
+        state: started
+        enabled: yes
+      become: yes
+      delegate_to: jumpbox
+
+    - name: Restart conserver if config changed
       service:
         name: conserver
         state: restarted
+      become: yes
+      delegate_to: jumpbox
+      when: conserver_config.changed
+
+    - name: Clear existing console log files for fresh job start
+      shell: rm -f /var/consoles/*
+      become: yes
+      delegate_to: jumpbox
+      failed_when: false
+
+    - name: Conserver setup completed successfully
+      debug:
+        msg: "Conserver setup completed - console logging is now active with fresh log files"
+
+  rescue:
+    - name: Conserver setup failed
+      debug:
+        msg: "Warning: Conserver setup failed, console logging will not be available but job will continue"

@@ -6,13 +6,19 @@
     status: "error"
   tags: dci
 
-- name: 'Release SUT in Beaker'
-  include_tasks: release.yml
-  loop: "{{ hostvars.localhost.systems | dict2items }}"
-  loop_control:
-    loop_var: system
-  when:
-    - hostvars.jumpbox.bkrjobid is defined
+- name: 'Collect logs on error'
+  delegate_to: localhost
+  block:
+    - name: 'Create temp dir for error logs if not exists'
+      include_tasks: create_temp_dir.yml
+      when: job_logs is not defined
+
+    - name: 'Upload error logs to DCI Control server'
+      include_tasks: logs.yml
+  rescue:
+    - name: 'Log collection failed during error'
+      debug:
+        msg: 'Warning: Could not collect logs during error handling'
 
 - name: 'Job in error'
   fail:

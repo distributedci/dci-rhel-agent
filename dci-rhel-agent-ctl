@@ -13,8 +13,9 @@ import os
 default_value =	{
   "local_repo": "/opt/dci",
   "settings_path": "/etc/dci-rhel-agent/settings.yml",
+  "logs_path": "/opt/dci-provisioner/logs",
   "hooks_path": "/etc/dci-rhel-agent/hooks",
-  "dci_rhel_agent_url":"quay.io/distributedci/dci-rhel-agent:latest-8"
+  "dci_rhel_agent_url":"quay.io/distributedci/dci-rhel-agent:nobkr-8"
 }
 
 proc = None
@@ -68,6 +69,11 @@ def main():
 
     if args.start:
         settings = load_settings(settings_path)
+        provisioner_dir = settings.get('lab', {}).get('provisioner_dir', None)
+        if provisioner_dir is not None:
+            logs_path = '{0}/logs'.format(provisioner_dir)
+        else:
+            logs_path = default_value['logs_path']
         if 'local_repo' in settings.keys():
             local_repo = settings['local_repo']
         else:
@@ -90,6 +96,7 @@ def main():
                 '/etc/dci-rhel-agent/secrets':'/etc/dci-rhel-agent/secrets:z',
                 '/etc/dci-rhel-agent/inventory':'/etc/dci-rhel-agent/inventory:z',
                 settings_path:'/etc/dci-rhel-agent/settings.yml:z',
+                logs_path:'/logs:z',
                 local_repo:'/data:z',
         }
         # if "-l" is used, we want to override container code with local code (dev mode)

@@ -1,0 +1,116 @@
+---
+#
+# Console log collection tasks
+# These tasks collect console logs from conserver for all systems with SOL configured
+#
+- name: Collect console logs from conserver
+  block:
+    - name: Check if conserver is configured and running
+      stat:
+        path: /var/consoles
+      delegate_to: jumpbox
+      register: consoles_dir_check
+
+    - name: Get list of console log files
+      find:
+        paths: /var/consoles
+        patterns: "*"
+        file_type: file
+      delegate_to: jumpbox
+      register: console_log_files
+      when: consoles_dir_check.stat.exists
+
+    - name: Create temporary directory for atomic console log transfers
+      tempfile:
+        state: directory
+        suffix: "_console_logs"
+      register: console_temp_dir
+      when: 
+        - consoles_dir_check.stat.exists
+        - console_log_files.files | length > 0
+
+    - name: Copy console log files to temporary location
+      fetch:
+        src: "{{ item.path }}"
+        dest: "{{ console_temp_dir.path }}/{{ item.path | basename }}.console.log"
+        flat: yes
+      delegate_to: jumpbox
+      loop: "{{ console_log_files.files }}"
+      when: 
+        - consoles_dir_check.stat.exists
+        - console_log_files.files | length > 0
+
+    - name: Atomically move console log files to final location
+      command: >
+        mv "{{ console_temp_dir.path }}/{{ item.path | basename }}.console.log"
+           "{{ job_logs.path }}/{{ item.path | basename }}.console.log"
+      loop: "{{ console_log_files.files }}"
+      when: 
+        - consoles_dir_check.stat.exists
+        - console_log_files.files | length > 0
+
+    - name: Clean up temporary console logs directory
+      file:
+        path: "{{ console_temp_dir.path }}"
+        state: absent
+      when: 
+        - console_temp_dir is defined
+        - console_temp_dir.path is defined
+
+    - name: Clean up console logs from jumpbox after fetch
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      delegate_to: jumpbox
+      loop: "{{ console_log_files.files }}"
+      when: 
+        - consoles_dir_check.stat.exists
+        - console_log_files.files | length > 0
+
+    - name: Stop conserver to terminate SOL connections
+      service:
+        name: conserver
+        state: stopped
+      become: yes
+      delegate_to: jumpbox
+      failed_when: false
+      when: consoles_dir_check.stat.exists
+
+    - name: Ensure all console logs are cleaned up from jumpbox
+      shell: rm -f /var/consoles/*
+      become: yes
+      delegate_to: jumpbox
+      failed_when: false
+      when: consoles_dir_check.stat.exists
+
+    - name: Verify console logs cleanup
+      find:
+        paths: /var/consoles
+        patterns: "*"
+        file_type: file
+      delegate_to: jumpbox
+      register: remaining_console_files
+      failed_when: false
+      when: consoles_dir_check.stat.exists
+
+    - name: Display cleanup verification
+      debug:
+        msg: |
+          Console logs cleanup verification:
+          - Files remaining after cleanup: {{ remaining_console_files.files | length if remaining_console_files.files is defined else 'N/A' }}
+          - Conserver stopped: Yes
+      when: consoles_dir_check.stat.exists
+
+    - name: Display console logs collection status
+      debug:
+        msg: |
+          Console logs collection completed:
+          - Console logs directory exists: {{ consoles_dir_check.stat.exists }}
+          - Number of console log files found: {{ console_log_files.files | length if consoles_dir_check.stat.exists else 0 }}
+          - Console logs copied to: {{ job_logs.path }}/ (as *.console.log files)
+          - Console logs cleaned up from jumpbox: {{ 'Yes' if consoles_dir_check.stat.exists else 'N/A' }}
+
+  rescue:
+    - name: Console logs collection failed
+      debug:
+        msg: "Warning: Console logs collection failed, but continuing with job execution"

@@ -6,13 +6,19 @@
     status: "failure"
   tags: dci
 
-- name: 'Release SUT in Beaker'
-  include_tasks: release.yml
-  loop: "{{ hostvars.localhost.systems | dict2items }}"
-  loop_control:
-    loop_var: system
-  when:
-    - hostvars.jumpbox.bkrjobid is defined
+- name: 'Collect logs on failure'
+  delegate_to: localhost
+  block:
+    - name: 'Create temp dir for failure logs if not exists'
+      include_tasks: create_temp_dir.yml
+      when: job_logs is not defined
+
+    - name: 'Upload failure logs to DCI Control server'
+      include_tasks: logs.yml
+  rescue:
+    - name: 'Log collection failed during failure'
+      debug:
+        msg: 'Warning: Could not collect logs during failure handling'
 
 - name: 'Failed job'
   fail:
