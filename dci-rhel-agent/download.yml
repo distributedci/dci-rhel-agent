@@ -4,5 +4,5 @@
     - DCI_CLIENT_ID: "{{ dci_client_id }}"
     - DCI_API_SECRET: "{{ dci_api_secret }}"
     - DCI_CS_URL: "{{ dci_cs_url }}"
-  shell: /bin/dci-downloader --settings /etc/dci-rhel-agent/settings.yml {% if dci_rhel_agent_cert %} --debug{% endif %} --local-repo /data
+  shell: /bin/dci-downloader --settings /etc/dci-rhel-agent/settings.yml --local-repo /data
   become: true

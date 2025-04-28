@@ -5,7 +5,7 @@
     vars:
       registry: quay.io
       tag: "distributedci/dci-rhel-agent"
-      version: "latest-8"
+      version: "nobkr-8"
 
     templates:
       - dci-container

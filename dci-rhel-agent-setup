@@ -12,7 +12,7 @@ import os
 # dci-rhel-agent-ctl default values
 default_value =	{
   "settings_path": "/etc/dci-rhel-agent/settings.yml",
-  "dci_rhel_agent_url":"quay.io/distributedci/dci-rhel-agent:latest-8"
+  "dci_rhel_agent_url":"quay.io/distributedci/dci-rhel-agent:nobkr-8"
 }
 
 proc = None

@@ -1,0 +1,156 @@
+---
+- name: 'Default to linuxefi'
+  set_fact:
+    use_boot_image: false
+    efi_boot_command: "efi"
+
+- name: Get SUT details
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ inventory_hostname }}"
+    method: GET
+  register: system_details
+  delegate_to: localhost
+
+- name: 'Register SUT CPU arch variable'
+  set_fact:
+    system_arch: "{{ system_details.json[inventory_hostname].arch }}"
+
+- name: Alternate EFI
+  set_fact:
+    efi_boot_command: ""
+  when:
+    - systems[inventory_hostname].alternate_efi_boot_commands| default(false, true) | bool
+
+- name: Use EFI bootloader image (x86 and aarch64)
+  set_fact:
+    use_boot_image: true
+  when:
+    - system_arch == 'x86_64' or system_arch == 'aarch64'
+    - systems[inventory_hostname].efi | default(False, true) | bool
+
+- name: Use powerpc-ieee1275 bootloader image (ppc64le)
+  set_fact:
+    use_boot_image: true
+  when:
+    - system_arch == 'ppc64le'
+    - not systems[inventory_hostname].petitboot | default(False, true) | bool
+
+- name: Get First Variant
+  set_fact:
+    boot_variant: "{{ hostvars.localhost.compose_info.boot_variants.keys()| first }}"
+
+- name: Get Variant Compose
+  set_fact:
+    boot: "{{ hostvars.localhost.compose_info.boot_variants[boot_variant] }}"
+
+- name: Generate base URL
+  ansible.builtin.set_fact:
+    base_url: "http://{{ jumpbox }}.{{ domain }}:{{ http_store_port }}"
+
+- name: Generate tree_url
+  ansible.builtin.set_fact:
+    tree_url: "{{ base_url }}/{{ boot[system_arch].os_tree |replace('/data','') }}"
+
+- name: Update repos
+  ansible.builtin.set_fact:
+    repos_url: "{{ repos_url | default({}) |combine({ item.key: base_url + '/' + item.value | replace('/data','')}) }}"
+  loop: "{{ boot[system_arch].repos| dict2items }}"
+
+- name: Record breadcrumb
+  ansible.builtin.set_fact:
+    breadcrumb: "{{ hostvars.localhost.compose_info.compose_id }}-{{ 999999 | random }}"
+
+- name: Kickstart Variables
+  ansible.builtin.set_fact:
+    kickstart:
+      osmajor: "{{ hostvars.localhost.compose_info.osmajor }}"
+      osminor: "{{ hostvars.localhost.compose_info.osminor }}"
+      tree_url: "{{ tree_url }}"
+      repos: "{{ repos_url }}"
+      ssh_pub_keys:
+        - "{{ lookup('file', '/etc/dci-rhel-agent/secrets/id_rsa.pub') }}"
+      breadcrumb: "{{ breadcrumb }}"
+      ks_append: "{{ systems[inventory_hostname].ks_append | default(ks_append| default('')) }}"
+      disable_root_login_pw: "{{ systems[inventory_hostname].disable_root_login_pw | default(false, true) }}"
+
+- name: Combine kickstart variables, default ks_meta and system specific ks_meta
+  ansible.builtin.set_fact:
+    provision_ks_meta: "{{ ks_meta | default({}) | ansible.builtin.combine(kickstart, systems[inventory_hostname].ks_meta | default({})) }}"
+
+- name: Provision System
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ inventory_hostname }}/actions"
+    method: POST
+    body:
+      action: "provision"
+      kernel_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.kernel }}"
+      initrd_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.initrd }}"
+      image_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.image }}"
+      use_boot_image: "{{ use_boot_image }}"
+      kernel_options: "grub2_postfix={{ efi_boot_command }} {{ systems[inventory_hostname].kernel_options | default(kernel_options| default('')) }}"
+      ks_meta: "{{ provision_ks_meta }}"
+    body_format: json
+    headers:
+      Accept: application/json
+      Content-Type: application/json
+    status_code: [201, 409]
+  changed_when: provision.status == 201
+  register: provision
+  delegate_to: localhost
+
+- name: Wait for Install job to initiate
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/jobs/{{ provision.json.job }}"
+    method: GET
+    status_code:
+      - 200
+      - 500
+  until: uri_output.status == 200 or uri_output.status == 500
+  retries: 60 # Retries for 60 * 10 seconds = 600 seconds = 10 minutes
+  delay: 10 # Every 10 seconds
+  failed_when: uri_output.status == 500
+  register: uri_output
+  delegate_to: localhost
+
+- name: "Wait for netboot to clear"
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ inventory_hostname }}"
+    method: GET
+    status_code:
+      - 200
+      - 500
+  until: netboot.json[inventory_hostname]['netboot'] | bool is false
+  retries: "{{ systems[inventory_hostname].reboot_watchdog_timeout | default(600) // 10 }}"
+  delay: 10 # Every 10 seconds
+  register: netboot
+  delegate_to: localhost
+
+- name: "Wait for kickstart to clear"
+  uri:
+    url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ inventory_hostname }}"
+    method: GET
+  until: kickstart.json[inventory_hostname]['kickstart'] | bool is false
+  retries: 60 # Retries for 60 * 10 seconds = 600 seconds = 10 minutes
+  delay: 10 # Every 10 seconds
+  register: kickstart
+  delegate_to: localhost
+
+- name: Wait 3600 (default) or install_watchdog seconds, but only start checking after 60 seconds
+  wait_for_connection:
+    delay: 60
+    timeout: "{{ systems[inventory_hostname].install_watchdog_timeout| default(3600) }}"
+
+- name: Read breadcrumb
+  ansible.builtin.slurp:
+    src: /root/.breadcrumb
+  register: breadcrumb_encoded
+
+- name: Decode breadcrumb
+  ansible.builtin.set_fact:
+    breadcrumb_remote: "{{ breadcrumb_encoded['content'] | b64decode }}"
+
+- name: Verify Install happened
+  assert:
+    that:
+      - breadcrumb == breadcrumb_remote
+...
