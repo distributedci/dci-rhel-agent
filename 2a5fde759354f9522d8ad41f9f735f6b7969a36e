@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6315e7ef_d2b4b969",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 606
+      },
+      "writtenOn": "2025-04-29T11:48:22Z",
+      "side": 1,
+      "message": "You shouldn\u0027t need --upgrade in the Dockerfile since you will always be installing it fresh",
+      "revId": "2a5fde759354f9522d8ad41f9f735f6b7969a36e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
