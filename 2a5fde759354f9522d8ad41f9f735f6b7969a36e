@@ -16,6 +16,24 @@
       "message": "You shouldn\u0027t need --upgrade in the Dockerfile since you will always be installing it fresh",
       "revId": "2a5fde759354f9522d8ad41f9f735f6b7969a36e",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec3c3577_302dad7f",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2025-04-29T12:53:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6315e7ef_d2b4b969",
+      "revId": "2a5fde759354f9522d8ad41f9f735f6b7969a36e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
     }
   ]
 }
