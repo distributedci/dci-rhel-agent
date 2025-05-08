@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "440ea523_7de4da3f",
+        "filename": "dci-rhel-agent/roles/setup_provisioner/tasks/configure_containers.yml",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 586
+      },
+      "writtenOn": "2025-05-08T14:41:04Z",
+      "side": 1,
+      "message": "If service is not found (like during first setup) task will fail.  Check if it exists first?  Or explicitly ignore \"Could not find\" in return msg.  Applies to other services stopped in this file as well.",
+      "revId": "d78aa13eec49fc2b4faef79b25117bedbba1eab1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0"
+    }
+  ]
+}
