@@ -87,6 +87,7 @@
       initrd_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.initrd }}"
       image_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.image }}"
       use_boot_image: "{{ use_boot_image }}"
+      netboot_clear_trigger: "{{ systems[inventory_hostname].netboot_clear_trigger | default(omit) }}"
       kernel_options: "grub2_postfix={{ efi_boot_command }} {{ systems[inventory_hostname].kernel_options | default(kernel_options| default('')) }}"
       ks_meta: "{{ provision_ks_meta }}"
     body_format: json
@@ -135,10 +136,24 @@
   register: kickstart
   delegate_to: localhost
 
-- name: Wait 3600 (default) or install_watchdog seconds, but only start checking after 60 seconds
-  wait_for_connection:
-    delay: 60
-    timeout: "{{ systems[inventory_hostname].install_watchdog_timeout| default(3600) }}"
+- name: Wait 3600 (default) or install_watchdog seconds
+  wait_for:
+    host: "{{ inventory_hostname }}"
+    port: 22
+    timeout: "{{ systems[inventory_hostname].intall_watchdog_timeout| default(3600) }}"
+  async: 3600
+  poll: 0
+  register: install_sleeper
+  delegate_to: localhost
+
+- name: Waiting for Install to Complete
+  async_status:
+    jid: "{{ install_sleeper.ansible_job_id }}"
+  register: job_result
+  until: job_result is finished
+  retries: 360
+  delay: 10
+  delegate_to: localhost
 
 - name: Read breadcrumb
   ansible.builtin.slurp:

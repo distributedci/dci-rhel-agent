@@ -20,6 +20,7 @@ topics:
         efi: false
 
 lab:
+  netboot_timeout: 10
   provisioner_dir: /opt/dci-provisioner
   dns_server: "{{ machine_network_ip }}"
   router: "{{ machine_network_ip }}"

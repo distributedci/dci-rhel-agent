@@ -32,6 +32,7 @@
       IMAGE_FETCH_TIMEOUT: 120
       LAB_HOST: "{{ jumpbox }}.{{ domain }}"
       LAB_PORT: 8008
+      NETBOOT_TIMEOUT: "{{ lab.netboot_timeout | default(omit) }}"
   register: container_info
 
 - name: Setting facts about container
