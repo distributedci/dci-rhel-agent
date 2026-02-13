@@ -8,7 +8,7 @@ The simplest working setup must be composed of at least 2 systems:
 
 - The first one is **DCI jumpbox**. This system acts as a `controller node` and will run mandatory services such as DHCP server, local DNS resolver and Beaker.
 
-- The second one is the **system under test** (SUT). Beaker will provision this system with **RHEL** and execute all the tests on top of it. This system is installed and wiped at each `dci-rhel-agent` job.
+- The second one is the **system under test** (SUT). The RHEL agent will provision this system with **RHEL** and execute all the tests on top of it. This system is installed and wiped at each `dci-rhel-agent` job.
 
 Please note that it's common to have multiple **SUTs** (for instance: systems with different hardware profiles).
 
@@ -53,7 +53,7 @@ We strongly advise the partners to provide Red Hat DCI's team an access to their
 
 ## Installation of DCI Rhel Agent
 
-The `dci-rhel-agent` is packaged and available as a RPM files.
+The `dci-rhel-agent` is packaged and available as an RPM file and container.
 However,`dci-release` and `epel-release` must be installed first.
 
 ```bash
@@ -74,7 +74,7 @@ There are two configuration files for `dci-rhel-agent`: `/etc/dci-rhel-agent/dci
 
 Note: The initial copy of `dcirc.sh` is shipped as `/etc/dci-rhel-agent/dcirc.sh.dist`. Copy this to `/etc/rhel-agent/dcirc.sh` to get started.
 
-This file has the credential associated to the jumpbox (also kwnown as a `Remoteci` in the [DCI web dashboard](https://www.distributed-ci.io). The partner team administrator has to create a Remote CI in the DCI web dashboard, copy the relative credential and paste it locally on the jumpbox to `/etc/dci-rhel-agent/dcirc.sh`.
+This file has the credential associated to the jumpbox (also known as a `Remoteci` in the [DCI web dashboard](https://www.distributed-ci.io). The partner team administrator has to create a Remote CI in the DCI web dashboard, copy the relative credential and paste it locally on the jumpbox to `/etc/dci-rhel-agent/dcirc.sh`.
 
 This file should be edited once:
 
@@ -89,15 +89,15 @@ export DCI_CS_URL
 ```
 
 - `/etc/dci-rhel-agent/inventory`
-  This file should be edited once upon installation. The ansible_host (192.168.1.1 as delivered) should be updated to the IP of the machine running the DCI RHEL agent.
+  This file should be edited once upon installation. The ansible_host (192.168.1.1 as delivered) should be updated to the IP of the machine running the DCI RHEL agent (jumpbox).
 - `/etc/dci-rhel-agent/settings.yml`
 
-This YAML file includes the configuration for one or more `dci-rhel-agent` Jobs.
+This YAML settings file includes the configuration for one or more `dci-rhel-agent` Jobs.
 The possible values are:
 
 | Variable                               | Required | Type           | Description                                                                                                                         |
 | -------------------------------------- | -------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| topic                                  | True     | String         | Name of the topic.                                                                                                                  |
+| topic                                  | True     | String         | Name of the topic (RHEL-8.8, RHEL-8.*, etc.)                                                                                        |
 | dci_tags                               | False    | List           | List of tags to set on the job                                                                                                      |
 | dci_name                               | False    | String         | Name of the job                                                                                                                     |
 | dci_configuration                      | False    | String         | String representing the configuration of the job                                                                                    |
@@ -118,7 +118,6 @@ The possible values are:
 | systems[].ks_append                    | False    | String         | Appends custom commands to default kickstart used to provision test system
 | systems[].kernel_options               | False    | String         | Arguments to pass to the install kernel                                                                                             |
 | systems[].sol_command                  | False    | String         | Command to use for serial console over lan                                                                                          |
-| beaker_xml                             | False    | String         | Path to a custom XML file to use with Beaker job.                                                                                   |
 | variants                               | False    | List of string | List of RHEL 8.x variant to enable (AppStream, BaseOS, CRB, HighAvailability, NFV, RT, ResilientStorage, SAP, SAPHANA and unified). |
 | archs                                  | False    | List of string | CPU arch to enable (aarch64, ppc64le, s390x and x86_64).                                                                            |
 | with_debug                             | False    | True/False     | Use RPM with debug symbols.                                                                                                         |
@@ -181,7 +180,7 @@ topics:
       - fqdn: sut3.{{ domain }}
 
 lab:
-  provisioner_dir: /opt/beaker
+  provisioner_dir: /opt/dci-provisioner
   dns_server: "{{ machine_network_ip }}"
   router: "{{ machine_network_ip }}"
   dhcp_start: "{{ machine_network_cidr | ipaddr('20') | ipaddr('address') }}"
@@ -241,11 +240,11 @@ lab:
 
 ## Setup of Containerized beaker and example virtual systems
 
-The dci-rhel-agent-setup program will read your /etc/dci-rhel-agent/settings.yml file and setup the beaker containers and two virtual systems.  This will give you a fully working environment capable of downloading RHEL components from DCI and installing them on the virtual systems.
+The dci-rhel-agent-setup program will read your /etc/dci-rhel-agent/settings.yml file and setup the dci-provisioner containers appropriately.  This will give you a fully working environment capable of downloading RHEL components from DCI and installing them on the test systems.
+
+The dnsmasq configuration for the Test Network is now stored in /etc/dnsmasq.d/provisioner.conf  The playbooks will create the new config automatically but you will need to remove the entries in /etc/NetworkManager/dnsmasq.d
 
 Setting the port.name under lab.network_config to the network interface that hosts your systems under test will allow you to test bare metal systems.  You will need to add entries for every test system under the lab section of the settings.yml file.  This includes mandatory fields like ip address, mac address, ipmi settings for power cycling.  There are also some optional settings.  Please see the table above for a complete list.
-
-Since the virtual setup is self contained it can uncover issues with the main installation before adding in external hosts.  External hosts present their own issues.
 
 Edit the inventory, by default it creates two Systems Under Test
 make sure libvirt_images_dir, local_repo and lab.provisioner_dir points to a location with enough disk space
@@ -254,7 +253,7 @@ make sure libvirt_images_dir, local_repo and lab.provisioner_dir points to a loc
 dci-rhel-agent-setup
 ```
 
-## Starting the DCI RHEL Agent and Accessing Beaker
+## Starting the DCI RHEL Agent
 
 Now that you have configured the DCI RHEL Agent, you need to start the service:
 
@@ -262,27 +261,9 @@ Now that you have configured the DCI RHEL Agent, you need to start the service:
 systemctl start dci-rhel-agent
 ```
 
-You may access Beaker at:
-
-```
-http://<hostname>/bkr
-```
-
-### Upgrading from Version 0.5.0
-
-If you have changed the /etc/dci-rhel-agent/inventory file you will need to change the beaker_server entry to jumpbox.
-
-The following settings in /etc/dci-rhel-agent/settings.yml have changed:
-
-local_repo_ip has been replaced with machine_network_ip.
-
-Both lab.jumpbox_fqdn and lab.labcontroller_fqdn have been dropped.
-
-The dnsmasq configuration for the Test Network is now stored in /etc/dnsmasq.d  The playbooks will create the new config automatically but you will need to remove the entries in /etc/NetworkManager/dnsmasq.d
-
 ### Further settings
 
-#### How to target a specific system in Beaker ?
+#### How to target a specific system?
 
 ##### Single system
 
@@ -306,19 +287,16 @@ systems:
 ```
 
 If you use the default settings and allow dci-rhel-agent-setup to configure the test network then all dns should work.
-If you setup your network yourself make sure all FQDN must resolve locally on the DCI jumpbox. If you don't have proper DNS records, please update `/etc/hosts` then reload `dnsmasq` service. Also, the supported architecture of the systems must be entered in Beaker in order for the agent to properly provision a system with the correct architecture.
+If you setup your network yourself make sure all FQDN must resolve locally on the DCI jumpbox. If you don't have proper DNS records, please update `/etc/hosts` then reload `dnsmasq` service. Also, the supported architecture of the systems must be entered in settings in order for the agent to properly provision a system with the correct architecture.
 
-All provision jobs in the same topic will run concurrently, but each topic will run consecutively. Running two instances of the agent simultaneously with different settings files is possible.  If you do this a best practice is to separate the settings by topic.  ie: settings-rhel8.yml and settings-rhel9.yml and run them with --config settings-rhel8.yml for example.
+$$$$$TODO: All provision jobs in the same topic will run concurrently, but each topic will run consecutively. Running two instances of the agent simultaneously with different settings files is possible.  If you do this a best practice is to separate the settings by topic.  ie: settings-rhel8.yml and settings-rhel9.yml and run them with --config settings-rhel8.yml for example.
 
 #### How to add tags to a job ?
 
 If you want to associate tags to jobs you can edit the file `settings.yml` and add your tags in the `dci_tags` list.
+Tags can be useful when searching through lists of jobs to isolate only the jobs a user is interested in viewing.
 By default, the tag "debug" is associated with every jobs. It should be kept 'as is' until the integration of the agent is done.
 The debug tag prevents jobs results to be compiled in DCI trends.
-
-#### How to use an external Beaker service ?
-
-It is possible to configure the `dci-rhel-agent` to use an external Beaker service (therefore not to use the Beaker service that runs in a container on the `dci-jumpbox`).  This is as simple as updating the beaker client config on the jumpbox to use this external beaker (/etc/beaker/client.conf).  Please see Beaker's documentation for further details.
 
 #### How to customize the system deployment ?
 
@@ -336,24 +314,9 @@ For example:
       - fqdn: x86_64_4.dci.local
 ```
 
-#### How to enable conserver ?
+#### How to extend the watchdog timeout for a system deployment? %%%%%TODO: GET WATCHDOG TIMEOUT VALUES
 
-The beaker-watchdog daemon on the Beaker lab controller can monitor the console logs from conserver for every running recipe. For that you will need to add the SOL (serial over lan) command and the kernel option in the setting file :
-
-For example:
-
-```
-    systems:
-      - fqdn: x86_64_2.dci.local
-        kernel_options: "console=ttyS1,115200n8"
-        sol_command: "ipmitool -I lanplus -U root -P calvin -H console_2.dci.local sol activate"
-      - fqdn: x86_64_3.dci.local
-      - fqdn: x86_64_4.dci.local
-```
-
-#### How to extend the Beaker watchdog timeout for a system deployment?
-
-If deployment of systems is timing out due to Beaker's watchdog timeout expiring, the timeout for a test system can be set to a user-specified amount in the settings file. There is a watchdog which monitors the time from reboot to system installation start (reboot_watchdog_timeout), and a watchdog which monitors the time from installation start (install_watchdog_timeout). Either or both can be modified from the settings file.  The amount of time the agent waits for the installation to start is defaulted to 12.5 minutes (25 retries, 30 seconds apart).  This wait time can be adjusted in the settings file (specified in minutes) to allow for more time as is sometimes needed when provisioning large VMs for example.
+If deployment of systems is timing out due to the default (60 minute) watchdog timeout expiring, the timeout for a test system can be set to a user-specified amount in the settings file. There is a watchdog which monitors the time from reboot to system installation start (reboot_watchdog_timeout), and a watchdog which monitors the time from installation start (install_watchdog_timeout). Either or both can be modified from the settings file.  The amount of time the agent waits for the installation to start is defaulted to 12.5 minutes (25 retries, 30 seconds apart).  This wait time can be adjusted in the settings file (specified in minutes) to allow for more time as is sometimes needed when provisioning large VMs for example.
 
 For example, the following will cause the agent to wait 3 hours for the installation to start, set the reboot watchdog timeout to 4 hours and the install watchdog timeout to 8 hours (after installation begins) for any deployment jobs on the my.x86_64.system.local test machine:
 
@@ -387,7 +350,7 @@ If you need advanced debug, you can spawn a new container with a shell:
 ```bash
 # dci-rhel-agent-ctl --start --debug
 [container]#
-[container]# ./entrypoint.py
+[container]# ./entrypoint.py  <--------- starts the agent with output to stdout
 [container]# dcictl topic-list
 ```
 
@@ -398,15 +361,10 @@ It can be modified to include any task needed to run **before** the system Under
 
 ## How to run your own set of tests ?
 
-By default, `dci-rhel-agent` provides 2 hooks files you can use to run your tests:
-  - `/etc/dci-rhel-agent/hooks/tests.yml`
+By default, `dci-rhel-agent` provides a hook files you can use to run your tests:
   - `/etc/dci-rhel-agent/hooks/user-tests.yml`
 
 Those files are kept when the `dci-rhel-agent` RPM will be updated.
-
-### tests.yml
-
-You can include any tasks that will be run on the jumpbox
 
 ### user-tests.yml
 
@@ -441,7 +399,7 @@ In the following example, the task uploads Junit files (your tests results) into
 
 ### How to run tests only (no provisioning)?
 
-If a user has a pre-provisioned system and would like to only run user-tests and enabled Red Hat tests, the agent can be started with the --tests-only command line option. An entry for the system and job needs to exist in the settings file so the agent can determine the appropriate Red Hat tests to run, if enabled (RHEL-7 vs. RHEL-8).
+If a user has a pre-provisioned system and would like to only run tests without re-provisioning the machine, the agent can be started with the --tests-only command line option. An entry for the system and job needs to exist in the settings file.
 
 `dci-rhel-agent-ctl --start --tests-only`
 
@@ -460,9 +418,9 @@ The DCI team is reachable via distributed-ci@redhat.com. When contacting DCI reg
 
 There could be .lock files in your local_repo (usually /opt/dci unless overridden in settings) which are not being cleared. Check in your local_repo/<topic_name> and manually delete any .lock files if present.
 
-### I have a new test system I would like to add to my DCI Beaker Lab.
+### I have a new test system I would like to add to my DCI Lab.
 
-Adding new SUT to your DCI Beaker Lab can all be handled in your settings file. Each settings file contains a "lab" section which describes various network configs for your SUT, along with a list of all SUTs and their relevant information. Add any new systems to this list, and run the dci-rhel-agent-setup as usual. The agent will see that there are SUTs in your settings file which are not integrated into your DCI Beaker lab and will make the appropriate changes to add them to the SUTs network, and include them in Beaker. New systems can be added to your topics..systems section to be used with the agent now. See the RHEL agent documentation above for settings file structure.
+Adding new SUT to your DCI Lab can all be handled in your settings file. Each settings file contains a "lab" section which describes various network configs for your SUT, along with a list of all SUTs and their relevant information. Add any new systems to this list, and run the dci-rhel-agent-setup as usual. The agent will see that there are SUTs in your settings file which are not integrated into your DCI lab and will make the appropriate changes to add them to the SUTs network. New systems can be added to your topics..systems section to be used with the agent now. See the RHEL agent documentation above for settings file structure.
 
 ### Can I use virtual machines as test systems in my DCI lab?
 
@@ -472,9 +430,9 @@ Yes. A common setup is to use the libvirt/qemu/kvm stack for VM test machines. T
 
 No. Due to the large size of RHEL composes, our dci-downloader tool called by the RHEL agent downloads only the files which have changed since your lab's last download of the topic. So your first run of the agent will include a lengthy download, but subsequent runs will be much faster.
 
-### I would like to continue to use the same RHEL compose for testing in our Beaker lab for a while.
+### I would like to continue to use the same RHEL compose for testing in our lab for a while.
 
-The RHEL agent provides an option which can be supplied when it is started to skip the download of composes. By supplying the `--skip-download` flag to your start call of the agent, the downloader will be bypassed and you can continue to run with the most recently downloaded RHEL compose until you are ready to move on. At that point, omitting the skip-download flag will allow your agent to download the latest available composes for each topic specified in your settings file.
+The RHEL agent provides an option which can be supplied when it is started to skip the download of composes. By supplying the `--skip-download` flag to your start call of the agent, the downloader will be bypassed and you can continue to run with the most recently downloaded RHEL compose until you are ready to move on. At that point, omitting the skip-download flag will allow your agent to download the latest available composes for each topic specified in your settings file.  %%%% TODO: NOTE ABOUT COMPOSE CHECK THAT COULD FAIL
 
 ### My EFI system does not recognize the default "linuxefi" and "initrdefi" commands supplied in the grub.cfg by the RHEL agent.
 

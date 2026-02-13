@@ -30,12 +30,27 @@
         job_id: '{{ hostvars.localhost.job_id }}'
       with_fileglob:
         - '{{ hostvars.localhost.job_logs.path }}/*'
+        - '{{ hostvars.localhost.job_artifacts.path }}/*.log'
         - '/logs/provisioner/*'
         - '/logs/lab/*'
 
-    - name: Delete tmp logs directory
+    - name: Upload artifacts directory to DCI Control Server
+      delegate_to: localhost
+      environment:
+        - DCI_CLIENT_ID: "{{ hostvars.localhost.dci_client_id }}"
+        - DCI_API_SECRET: "{{ hostvars.localhost.dci_api_secret }}"
+        - DCI_CS_URL: "{{ hostvars.localhost.dci_cs_url }}"
+      dci_file:
+        path: '{{ item }}'
+        name: "{{ item | basename | regex_replace('^(.*\\.cli\\.)?(.*).xml$','\\2') }}"
+        job_id: '{{ hostvars.localhost.job_id }}'
+        mime: 'application/junit'
+      with_fileglob: '{{ hostvars.localhost.job_artifacts.path }}/*.xml'
+
+    - name: Delete tmp logs directories
       file:
         state: absent
         path: "{{ item }}"
       with_items:
         - "{{ job_logs.path }}"
+        - "{{ job_artifacts.path }}"
