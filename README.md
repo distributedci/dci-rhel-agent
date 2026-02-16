@@ -6,7 +6,7 @@
 
 The simplest working setup must be composed of at least 2 systems:
 
-- The first one is **DCI jumpbox**. This system acts as a `controller node` and will run mandatory services such as DHCP server, local DNS resolver and Beaker.
+- The first one is **DCI jumpbox**. This system acts as a `controller node` and will run mandatory services such as DHCP server, local DNS resolver and the dci-provisioner containers.
 
 - The second one is the **system under test** (SUT). The RHEL agent will provision this system with **RHEL** and execute all the tests on top of it. This system is installed and wiped at each `dci-rhel-agent` job.
 
@@ -107,7 +107,7 @@ The possible values are:
 | domain                                 | False    | String         | Domain of DCI jumpbox. This is the name of the domain on the SUT network.  The default is dci.local.                                |
 | local_repo                             | True     | String         | Path to store DCI artefacts (Local RHEL mirror that will be exposed to SUT by `httpd`). Default is `/opt/dci`.                      |
 | libvirt_images_dir                     | False    | String         | Path to store libvirt images for virtual hosts. Default is `/opt/libvirt/images`.                      |
-| disable_root_login_pw                  | False    | True/False     | When set to true, disables password based logins for root user setup by Beaker.  Key based logins only (setup by agent).
+| disable_root_login_pw                  | False    | True/False     | When set to true, disables password based logins for root user setup by dci-provisioenr.  Key based logins only (setup by agent).
 | machine_network_cidr                   | True     | String         | The private network to use for your Systems Under Test,  This is managed by dci.  The default is 10.60.0.0/24.                      |
 | systems                                | False    | List of Dict   | List of all systems that will be deployed using RHEL from DCI.                                                                      |
 | systems[].fqdn                         | True     | String         | Fully qualified Domain name of System under Test.                                                                                   |
@@ -121,15 +121,15 @@ The possible values are:
 | variants                               | False    | List of string | List of RHEL 8.x variant to enable (AppStream, BaseOS, CRB, HighAvailability, NFV, RT, ResilientStorage, SAP, SAPHANA and unified). |
 | archs                                  | False    | List of string | CPU arch to enable (aarch64, ppc64le, s390x and x86_64).                                                                            |
 | with_debug                             | False    | True/False     | Use RPM with debug symbols.                                                                                                         |
-| lab.provisioner_dir                  | True     | String         | Path to store the beaker data files. Default is '/opt/beaker'                                                                       |
+| lab.provisioner_dir                  | True     | String         | Path to store the provisioner data files.                                                                                      |
 | lab.build_bridge                | False    | True/False     | Whether or not to setup the bridge network, defaults to True.                                                                       |
 | lab.bridge_interface            | False    | String         | Network interface where all your SUT's will be connected.  Example provided in settings.                                            |
-| lab.dns_server                  | False    | IP             | IP address of DNS server to specify in beaker.conf (dnsmasq config)                                                                 |
-| lab.ntp_server                  | False    | IP             | IP address of NTP server to specify in beaker.conf (dnsmasq config)                                                                 |
+| lab.dns_server                  | False    | IP             | IP address of DNS server to specify in dnsmasq config                                                                               |
+| lab.ntp_server                  | False    | IP             | IP address of NTP server to specify in dnsmasq config                                                                               |
 | lab.dhcp_start                  | False    | IP             | Starting IP address range to assign to DCI test systems via DHCP.                                                                   |
 | lab.dhcp_end                    | False    | IP             | Ending IP address range to assigne to DCI test systems via DHCP.                                                                    |
 | lab.router                      | False    | IP             | Gateway address                                                                                                                     |
-| system_inventory                       | False    | various        | List of all DCI tests systems and corresponding Beaker information                                                                  |
+| system_inventory                       | False    | various        | List of all DCI tests systems and corresponding provisioner information                                                                  |
 
 Example:
 
@@ -238,7 +238,7 @@ lab:
       power_type: apc_snmp
 ```
 
-## Setup of Containerized beaker and example virtual systems
+## Setup of example virtual systems
 
 The dci-rhel-agent-setup program will read your /etc/dci-rhel-agent/settings.yml file and setup the dci-provisioner containers appropriately.  This will give you a fully working environment capable of downloading RHEL components from DCI and installing them on the test systems.
 
@@ -267,7 +267,6 @@ systemctl start dci-rhel-agent
 
 ##### Single system
 
-If you have registred several systems in Beaker, you might want to configure where the DCI job will be executed.
 You can use the `systems` option in `settings.yml` to match a single server by checking the hostname.
 
 ```
@@ -289,7 +288,7 @@ systems:
 If you use the default settings and allow dci-rhel-agent-setup to configure the test network then all dns should work.
 If you setup your network yourself make sure all FQDN must resolve locally on the DCI jumpbox. If you don't have proper DNS records, please update `/etc/hosts` then reload `dnsmasq` service. Also, the supported architecture of the systems must be entered in settings in order for the agent to properly provision a system with the correct architecture.
 
-$$$$$TODO: All provision jobs in the same topic will run concurrently, but each topic will run consecutively. Running two instances of the agent simultaneously with different settings files is possible.  If you do this a best practice is to separate the settings by topic.  ie: settings-rhel8.yml and settings-rhel9.yml and run them with --config settings-rhel8.yml for example.
+All provision jobs in the same topic will run concurrently, but each topic will run consecutively. Running two instances of the agent simultaneously with different settings files is possible.  If you do this a best practice is to separate the settings by topic.  ie: settings-rhel8.yml and settings-rhel9.yml and run them with --config settings-rhel8.yml for example.
 
 #### How to add tags to a job ?
 
@@ -314,19 +313,16 @@ For example:
       - fqdn: x86_64_4.dci.local
 ```
 
-#### How to extend the watchdog timeout for a system deployment? %%%%%TODO: GET WATCHDOG TIMEOUT VALUES
+#### How to modify the watchdog timeout for a system deployment?
 
-If deployment of systems is timing out due to the default (60 minute) watchdog timeout expiring, the timeout for a test system can be set to a user-specified amount in the settings file. There is a watchdog which monitors the time from reboot to system installation start (reboot_watchdog_timeout), and a watchdog which monitors the time from installation start (install_watchdog_timeout). Either or both can be modified from the settings file.  The amount of time the agent waits for the installation to start is defaulted to 12.5 minutes (25 retries, 30 seconds apart).  This wait time can be adjusted in the settings file (specified in minutes) to allow for more time as is sometimes needed when provisioning large VMs for example.
-
-For example, the following will cause the agent to wait 3 hours for the installation to start, set the reboot watchdog timeout to 4 hours and the install watchdog timeout to 8 hours (after installation begins) for any deployment jobs on the my.x86_64.system.local test machine:
+If deployment of systems is timing out due to the default (60 minute) watchdog timeout expiring, the timeout for a test system can be set to a user-specified amount in the settings file. There is a watchdog which monitors the time from reboot to system installation start (reboot_watchdog_timeout, default = 10 minutes), and a watchdog which monitors the time from installation start (install_watchdog_timeout, default = 60 minutes). Either or both can be modified from the settings file:
 
 ```
 
     systems:
       - fqdn: x86_64_2.dci.local
-        reboot_watchdog_timeout: 14400
-        install_watchdog_timeout: 28800
-        install_wait_time: 180
+        reboot_watchdog_timeout: 1200
+        install_watchdog_timeout: 7200
 ```
 
 ## Usage
@@ -432,7 +428,7 @@ No. Due to the large size of RHEL composes, our dci-downloader tool called by th
 
 ### I would like to continue to use the same RHEL compose for testing in our lab for a while.
 
-The RHEL agent provides an option which can be supplied when it is started to skip the download of composes. By supplying the `--skip-download` flag to your start call of the agent, the downloader will be bypassed and you can continue to run with the most recently downloaded RHEL compose until you are ready to move on. At that point, omitting the skip-download flag will allow your agent to download the latest available composes for each topic specified in your settings file.  %%%% TODO: NOTE ABOUT COMPOSE CHECK THAT COULD FAIL
+The RHEL agent provides an option which can be supplied when it is started to skip the download of composes. By supplying the `--skip-download` flag to your start call of the agent, the downloader will be bypassed and you can continue to run with the most recently downloaded RHEL compose until you are ready to move on. At that point, omitting the skip-download flag will allow your agent to download the latest available composes for each topic specified in your settings file.
 
 ### My EFI system does not recognize the default "linuxefi" and "initrdefi" commands supplied in the grub.cfg by the RHEL agent.
 

@@ -15,7 +15,7 @@ default_value =	{
   "settings_path": "/etc/dci-rhel-agent/settings.yml",
   "logs_path": "/opt/dci-provisioner/logs",
   "hooks_path": "/etc/dci-rhel-agent/hooks",
-  "dci_rhel_agent_url":"quay.io/distributedci/dci-rhel-agent:nobkr-8"
+  "dci_rhel_agent_url":"quay.io/distributedci/dci-rhel-agent:latest"
 }
 
 proc = None

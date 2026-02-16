@@ -3,14 +3,14 @@ provisioner_dir: "{{ lab.provisioner_dir }}"
 containers:
   - name: dci-provisioner
     service: container-provisioner.service
-    image: quay.io/distributedci/dci-provisioner:nobkr-8
+    image: quay.io/distributedci/dci-provisioner:latest
     volumes:
       - "{{ provisioner_dir }}/logs/provisioner:/var/log/supervisord:z"
     ports:
       - "8000"
   - name: dci-lab
     service: container-lab.service
-    image: quay.io/distributedci/dci-lab:nobkr-8
+    image: quay.io/distributedci/dci-lab:latest
     volumes:
       - "{{ provisioner_dir }}/tftpboot:/opt/tftpboot:z"
       - "{{ provisioner_dir }}/templates:/opt/templates:z"
