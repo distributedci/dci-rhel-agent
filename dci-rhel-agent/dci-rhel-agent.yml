@@ -65,7 +65,7 @@
         path: '/etc/dci-rhel-agent/hooks/user-tests.yml'
       register: check_user_tests_hook_file
 
-- name: 'Prepare the jumpbox'
+- name: 'Prepare'
   hosts: localhost
   gather_facts: no
   tags:
@@ -104,7 +104,6 @@
   gather_facts: yes
   tags:
     - pre-run
-    - beaker
   tasks:
     - block:
         - name: 'Download RHEL'
@@ -114,60 +113,57 @@
               tags: download
           tags: always
 
-        - name: 'Process Recipes'
-          include_tasks: process_recipe.yml
-          loop: "{{ systems | dict2items }}"
-          loop_control:
-            loop_var: system
+        - name: 'Process Compose'
+          include_tasks: process_compose.yml
 
         - name: 'Download harness'
           include_tasks: dci-harness.yml
+
       rescue:
         - name: Teardown error
           include_tasks: teardown_error.yml
 
-- name: 'Launch install'
-  hosts: jumpbox
+- name: 'Prep install'
+  hosts: localhost
   tags:
     - install
-    - beaker
   tasks:
     - block:
-        - name: 'Create temp dir'
-          include_tasks: create_temp_dir.yml
-
-        - name: Debug Jumpbox collected facts
-          debug:
-            var: hostvars[inventory_hostname]
-
         - name: 'Add job state running'
-          delegate_to: localhost
           dci_job:
             id: "{{ hostvars.localhost.job_id }}"
             status: "running"
 
-        - name: 'Install RHEL on SUT'
-          include_tasks: install.yml
+        - name: 'Gather system arches'
+          include_tasks: gather_arches.yml
+          loop: "{{ systems | dict2items }}"
+          loop_control:
+            loop_var: system
+
+        - name: 'Tag job with SUT(s) arches'
+          dci_job:
+            id: "{{ job_id }}"
+            tags: '{{ arch_tags | unique }}'
+
       rescue:
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
-- name: 'Monitor SUTs Install'
-  hosts: beaker_sut
+- name: 'Install Systems Under Test'
+  hosts: sut
   gather_facts: False
   strategy: free
   tags:
     - install
-    - beaker
   tasks:
     - block:
-        - name: 'Monitor SUT'
-          include_tasks: monitor_suts.yml
+        - name: 'Wait for SUT(s) to Install'
+          include_tasks: install_suts.yml
       rescue:
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
-- name: 'Launch tests on the jumpbox'
+- name: 'Launch tests'
   hosts: localhost
   gather_facts: yes
   tags:
@@ -188,30 +184,13 @@
           include_tasks: teardown_failure.yml
 
 - name: 'Launch tests on SUTs'
-  hosts: beaker_sut
+  hosts: sut
   gather_facts: no
   tags:
     - tests
     - sut
   tasks:
     - block:
-        - name: 'Launch RHEL CKI Test'
-          ignore_errors: yes
-          import_role:
-            name: dci-rhel-cki
-          when:
-            - dci_rhel_agent_cki| default(false) | bool == true
-            - cki_job_url is defined or hostvars.localhost.job_info.job.topic.data.cki_job_url is defined
-          become: true
-
-        - name: 'Launch RHEL HW Cert Tests'
-          ignore_errors: yes
-          import_role:
-            name: dci-rhel-certification
-          when:
-            - dci_rhel_agent_cert|bool and (hostvars.localhost.topic_name.startswith("RHEL-7") or hostvars.localhost.topic_name.startswith("RHEL-8"))
-          become: true
-
         - name: 'Launch partner tests if present'
           include_tasks: '/etc/dci-rhel-agent/hooks/user-tests.yml'
           when: hostvars.localhost['check_user_tests_hook_file'].stat.exists
@@ -219,21 +198,19 @@
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
-- name: 'Grab logs and release SUTs'
-  hosts: jumpbox
+- name: 'Grab logs'
+  hosts: localhost
   gather_facts: no
   tags:
     - post-run
-    - beaker
   tasks:
     - block:
         - name: 'Add job state post-run'
-          delegate_to: localhost
           dci_job:
             id: "{{ hostvars.localhost.job_id }}"
             status: "post-run"
 
-        - name: 'Upload Beaker logs to DCI Control server'
+        - name: 'Upload logs to DCI Control server'
           include_tasks: logs.yml
 
       rescue:
