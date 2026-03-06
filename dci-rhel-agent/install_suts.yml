@@ -45,7 +45,7 @@
 
 - name: Generate base URL
   ansible.builtin.set_fact:
-    base_url: "http://{{ jumpbox }}.{{ domain }}:{{ http_store_port }}"
+    base_url: "http://{{ machine_network_ip }}:{{ http_store_port }}"
 
 - name: Generate tree_url
   ansible.builtin.set_fact:
