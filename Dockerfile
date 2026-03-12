@@ -13,8 +13,7 @@ RUN yum upgrade -y && \
   yum-config-manager --add-repo https://packages.distributed-ci.io/repos/current/el/8/x86_64 && \
   yum-config-manager --setopt=beaker-project.org_yum_harness_RedHatEnterpriseLinux8.gpgcheck=0 --save && \
   yum -y install sshpass gcc python3 python3-devel python3-pip python3-lxml \
-                 rsync restraint-client python3-netaddr openssh-clients \
-                 dci-downloader dnf && \
+                 rsync python3-netaddr openssh-clients dci-downloader dnf && \
   yum clean all
 
 RUN pip3 install -U pip && \
