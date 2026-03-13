@@ -30,7 +30,7 @@
       RQ_QUEUE: "{{ jumpbox }}.{{ domain }}"
       RQ_JOBS_TIMEOUT: 10h
       IMAGE_FETCH_TIMEOUT: 120
-      LAB_HOST: "{{ jumpbox }}.{{ domain }}"
+      LAB_HOST: "{{ machine_network_ip }}"
       LAB_PORT: 8008
       NETBOOT_TIMEOUT: "{{ lab.netboot_timeout | default(omit) }}"
   register: container_info

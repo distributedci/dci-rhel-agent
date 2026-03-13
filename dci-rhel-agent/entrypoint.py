@@ -132,6 +132,8 @@ def main():
                 current_job['jumpbox'] = sets['jumpbox']
             if 'domain' in sets:
                 current_job['domain'] = sets['domain']
+            if 'machine_network_ip' in sets:
+                current_job['machine_network_ip'] = sets['machine_network_ip']
             provision_and_test(current_job, cmdline)
     else:
         print ('Incompatible settings file.  Topics not found. Please update settings file format.')
