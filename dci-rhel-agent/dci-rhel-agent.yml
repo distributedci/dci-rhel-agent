@@ -116,9 +116,6 @@
         - name: 'Process Compose'
           include_tasks: process_compose.yml
 
-        - name: 'Download harness'
-          include_tasks: dci-harness.yml
-
       rescue:
         - name: Teardown error
           include_tasks: teardown_error.yml

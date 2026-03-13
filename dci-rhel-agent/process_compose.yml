@@ -34,3 +34,10 @@
       - compose_info.compose_id == item.display_name
   when: item.type == 'compose'
   loop: "{{ components }}"
+
+- name: Upload .composeinfo to DCI Control Server
+  dci_file:
+    path: "/data/{{ topic_name }}/compose/.composeinfo"
+    name: 'composeinfo.txt'
+    mime: 'text/plain'
+    job_id: '{{ job_id }}'
