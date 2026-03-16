@@ -168,4 +168,12 @@
   assert:
     that:
       - breadcrumb == breadcrumb_remote
+
+- name: Set PXE first in EFI boot order
+  ansible.builtin.shell: |
+    out=$(efibootmgr -v)
+    pxe=$(echo "$out" | sed -E -n '/^Boot[[:xdigit:]]{4}\*.*PXE/{s/^Boot([[:xdigit:]]{4})\*.*/\1/p;q}')
+    cur=$(echo "$out" | sed -n 's/^BootOrder: *//p' | tr -d '\r')
+    efibootmgr --bootorder "$pxe,$(echo "$cur" | sed "s/,${pxe},/,/g; s/^${pxe},//; s/,${pxe}$//; s/^${pxe}$//")"
+  when: pxe_first_boot | default(false) | bool
 ...

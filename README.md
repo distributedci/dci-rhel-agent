@@ -121,6 +121,7 @@ The possible values are:
 | variants                               | False    | List of string | List of RHEL 8.x variant to enable (AppStream, BaseOS, CRB, HighAvailability, NFV, RT, ResilientStorage, SAP, SAPHANA and unified). |
 | archs                                  | False    | List of string | CPU arch to enable (aarch64, ppc64le, s390x and x86_64).                                                                            |
 | with_debug                             | False    | True/False     | Use RPM with debug symbols.                                                                                                         |
+| pxe_first_boot                        | False    | True/False     | When set to true, set the first enabled EFI entry containing "PXE" at the top of the boot order after install. Default is false.  |
 | lab.provisioner_dir                  | True     | String         | Path to store the provisioner data files.                                                                                      |
 | lab.build_bridge                | False    | True/False     | Whether or not to setup the bridge network, defaults to True.                                                                       |
 | lab.bridge_interface            | False    | String         | Network interface where all your SUT's will be connected.  Example provided in settings.                                            |
