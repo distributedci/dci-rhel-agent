@@ -11,7 +11,7 @@ RUN yum upgrade -y && \
   yum -y install yum-utils && \
   yum-config-manager --add-repo https://packages.distributed-ci.io/repos/current/el/8/x86_64 && \
   yum -y install sshpass gcc python3 python3-devel python3-pip python3-lxml \
-                 rsync python3-netaddr openssh-clients dci-downloader dnf && \
+                 rsync python3-netaddr openssh-clients dnf && \
   yum clean all
 
 RUN pip3 install -U pip && \
@@ -22,6 +22,7 @@ RUN pip3 install -U pip && \
     pip3 install 'dumb-init==1.2.2' && \
     pip3 install xmltodict && \
     pip3 install productmd && \
+    pip3 install --user rhdl && \
     # Installing dci-ansible manually to work around Ansible dependency since Ansible
     # is installed via pip here
     dnf download dci-ansible && \
