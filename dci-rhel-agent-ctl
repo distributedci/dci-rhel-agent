@@ -98,6 +98,7 @@ def main():
                 settings_path:'/etc/dci-rhel-agent/settings.yml:z',
                 logs_path:'/logs:z',
                 local_repo:'/data:z',
+                '~/.config/rhdl':'/root/.config/rhdl:z',
         }
         # if "-l" is used, we want to override container code with local code (dev mode)
         if args.local:
