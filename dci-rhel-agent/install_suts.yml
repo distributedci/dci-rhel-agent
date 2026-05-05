@@ -86,6 +86,7 @@
       kernel_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.kernel }}"
       initrd_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.initrd }}"
       image_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.image }}"
+      grub_modules_url: "{{ tree_url }}{{ boot[system_arch].pxe_images.grub_modules | default(omit) }}"
       use_boot_image: "{{ use_boot_image }}"
       netboot_clear_trigger: "{{ systems[inventory_hostname].netboot_clear_trigger | default(omit) }}"
       kernel_options: "grub2_postfix={{ efi_boot_command }} {{ systems[inventory_hostname].kernel_options | default(kernel_options| default('')) }}"
