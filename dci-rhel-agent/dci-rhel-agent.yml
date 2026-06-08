@@ -10,11 +10,30 @@
         dci_cs_url="{{ lookup('env','DCI_CS_URL') }}"
       no_log: true
 
+    - name: 'Check if this is a RHEL4NV partner topic'
+      set_fact:
+        is_partner_topic: "{{ topic is match('RHEL4NV-FULL-.*') }}"
+        original_topic: "{{ topic }}"
+
+    - name: 'Map RHEL4NV topic to standard RHEL topic for job scheduling'
+      set_fact:
+        scheduled_topic: "{{ topic | regex_replace('^RHEL4NV-FULL-(.*)$', 'RHEL-\\1') }}"
+      when: is_partner_topic
+
+    - name: 'Use original topic if not RHEL4NV'
+      set_fact:
+        scheduled_topic: "{{ topic }}"
+      when: not is_partner_topic
+
+    - name: 'Create or retrieve RHEL4NV partner component before scheduling'
+      include_tasks: create_partner_component.yml
+      when: is_partner_topic
+
     - name: 'Schedule a new job in DCI Control Server'
       dci_job:
-        components: '{{ dci_components }}'
+        components: '{{ [partner_component_id] if is_partner_topic else dci_components }}'
         components_by_query: "{{ dci_components_by_query }}"
-        topic: '{{ topic }}'
+        topic: '{{ scheduled_topic }}'
         comment: "{{ dci_comment | default('') }}"
         url: "{{ dci_url | default('') }}"
         name: "{{ dci_name | default('') }}"
@@ -29,10 +48,11 @@
       set_fact:
         job_id: "{{ job_info['job']['id'] }}"
         topic_id: "{{ job_info['job']['topic_id'] }}"
-        topic_name: "{{ job_info['job']['topic']['name'] }}"
+        topic_name: "{{ original_topic if is_partner_topic else job_info['job']['topic']['name'] }}"
         remoteci_id: "{{ job_info['job']['remoteci_id'] }}"
         components: "{{ job_info['job']['components'] }}"
         product: "{{ job_info['job']['topic']['product_id'] }}"
+        job_team_id: "{{ job_info['job']['team_id'] }}"
 
     - name: 'Update job name with topic_name'
       dci_job:

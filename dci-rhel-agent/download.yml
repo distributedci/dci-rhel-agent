@@ -7,18 +7,23 @@
         | map(attribute='display_name') | list | first)
       }}
 
+- name: Detect if this is a RHEL4NV compose ID
+  set_fact:
+    is_rhel4nv_compose: "{{ compose_id is match('RHEL4NV-.*') }}"
+
 - name: Set compose version from compose ID
   set_fact:
     compose_version: >-
       {{
-        (compose_id.split('-')[1]) if (compose_id | default('') | length > 0) else ''
+        (compose_id.split('-')[2]) if is_rhel4nv_compose
+        else ((compose_id.split('-')[1]) if (compose_id | default('') | length > 0) else '')
       }}
 
 - name: Resolve compose minor from compose ID
   set_fact:
     compose_minor: >-
       {{
-        (compose_version.split('.')[1]) if (compose_version | length > 0) else ''
+        (compose_version.split('.')[1]) if (compose_version | length > 0 and '.' in compose_version) else ''
       }}
 
 - name: Set topic name directory based on compose ID
@@ -69,5 +74,6 @@
     rhdl download {{ compose_id }}
     --destination /data/{{ topic_name_resolved }}/compose
     --flat
+    --force
     {{ rhdl_flags }}
   become: true

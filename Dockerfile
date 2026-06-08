@@ -25,8 +25,8 @@ RUN pip3 install -U pip && \
     pip3 install --user rhdl && \
     # Installing dci-ansible manually to work around Ansible dependency since Ansible
     # is installed via pip here
-    dnf download dci-ansible && \
-    rpm -ivh --nodeps dci-ansible*.rpm
+    dnf download dci-ansible python3-dciclient python3-dciauth && \
+    rpm -ivh --nodeps *.rpm
 
 ENV LC_ALL="C.UTF-8"
 
