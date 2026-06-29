@@ -11,11 +11,10 @@ RUN yum upgrade -y && \
   yum -y install yum-utils && \
   yum-config-manager --add-repo https://packages.distributed-ci.io/repos/current/el/8/x86_64 && \
   yum -y install sshpass gcc python3 python3-devel python3-pip python3-lxml \
-                 rsync python3-netaddr openssh-clients dci-downloader dnf bzip2-devel && \
+                 rsync python3-netaddr openssh-clients dci-downloader dnf && \
   yum clean all
 
 RUN pip3 install -U pip && \
-    pip3 install createrepo-c && \
     pip3 install ansible && \
     pip3 install ansible-runner && \
     #Install dumb-init package to handle "PID 1 problem" and reap zombie processes
