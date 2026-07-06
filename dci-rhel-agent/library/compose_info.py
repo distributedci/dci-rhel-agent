@@ -60,6 +60,10 @@ class ComposeInfo(object):
             pxe_images['kernel'] = tree_info.images.images[arch]['kernel']
             pxe_images['initrd'] = tree_info.images.images[arch]['initrd']
             pxe_images['image'] = self.find_image(os.path.join(compose_path, os_path), arch)
+
+            # Add grub modules directory for RHEL-8 PPC
+            if arch == 'ppc64le' and self.osmajor.startswith('RedHatEnterpriseLinux8'):
+                pxe_images['grub_modules'] = 'boot/grub/powerpc-ieee1275/'
         except (IOError, OSError):
             pass
 

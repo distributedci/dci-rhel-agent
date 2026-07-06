@@ -15,7 +15,6 @@ RUN yum upgrade -y && \
   yum clean all
 
 RUN pip3 install -U pip && \
-    pip3 install createrepo-c && \
     pip3 install ansible && \
     pip3 install ansible-runner && \
     #Install dumb-init package to handle "PID 1 problem" and reap zombie processes
