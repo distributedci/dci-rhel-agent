@@ -25,13 +25,9 @@
         scheduled_topic: "{{ topic }}"
       when: not is_partner_topic
 
-    - name: 'Create or retrieve RHEL4NV partner component before scheduling'
-      include_tasks: create_partner_component.yml
-      when: is_partner_topic
-
     - name: 'Schedule a new job in DCI Control Server'
       dci_job:
-        components: '{{ [partner_component_id] if is_partner_topic else dci_components }}'
+        components: '{{ [] if is_partner_topic else dci_components }}'
         components_by_query: "{{ dci_components_by_query }}"
         topic: '{{ scheduled_topic }}'
         comment: "{{ dci_comment | default('') }}"
@@ -53,6 +49,9 @@
         components: "{{ job_info['job']['components'] }}"
         product: "{{ job_info['job']['topic']['product_id'] }}"
         job_team_id: "{{ job_info['job']['team_id'] }}"
+
+    - name: 'Create or retrieve RHEL4NV partner component'
+      include_tasks: create_partner_component.yml
 
     - name: 'Update job name with topic_name'
       dci_job:
@@ -180,12 +179,25 @@
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
+- name: 'Setup supplementary repositories'
+  hosts: sut
+  gather_facts: no
+  tags:
+    - install
+  tasks:
+    - block:
+        - name: 'Setup RHEL4NV supplementary repositories on SUTs'
+          include_tasks: setup_partner_repos.yml
+      rescue:
+        - name: Teardown failure
+          include_tasks: teardown_failure.yml
+
 - name: 'Launch tests'
   hosts: localhost
   gather_facts: yes
   tags:
     - tests
-    - jumpbox
+    - sut
   tasks:
     - block:
         - name: 'Check partner tests hook file is present'

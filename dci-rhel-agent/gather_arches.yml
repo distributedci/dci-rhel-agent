@@ -3,6 +3,7 @@
   uri:
     url: "http://{{ jumpbox }}.{{ domain }}:{{ provision_port }}/systems/{{ system.value.fqdn }}"
     method: GET
+    validate_certs: no
   register: system_details
 
 - name: 'Register SUT CPU arch variable'

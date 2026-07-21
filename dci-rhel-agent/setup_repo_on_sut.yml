@@ -1,0 +1,24 @@
+---
+- name: Determine repository subdirectory
+  set_fact:
+    repo_subdir: "{{ 'supplementary' if repo.type == 'supp' else 'extensions' }}"
+
+- name: Generate repository base URL
+  set_fact:
+    repo_base_url: "http://{{ hostvars.localhost.jumpbox }}.{{ hostvars.localhost.domain }}:{{ hostvars.localhost.http_store_port }}/{{ hostvars.localhost.topic_name }}/compose/{{ repo.name }}/{{ system_arch }}/{{ repo_subdir }}/os"
+
+- name: Create yum repository file on SUT
+  copy:
+    dest: "/etc/yum.repos.d/{{ repo.name }}.repo"
+    content: |
+      [{{ repo.name }}]
+      name={{ repo.name }}
+      baseurl={{ repo_base_url }}
+      enabled=1
+      gpgcheck=0
+    mode: '0644'
+  become: true
+
+- name: Debug repository setup
+  debug:
+    msg: "Set up repository {{ repo.name }} at {{ repo_base_url }} on {{ inventory_hostname }}"

@@ -1,77 +1,91 @@
 ---
-- name: Extract RHEL version from RHEL4NV topic name
+- name: Check if this is a RHEL4NV partner topic requiring component creation
   set_fact:
-    rhel_version: "{{ original_topic | regex_replace('^RHEL4NV-FULL-(.*)$', '\\1') }}"
+    is_partner_topic: "{{ topic_name is match('RHEL4NV-FULL-.*') }}"
 
-- name: Construct standard RHEL topic name
-  set_fact:
-    standard_rhel_topic: "RHEL-{{ rhel_version }}"
+- block:
+    - name: Extract RHEL version from RHEL4NV topic name
+      set_fact:
+        rhel_version: "{{ topic_name | regex_replace('^RHEL4NV-FULL-(.*)$', '\\1') }}"
 
-- name: Debug topic mapping
-  debug:
-    msg: "Mapping {{ original_topic }} to standard topic {{ standard_rhel_topic }}"
+    - name: Construct standard RHEL topic name
+      set_fact:
+        standard_rhel_topic: "RHEL-{{ rhel_version }}"
 
-- name: Search for standard RHEL topic
-  dci_topic:
-    state: search
-    name: "{{ standard_rhel_topic }}"
-  register: rhel_topic_search
+    - name: Debug topic mapping
+      debug:
+        msg: "Mapping {{ topic_name }} to standard topic {{ standard_rhel_topic }}"
 
-- name: Fail if standard RHEL topic doesn't exist
-  fail:
-    msg: "Standard RHEL topic {{ standard_rhel_topic }} not found on DCI control server"
-  when: rhel_topic_search.topics | default([]) | length == 0
+    - name: Search for standard RHEL topic
+      dci_topic:
+        state: search
+        name: "{{ standard_rhel_topic }}"
+      register: rhel_topic_search
 
-- name: Set topic_id from standard RHEL topic
-  set_fact:
-    partner_topic_id: "{{ rhel_topic_search.topics[0].id }}"
+    - name: Fail if standard RHEL topic doesn't exist
+      fail:
+        msg: "Standard RHEL topic {{ standard_rhel_topic }} not found on DCI control server"
+      when: rhel_topic_search.topics | default([]) | length == 0
 
-- name: Debug topic info
-  debug:
-    msg: "Using standard RHEL topic {{ partner_topic_id }} ({{ standard_rhel_topic }}) for RHEL4NV components"
+    - name: Set topic_id from standard RHEL topic
+      set_fact:
+        partner_topic_id: "{{ rhel_topic_search.topics[0].id }}"
 
-- name: Get RHEL4NV component name from RHDL
-  shell: rhdl compose-list {{ original_topic }} --channel nightly --format plain
-  register: rhdl_component_result
-  changed_when: false
+    - name: Debug topic info
+      debug:
+        msg: "Using standard RHEL topic {{ partner_topic_id }} ({{ standard_rhel_topic }}) for RHEL4NV components"
 
-- name: Set RHEL4NV component display_name from RHDL
-  set_fact:
-    partner_component_name: "{{ rhdl_component_result.stdout_lines[1] | trim }}"
+    - name: Get RHEL4NV component name from RHDL
+      shell: rhdl compose-list {{ topic_name }} --channel nightly --format plain
+      register: rhdl_component_result
+      changed_when: false
 
-- name: Debug component name
-  debug:
-    msg: "RHEL4NV component name from RHDL: {{ partner_component_name }}"
+    - name: Set RHEL4NV component display_name from RHDL
+      set_fact:
+        partner_component_name: "{{ rhdl_component_result.stdout_lines[1] | trim }}"
 
-- name: Search for existing RHEL4NV component
-  dci_component:
-    state: search
-    topic_id: "{{ partner_topic_id }}"
-    display_name: "{{ partner_component_name }}"
-  register: existing_component
+    - name: Debug component name
+      debug:
+        msg: "RHEL4NV component name from RHDL: {{ partner_component_name }}"
 
-- name: Display existing component search results
-  debug:
-    msg: "Found {{ existing_component.components | default([]) | length }} existing components matching '{{ partner_component_name }}'"
+    - name: Search for existing RHEL4NV component
+      dci_component:
+        state: search
+        topic_id: "{{ partner_topic_id }}"
+        display_name: "{{ partner_component_name }}"
+      register: existing_component
 
-- name: Create RHEL4NV component if it doesn't exist
-  dci_component:
-    state: present
-    display_name: "{{ partner_component_name }}"
-    type: "compose"
-    topic_id: "{{ partner_topic_id }}"
-  register: new_component
-  when: existing_component.components | default([]) | length == 0
+    - name: Display existing component search results
+      debug:
+        msg: "Found {{ existing_component.components | default([]) | length }} existing components matching '{{ partner_component_name }}'"
 
-- name: Set component_id for RHEL4NV component
-  set_fact:
-    partner_component_id: >-
-      {{
-        (existing_component.components[0].id)
-        if (existing_component.components | default([]) | length > 0)
-        else (new_component.component.id)
-      }}
+    - name: Create RHEL4NV component if it doesn't exist
+      dci_component:
+        state: present
+        display_name: "{{ partner_component_name }}"
+        type: "compose"
+        topic_id: "{{ partner_topic_id }}"
+        team_id: "{{ job_team_id }}"
+      register: new_component
+      when: existing_component.components | default([]) | length == 0
 
-- name: Debug RHEL4NV component info
-  debug:
-    msg: "Using RHEL4NV component {{ partner_component_id }} ({{ partner_component_name }}) under {{ standard_rhel_topic }} topic"
+    - name: Set component_id for RHEL4NV component
+      set_fact:
+        partner_component_id: >-
+          {{
+            (existing_component.components[0].id)
+            if (existing_component.components | default([]) | length > 0)
+            else (new_component.component.id)
+          }}
+
+    - name: Attach RHEL4NV component to job
+      dci_job_component:
+        job_id: "{{ job_id }}"
+        component_id: "{{ partner_component_id }}"
+        state: present
+
+    - name: Debug RHEL4NV component info
+      debug:
+        msg: "Using RHEL4NV component {{ partner_component_id }} ({{ partner_component_name }}) under {{ standard_rhel_topic }} topic, attached to job {{ job_id }}"
+
+  when: is_partner_topic
