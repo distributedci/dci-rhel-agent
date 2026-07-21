@@ -10,11 +10,26 @@
         dci_cs_url="{{ lookup('env','DCI_CS_URL') }}"
       no_log: true
 
+    - name: 'Check if this is a RHEL4NV partner topic'
+      set_fact:
+        is_partner_topic: "{{ topic is match('RHEL4NV-FULL-.*') }}"
+        original_topic: "{{ topic }}"
+
+    - name: 'Map RHEL4NV topic to standard RHEL topic for job scheduling'
+      set_fact:
+        scheduled_topic: "{{ topic | regex_replace('^RHEL4NV-FULL-(.*)$', 'RHEL-\\1') }}"
+      when: is_partner_topic
+
+    - name: 'Use original topic if not RHEL4NV'
+      set_fact:
+        scheduled_topic: "{{ topic }}"
+      when: not is_partner_topic
+
     - name: 'Schedule a new job in DCI Control Server'
       dci_job:
-        components: '{{ dci_components }}'
+        components: '{{ [] if is_partner_topic else dci_components }}'
         components_by_query: "{{ dci_components_by_query }}"
-        topic: '{{ topic }}'
+        topic: '{{ scheduled_topic }}'
         comment: "{{ dci_comment | default('') }}"
         url: "{{ dci_url | default('') }}"
         name: "{{ dci_name | default('') }}"
@@ -29,10 +44,14 @@
       set_fact:
         job_id: "{{ job_info['job']['id'] }}"
         topic_id: "{{ job_info['job']['topic_id'] }}"
-        topic_name: "{{ job_info['job']['topic']['name'] }}"
+        topic_name: "{{ original_topic if is_partner_topic else job_info['job']['topic']['name'] }}"
         remoteci_id: "{{ job_info['job']['remoteci_id'] }}"
         components: "{{ job_info['job']['components'] }}"
         product: "{{ job_info['job']['topic']['product_id'] }}"
+        job_team_id: "{{ job_info['job']['team_id'] }}"
+
+    - name: 'Create or retrieve RHEL4NV partner component'
+      include_tasks: create_partner_component.yml
 
     - name: 'Update job name with topic_name'
       dci_job:
@@ -160,12 +179,25 @@
         - name: Teardown failure
           include_tasks: teardown_failure.yml
 
+- name: 'Setup supplementary repositories'
+  hosts: sut
+  gather_facts: no
+  tags:
+    - install
+  tasks:
+    - block:
+        - name: 'Setup RHEL4NV supplementary repositories on SUTs'
+          include_tasks: setup_partner_repos.yml
+      rescue:
+        - name: Teardown failure
+          include_tasks: teardown_failure.yml
+
 - name: 'Launch tests'
   hosts: localhost
   gather_facts: yes
   tags:
     - tests
-    - jumpbox
+    - sut
   tasks:
     - block:
         - name: 'Check partner tests hook file is present'

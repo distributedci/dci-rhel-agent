@@ -1,0 +1,54 @@
+---
+- name: Check if this is a RHEL4NV partner topic
+  set_fact:
+    setup_partner_repos: "{{ hostvars.localhost.topic_name is match('RHEL4NV-FULL-.*') }}"
+- block:
+    - name: Extract RHEL version from topic name
+      set_fact:
+        rhel_version: "{{ hostvars.localhost.topic_name | regex_replace('^RHEL4NV-FULL-(.*)$', '\\1') }}"
+      delegate_to: localhost
+
+    - name: Define supplementary repository versions
+      set_fact:
+        supp_repos:
+          - name: "Supp-{{ rhel_version }}"
+            type: "supp"
+          - name: "Ext-{{ rhel_version }}"
+            type: "ext"
+      delegate_to: localhost
+
+    - name: Download supplementary repositories with RHDL for SUT architecture
+      shell: >
+        rhdl download {{ item.name }}
+        --destination /data/{{ hostvars.localhost.topic_name }}/compose
+        --include="{{ system_arch }}/*"
+        --exclude "*"
+        --force
+      loop: "{{ supp_repos }}"
+      register: repo_download_result
+      ignore_errors: yes
+      become: true
+      delegate_to: localhost
+
+    - name: Log missing repositories
+      debug:
+        msg: "Repository {{ item.item.name }} not found, skipping setup"
+      loop: "{{ repo_download_result.results }}"
+      when: item.failed | default(false)
+
+    - name: Log successful repository downloads
+      debug:
+        msg: "Successfully downloaded repository {{ item.item.name }}"
+      loop: "{{ repo_download_result.results }}"
+      when: not (item.failed | default(false))
+
+    - name: Build list of successfully downloaded repositories
+      set_fact:
+        available_repos: "{{ repo_download_result.results | rejectattr('failed') | map(attribute='item') | list }}"
+
+    - name: Setup each successfully downloaded repository on SUT
+      include_tasks: setup_repo_on_sut.yml
+      loop: "{{ available_repos }}"
+      loop_control:
+        loop_var: repo
+  when: setup_partner_repos
