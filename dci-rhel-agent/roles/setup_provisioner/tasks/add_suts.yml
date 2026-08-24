@@ -37,6 +37,9 @@
       Accept: application/json
       Content-Type: application/json
     status_code: [200]
+    url_username: "{{ provisioner_username }}"
+    url_password: "{{ provisioner_password }}"
+    force_basic_auth: yes
   when:
     - item.key.split('.')[0] + "." + domain in systems.json.systems
   become: true
@@ -60,6 +63,9 @@
       Accept: application/json
       Content-Type: application/json
     status_code: [201, 409]
+    url_username: "{{ provisioner_username }}"
+    url_password: "{{ provisioner_password }}"
+    force_basic_auth: yes
   when:
     - item.key.split('.')[0] + "." + domain not in systems.json.systems
   loop: "{{ q('dict', lab.system_inventory | default({})) }}"

@@ -4,6 +4,9 @@
 - name: Populate service facts
   service_facts:
 
+- name: Generate Provisioner Credentials
+  include_tasks: generate_credentials.yml
+
 - name: Configure Netboot
   include_tasks: configure_netboot.yml
 

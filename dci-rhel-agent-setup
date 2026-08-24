@@ -68,7 +68,8 @@ def main():
       local_source_path = os.environ.get('LOCAL_SOURCE_PATH', './dci-rhel-agent')
       volumes[local_source_path] = '/usr/share/dci-rhel-agent:z'
 
-    myCmd = 'podman run --rm -ti --network host'
+    myCmd = 'source /etc/dci-rhel-agent/dcirc.sh && '
+    myCmd = myCmd + 'podman run --rm -ti --network host -e DCI_CLIENT_ID'
 
     for key, value in volumes.items():
       myCmd = myCmd + ' -v ' + key + ':' + value
