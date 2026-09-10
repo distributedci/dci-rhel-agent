@@ -410,10 +410,6 @@ The test network is separate from your public network and should not need to be 
 The status of each job executed through DCI is captured on our web UI (distributed-ci.io). When a failure occurs, a good first step is to find the job in the DCI UI by logging in, clicking on the "Jobs" link on the left side of the page, and then filtering the jobs by your team. The most recent job will be at the top of the list. Clicking on the topic name with take you to a log of the output of each Ansible task that was executed during the job. By clicking on each task, you can see a more verbose output which can help to troubleshoot where your job failed and why.
 The DCI team is reachable via distributed-ci@redhat.com. When contacting DCI regarding a failing job it is helpful to have as much information as possible to help the team troubleshoot. A link to the failing job, anything new that has changed in your lab, and whether or not this job has succeeded in the past are all helpful in assisting the DCI team to find the root cause.
 
-### My job is hanging at the dci-downloader task.
-
-There could be .lock files in your local_repo (usually /opt/dci unless overridden in settings) which are not being cleared. Check in your local_repo/<topic_name> and manually delete any .lock files if present.
-
 ### I have a new test system I would like to add to my DCI Lab.
 
 Adding new SUT to your DCI Lab can all be handled in your settings file. Each settings file contains a "lab" section which describes various network configs for your SUT, along with a list of all SUTs and their relevant information. Add any new systems to this list, and run the dci-rhel-agent-setup as usual. The agent will see that there are SUTs in your settings file which are not integrated into your DCI lab and will make the appropriate changes to add them to the SUTs network. New systems can be added to your topics..systems section to be used with the agent now. See the RHEL agent documentation above for settings file structure.
@@ -424,7 +420,7 @@ Yes. A common setup is to use the libvirt/qemu/kvm stack for VM test machines. T
 
 ### Does the agent download an entire RHEL compose every time a new nightly or milestone compose is available?
 
-No. Due to the large size of RHEL composes, our dci-downloader tool called by the RHEL agent downloads only the files which have changed since your lab's last download of the topic. So your first run of the agent will include a lengthy download, but subsequent runs will be much faster.
+No. Due to the large size of RHEL composes, our Red Hat Downloader (RHDL) tool called by the RHEL agent downloads only the files which have changed since your lab's last download of the topic. So your first run of the agent will include a lengthy download, but subsequent runs will be much faster.
 
 ### I would like to continue to use the same RHEL compose for testing in our lab for a while.
 
