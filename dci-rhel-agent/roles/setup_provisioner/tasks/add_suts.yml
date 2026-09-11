@@ -26,6 +26,7 @@
     body:
       arch: "{{ item.value.arch }}"
       ip_address: "{{ item.value.ip_address }}"
+      mac: "{{ item.value.mac | default('') }}"
       lab: "{{ jumpbox }}.{{ domain }}"
       bmc_type: "{{ item.value.power_type }}"
       bmc_address: "{{ item.value.power_address }}"
@@ -52,6 +53,7 @@
     body:
       arch: "{{ item.value.arch }}"
       ip_address: "{{ item.value.ip_address }}"
+      mac: "{{ item.value.mac | default('') }}"
       lab: "{{ jumpbox }}.{{ domain }}"
       bmc_type: "{{ item.value.power_type }}"
       bmc_address: "{{ item.value.power_address }}"

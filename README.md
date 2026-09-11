@@ -114,6 +114,7 @@ The possible values are:
 | systems[].efi                          | False    | True/False     | Use efi netboot images instead of pxelinux.0                                                                                        |
 | systems[].alternate_efi_boot_commands  | False    | True/False     | Use alternate linux and initrd commands instead if linuxefi and initrdefi                                                           |
 | systems[].petitboot                    | False    | True/False     | Use alternate bootloader with ppc                                                                                                   |
+| systems[].pxe_first_boot               | False    | True/False     | After a verified install, move the system's IPv4 PXE entry to the front of the UEFI boot order (via efibootmgr on the SUT). Enable for BMCs that re-sort the boot order to disk-first and break re-provisioning. UEFI x86_64/aarch64 only. |
 | systems[].ks_meta                      | False    | Dict           | Metadata to pass to anaconda kickstart templating                                                                                   |
 | systems[].ks_append                    | False    | String         | Appends custom commands to default kickstart used to provision test system
 | systems[].kernel_options               | False    | String         | Arguments to pass to the install kernel                                                                                             |
