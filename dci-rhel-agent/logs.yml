@@ -5,6 +5,12 @@
 #
 - name: Collect and Upload logs
   block:
+    - name: Mark the job logs as collected
+      set_fact:
+        logs_collected: true
+      delegate_to: localhost
+      delegate_facts: true
+
     - name: Check if ansible log exists
       stat:
         path: /var/log/ansible.log
@@ -14,9 +20,17 @@
     #When Ansible verbosity is at levels 3 or 4, ansible copy module has checksum error due
     #to file changing between generation of initial checksum and final checksum after copy
     - name: Copy ansible.log file to logs directory
-      shell: 'cp /var/log/ansible.log {{ job_logs.path }}'
+      shell: 'cp /var/log/ansible.log {{ hostvars.localhost.job_logs.path }}'
       delegate_to: localhost
       when: ansible_log_check.stat.exists
+
+    - name: Collect console logs
+      include_tasks:
+        file: finalize_console_logs.yml
+        apply:
+          tags: conserver
+      when: systems | default({}) | dict2items | selectattr('value.sol_command', 'defined') | list | length > 0
+      tags: conserver
 
     - name: Upload logs directory to DCI Control Server
       delegate_to: localhost
@@ -48,9 +62,10 @@
       with_fileglob: '{{ hostvars.localhost.job_artifacts.path }}/*.xml'
 
     - name: Delete tmp logs directories
+      delegate_to: localhost
       file:
         state: absent
         path: "{{ item }}"
       with_items:
-        - "{{ job_logs.path }}"
-        - "{{ job_artifacts.path }}"
+        - "{{ hostvars.localhost.job_logs.path }}"
+        - "{{ hostvars.localhost.job_artifacts.path }}"

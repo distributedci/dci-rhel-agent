@@ -1,21 +1,42 @@
 ---
-- name: Configure conserver
-  hosts: jumpbox
-  become: yes
-  gather_facts: no
-  tags: conserver
-  tasks:
+#
+# Configure conserver on the jumpbox so that every system with a sol_command
+# gets its console captured to /var/consoles/<fqdn>.
+#
+# Included from the 'Setup Conserver for Console Logging' play, which runs on
+# localhost; every task here delegates to the jumpbox.
+#
+- name: Setup conserver for console logging
+  # A rescue does not catch an unreachable host, so without this an unreachable
+  # jumpbox would fail the job even though console logging is optional.
+  ignore_unreachable: true
+  block:
     - name: Install required packages
       package:
         name:
           - conserver
           - conserver-client
         state: present
-    - name: Create /var/consoles if it does not exist
+      become: yes
+      delegate_to: jumpbox
+
+    - name: Clear console logs left over from a previous job
+      file:
+        path: /var/consoles
+        state: absent
+      become: yes
+      delegate_to: jumpbox
+
+    - name: Create /var/consoles
       file:
         path: /var/consoles
         state: directory
         mode: '0755'
+        owner: root
+        group: root
+      become: yes
+      delegate_to: jumpbox
+
     - name: Create conserver.cf file
       template:
         src: conserver.cf.j2
@@ -23,10 +44,22 @@
         owner: root
         group: root
         mode: 0644
-      notify:
-        - restart conserver
-  handlers:
-    - name: restart conserver
+      become: yes
+      delegate_to: jumpbox
+
+    - name: Start and enable conserver with a fresh set of log files
       service:
         name: conserver
         state: restarted
+        enabled: yes
+      become: yes
+      delegate_to: jumpbox
+
+    - name: Conserver setup completed successfully
+      debug:
+        msg: "Conserver setup completed - console logging is now active with fresh log files"
+
+  rescue:
+    - name: Conserver setup failed
+      debug:
+        msg: "Warning: Conserver setup failed, console logging will not be available but job will continue"

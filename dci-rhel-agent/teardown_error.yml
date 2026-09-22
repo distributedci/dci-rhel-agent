@@ -6,6 +6,28 @@
     status: "error"
   tags: dci
 
+# When a localhost play fails, the 'fail' below removes localhost from the run
+# and the post-run 'Grab logs' play never executes, so the logs have to be
+# collected here.  When a SUT play fails only that host is removed, 'Grab logs'
+# still runs on localhost, and collecting here instead would upload a partial
+# set and delete the temp directories while the other SUTs are still installing.
+- name: 'Collect logs on error'
+  delegate_to: localhost
+  when:
+    - "'sut' not in group_names"
+    - not hostvars.localhost.logs_collected | default(false) | bool
+  block:
+    - name: 'Create temp dir for error logs if necessary'
+      include_tasks: create_temp_dir.yml
+      when: hostvars.localhost.job_logs is not defined
+
+    - name: 'Upload error logs to DCI Control Server'
+      include_tasks: logs.yml
+  rescue:
+    - name: 'Log collection failed during error'
+      debug:
+        msg: 'Warning: Could not collect logs during error handling'
+
 - name: 'Job in error'
   fail:
     msg: 'Something went wrong. Review the log at: https://www.distributed-ci.io/jobs/{{ hostvars.localhost.job_id }}/jobStates'
