@@ -1,21 +1,5 @@
 ---
-#
-# Job wide console log collection.  Included from logs.yml, which runs at most
-# once per job, after every system has finished.
-#
-# Conserver is stopped first so the SOL sessions are released and the logs are
-# complete, then everything left in /var/consoles is collected.  The fetch
-# destination is derived from the file name, so a system already snapshotted by
-# collect_console_logs.yml is overwritten with its final log rather than
-# uploaded twice.
-#
-# Nothing is deleted here.  The logs stay on the jumpbox for inspection until
-# conserver.yml clears them at the start of the next job.
-#
 - name: 'Finalize console log collection'
-  # A rescue does not catch an unreachable host, so without this an unreachable
-  # jumpbox would fail the job from what is only a best effort log grab.  The
-  # remaining tasks still run when it triggers, hence the default([]) below.
   ignore_unreachable: true
   block:
     - name: 'Stop conserver to release the SOL sessions'
@@ -26,10 +10,6 @@
       delegate_to: jumpbox
       failed_when: false
 
-    # conserver.yml clears /var/consoles at the start of every job and only one
-    # agent runs against a jumpbox at a time, so everything here belongs to this
-    # job.  That includes the <fqdn>-YYYYMMDD-HHMMSS files conserver produces
-    # when a console passes logfilemax.
     - name: 'Find the console logs for this job'
       find:
         paths: /var/consoles
