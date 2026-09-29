@@ -5,6 +5,12 @@
 #
 - name: Collect and Upload logs
   block:
+    - name: Mark the job logs as collected
+      set_fact:
+        logs_collected: true
+      delegate_to: localhost
+      delegate_facts: true
+
     - name: Check if ansible log exists
       stat:
         path: /var/log/ansible.log
@@ -14,9 +20,67 @@
     #When Ansible verbosity is at levels 3 or 4, ansible copy module has checksum error due
     #to file changing between generation of initial checksum and final checksum after copy
     - name: Copy ansible.log file to logs directory
-      shell: 'cp /var/log/ansible.log {{ job_logs.path }}'
+      shell: 'cp /var/log/ansible.log {{ hostvars.localhost.job_logs.path }}'
       delegate_to: localhost
       when: ansible_log_check.stat.exists
+
+    - name: Collect console logs
+      include_tasks:
+        file: finalize_console_logs.yml
+        apply:
+          tags: conserver
+      when: systems | default({}) | dict2items | selectattr('value.sol_command', 'defined') | list | length > 0
+      tags: conserver
+
+    - name: Create the staging directories for the provisioner and lab logs
+      delegate_to: localhost
+      file:
+        path: '{{ hostvars.localhost.job_logs.path }}/{{ item }}'
+        state: directory
+        mode: '0700'
+      loop:
+        - provisioner
+        - lab
+
+    - name: Stage the provisioner and lab logs for redaction
+      delegate_to: localhost
+      copy:
+        src: '{{ item }}'
+        dest: '{{ hostvars.localhost.job_logs.path }}/{{ item | dirname | basename }}/{{ item | basename }}'
+        remote_src: yes
+      with_fileglob:
+        - '/logs/provisioner/*'
+        - '/logs/lab/*'
+
+    - name: Find the log files staged for upload
+      delegate_to: localhost
+      find:
+        paths: '{{ hostvars.localhost.job_logs.path }}'
+        recurse: yes
+        file_type: file
+      register: staged_logs
+
+    - name: Find the artifact files staged for upload
+      delegate_to: localhost
+      find:
+        paths: '{{ hostvars.localhost.job_artifacts.path }}'
+        patterns:
+          - '*.log'
+          - '*.xml'
+        file_type: file
+      register: staged_artifacts
+
+    - name: Redact credentials from the files staged for upload
+      delegate_to: localhost
+      replace:
+        path: '{{ item.path }}'
+        regexp: '{{ hostvars.localhost.upload_secrets | map("regex_escape") | join("|") }}'
+        replace: '<redacted for security>'
+      loop: "{{ (staged_logs.files | default([])) + (staged_artifacts.files | default([])) }}"
+      loop_control:
+        label: '{{ item.path }}'
+      when: hostvars.localhost.upload_secrets | default([]) | length > 0
+      no_log: true
 
     - name: Upload logs directory to DCI Control Server
       delegate_to: localhost
@@ -31,8 +95,8 @@
       with_fileglob:
         - '{{ hostvars.localhost.job_logs.path }}/*'
         - '{{ hostvars.localhost.job_artifacts.path }}/*.log'
-        - '/logs/provisioner/*'
-        - '/logs/lab/*'
+        - '{{ hostvars.localhost.job_logs.path }}/provisioner/*'
+        - '{{ hostvars.localhost.job_logs.path }}/lab/*'
 
     - name: Upload artifacts directory to DCI Control Server
       delegate_to: localhost
@@ -48,9 +112,10 @@
       with_fileglob: '{{ hostvars.localhost.job_artifacts.path }}/*.xml'
 
     - name: Delete tmp logs directories
+      delegate_to: localhost
       file:
         state: absent
         path: "{{ item }}"
       with_items:
-        - "{{ job_logs.path }}"
-        - "{{ job_artifacts.path }}"
+        - "{{ hostvars.localhost.job_logs.path }}"
+        - "{{ hostvars.localhost.job_artifacts.path }}"

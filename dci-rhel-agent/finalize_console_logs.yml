@@ -1,0 +1,35 @@
+---
+- name: 'Finalize console log collection'
+  ignore_unreachable: true
+  block:
+    - name: 'Stop conserver to release the SOL sessions'
+      service:
+        name: conserver
+        state: stopped
+      become: yes
+      delegate_to: jumpbox
+      failed_when: false
+
+    - name: 'Find the console logs for this job'
+      find:
+        paths: /var/consoles
+        file_type: file
+      become: yes
+      delegate_to: jumpbox
+      register: job_console_logs
+
+    - name: 'Fetch the console logs to the job logs directory'
+      fetch:
+        src: "{{ item.path }}"
+        dest: "{{ hostvars.localhost.job_logs.path }}/{{ item.path | basename }}.console.log"
+        flat: yes
+      become: yes
+      delegate_to: jumpbox
+      loop: "{{ job_console_logs.files | default([]) }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+  rescue:
+    - name: 'Console log finalization failed'
+      debug:
+        msg: 'Warning: could not finalize console log collection, continuing'

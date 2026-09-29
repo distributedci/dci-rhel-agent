@@ -7,6 +7,14 @@ default * {
         rw *;
         # enable logging
         logfile /var/consoles/&;
+        logfilemax 10m;
+}
+
+# conserver refuses clients by default, so without this the 'console' command
+# is rejected on the jumpbox itself.  The agent does not need it - it reads
+# /var/consoles directly - but an operator does, to watch a live console.
+access * {
+        trusted 127.0.0.1;
 }
 
 {% for system_key, system in systems.items() %}

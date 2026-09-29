@@ -117,7 +117,7 @@ The possible values are:
 | systems[].ks_meta                      | False    | Dict           | Metadata to pass to anaconda kickstart templating                                                                                   |
 | systems[].ks_append                    | False    | String         | Appends custom commands to default kickstart used to provision test system
 | systems[].kernel_options               | False    | String         | Arguments to pass to the install kernel                                                                                             |
-| systems[].sol_command                  | False    | String         | Command to use for serial console over lan                                                                                          |
+| systems[].sol_command                  | False    | String         | Command to use for serial console over lan.  When set, the console is captured by conserver and attached to the job as `<fqdn>.console.log`.  The command is run on the jumpbox, so the program it names (`ipmitool`, for example) must be installed there |
 | variants                               | False    | List of string | List of RHEL 8.x variant to enable (AppStream, BaseOS, CRB, HighAvailability, NFV, RT, ResilientStorage, SAP, SAPHANA and unified). |
 | archs                                  | False    | List of string | CPU arch to enable (aarch64, ppc64le, s390x and x86_64).                                                                            |
 | with_debug                             | False    | True/False     | Use RPM with debug symbols.                                                                                                         |
