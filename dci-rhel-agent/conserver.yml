@@ -11,14 +11,38 @@
   # jumpbox would fail the job even though console logging is optional.
   ignore_unreachable: true
   block:
-    - name: Install required packages
-      package:
-        name:
-          - conserver
-          - conserver-client
-        state: present
-      become: yes
+    # conserver and conserver-client come from the dci-rhel-agent package, but
+    # the program a sol_command names is free form, so it can only be checked
+    # for.  Without this a missing program gives a console log that is empty or
+    # holds nothing but a 'command not found', with no indication of why.
+    - name: Work out which programs the SOL commands need
+      set_fact:
+        sol_programs: >-
+          {{ systems | dict2items
+             | selectattr('value.sol_command', 'defined')
+             | map(attribute='value.sol_command')
+             | map('trim')
+             | map('regex_replace', '\s.*$', '')
+             | map('basename')
+             | unique | list }}
+
+    - name: Check that every SOL program is present on the jumpbox
+      shell: "command -v {{ item | quote }}"
+      changed_when: false
+      failed_when: false
+      register: sol_program_check
+      loop: "{{ sol_programs }}"
       delegate_to: jumpbox
+
+    - name: Warn about SOL programs that are missing from the jumpbox
+      debug:
+        msg: >-
+          Warning: '{{ item.item }}' is not installed on the jumpbox, so the
+          SOL command using it cannot run and its console log will be empty.
+      loop: "{{ sol_program_check.results | default([]) }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: item.rc | default(0) != 0
 
     - name: Clear console logs left over from a previous job
       file:
@@ -37,13 +61,15 @@
       become: yes
       delegate_to: jumpbox
 
+    # Each sol_command is written into this file verbatim, BMC password and
+    # all, and conserver reads it as root, so it is not world readable.
     - name: Create conserver.cf file
       template:
         src: conserver.cf.j2
         dest: /etc/conserver.cf
         owner: root
         group: root
-        mode: 0644
+        mode: 0600
       become: yes
       delegate_to: jumpbox
 

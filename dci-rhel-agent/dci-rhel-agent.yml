@@ -60,8 +60,32 @@
     - name: 'Redact sensitive BMC credentials from settings copy'
       replace:
         path: /tmp/settings.yml.redacted
-        regexp: '^(\s*(?:power_user|power_password)\s*:\s*).*$'
+        regexp: '^(\s*(?:power_user|power_password|power_pass|sut_password|sol_command)\s*:\s*).*$'
         replace: '\g<1><redacted for security>'
+
+    - name: 'Collect the credentials that must not be uploaded'
+      set_fact:
+        upload_secrets: >-
+          {{ ( _sol_commands | map('regex_findall', '(?:^|\s)-P[ \t]*(\S+)') | flatten
+               + _sol_commands | map('regex_findall', '(?:^|\s)--pass(?:word|wd)[ =][ \t]*(\S+)') | flatten
+               + _sol_commands | map('regex_findall', '(?:^|\s)(?:-u|--user[ =])[ \t]*[^\s:]*:(\S+)') | flatten
+               + _settings | regex_findall('(?m)^[ \t]*power_(?:password|pass)[ \t]*:[ \t]*(\S.*?)[ \t]*$') )
+             | map('regex_replace', "^[\"']+", '')
+             | map('regex_replace', "[\"']+$", '')
+             | reject('match', '^.{0,3}$')
+             | unique | list }}
+      vars:
+        _settings: "{{ lookup('file', '/etc/dci-rhel-agent/settings.yml') }}"
+        _sol_commands: "{{ _settings | regex_findall('(?m)^[ \t]*sol_command[ \t]*:[ \t]*(.*)$') }}"
+      no_log: true
+
+    - name: 'Redact the credentials embedded in the settings copy'
+      replace:
+        path: /tmp/settings.yml.redacted
+        regexp: '{{ upload_secrets | map("regex_escape") | join("|") }}'
+        replace: '<redacted for security>'
+      when: upload_secrets | length > 0
+      no_log: true
 
     - name: 'Upload redacted settings yml file'
       ignore_errors: yes
