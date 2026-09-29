@@ -2,19 +2,9 @@
 #
 # Configure conserver on the jumpbox so that every system with a sol_command
 # gets its console captured to /var/consoles/<fqdn>.
-#
-# Included from the 'Setup Conserver for Console Logging' play, which runs on
-# localhost; every task here delegates to the jumpbox.
-#
 - name: Setup conserver for console logging
-  # A rescue does not catch an unreachable host, so without this an unreachable
-  # jumpbox would fail the job even though console logging is optional.
   ignore_unreachable: true
   block:
-    # conserver and conserver-client come from the dci-rhel-agent package, but
-    # the program a sol_command names is free form, so it can only be checked
-    # for.  Without this a missing program gives a console log that is empty or
-    # holds nothing but a 'command not found', with no indication of why.
     - name: Work out which programs the SOL commands need
       set_fact:
         sol_programs: >-
@@ -55,14 +45,12 @@
       file:
         path: /var/consoles
         state: directory
-        mode: '0755'
+        mode: '0700'
         owner: root
         group: root
       become: yes
       delegate_to: jumpbox
 
-    # Each sol_command is written into this file verbatim, BMC password and
-    # all, and conserver reads it as root, so it is not world readable.
     - name: Create conserver.cf file
       template:
         src: conserver.cf.j2
@@ -73,11 +61,14 @@
       become: yes
       delegate_to: jumpbox
 
-    - name: Start and enable conserver with a fresh set of log files
+    # Not enabled at boot.  conserver only ever runs for the duration of a job,
+    # and letting systemd restart it after a reboot would reattach the SOL
+    # sessions and grow /var/consoles while no job is running.
+    - name: Start conserver with a fresh set of log files
       service:
         name: conserver
         state: restarted
-        enabled: yes
+        enabled: no
       become: yes
       delegate_to: jumpbox
 
