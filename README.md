@@ -339,6 +339,14 @@ To explicitly run a job and for troubleshooting purposes, launch `dci-rhel-agent
 # dci-rhel-agent-ctl --start
 ```
 
+You can override settings.yml keys for a single run with `-o` / `--override` (repeatable, dotted path, YAML values):
+
+```bash
+dci-rhel-agent-ctl --start \
+  -o topics.0.topic=RHEL-9.6 \
+  -o 'topics.0.dci_tags=[smoke,daily]'
+```
+
 The return code is the number of failed jobs. This is also a good time to go get a coffee as this will take a little while. You may also wish to use screen on RHEL 7 and earlier or tmux on RHEL 8 in order to be able to detach your session and return to it later.
 
 If you need advanced debug, you can spawn a new container with a shell:
