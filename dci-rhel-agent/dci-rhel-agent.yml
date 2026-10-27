@@ -40,10 +40,10 @@
         components: "{{ job_info['job']['components'] }}"
         product: "{{ job_info['job']['topic']['product_id'] }}"
 
-    - name: 'Update job name with topic_name'
+    - name: 'Use topic_name as job name when dci_name is not define'
       dci_job:
         id: "{{ job_id }}"
-        name: '{{ topic_name }}'
+        name: '{{ dci_name | default(topic_name) }}'
 
     - name: 'Set DCI tags for the current job'
       dci_job:
