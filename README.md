@@ -290,6 +290,17 @@ If you setup your network yourself make sure all FQDN must resolve locally on th
 
 All provision jobs in the same topic will run concurrently, but each topic will run consecutively. Running two instances of the agent simultaneously with different settings files is possible.  If you do this a best practice is to separate the settings by topic.  ie: settings-rhel8.yml and settings-rhel9.yml and run them with --config settings-rhel8.yml for example.
 
+#### Storing secrets with dci-vault
+
+Encrypt secrets for `settings.yml` with [`dci-vault`](https://github.com/distributedci/python-dciclient) (uses `DCI_API_SECRET`):
+
+```bash
+source /etc/dci-rhel-agent/dcirc.sh
+echo -n 'my-bmc-password' | dci-vault encrypt_string --stdin-name power_password
+```
+
+Paste the `!vault` block into `settings.yml`, then run `dci-rhel-agent-ctl --start`.
+
 #### How to add tags to a job ?
 
 If you want to associate tags to jobs you can edit the file `settings.yml` and add your tags in the `dci_tags` list.
