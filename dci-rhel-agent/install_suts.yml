@@ -192,4 +192,39 @@
   assert:
     that:
       - breadcrumb == breadcrumb_remote
+
+- name: 'Ensure the provisioning NIC is first in the UEFI boot order'
+  when:
+    - systems[inventory_hostname].pxe_first_boot | default(false, true) | bool
+    - system_arch in ['x86_64', 'aarch64']
+    - system_details.json[inventory_hostname].mac | default('') | length > 0
+  block:
+    - name: 'Normalize the provisioning MAC'
+      ansible.builtin.set_fact:
+        pxe_mac_norm: "{{ system_details.json[inventory_hostname].mac | lower | regex_replace('[:.-]', '') }}"
+
+    - name: 'Move the IPv4 PXE boot entry for that MAC to the front'
+      ansible.builtin.shell:
+        executable: /bin/bash
+        cmd: |
+          set -euo pipefail
+          pxe=$(efibootmgr -v | awk -v needle='mac({{ pxe_mac_norm }}' '
+            { line = tolower($0) }
+            !found && index(line, needle) && index(line, "ipv4(") && !index(line, "uri(") {
+              print substr($1, 5, 4); found = 1
+            }')
+          [[ -n "$pxe" ]] || { echo "no IPv4 PXE entry for MAC {{ pxe_mac_norm }}" >&2; exit 4; }
+          cur=$(efibootmgr | awk -F': ' '/^BootOrder:/{print $2}')
+          rest=$(echo "$cur" | tr ',' '\n' | grep -vx "$pxe" | paste -sd, - || true)
+          new="${pxe}${rest:+,$rest}"
+          efibootmgr -o "$new" >/dev/null
+          echo "boot order: '$cur' -> '$new'"
+      changed_when: true
+  rescue:
+    - name: 'Warn that PXE-first boot order could not be ensured'
+      ansible.builtin.debug:
+        msg: >-
+          Could not ensure PXE-first boot order on {{ inventory_hostname }};
+          re-provisioning may require manual boot-order correction.
+          See the failed task output above for details.
 ...
