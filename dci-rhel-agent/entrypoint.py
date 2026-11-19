@@ -31,7 +31,9 @@ topics:
 """
 import ansible_runner
 import signal
+import shutil
 import sys
+import tempfile
 import yaml
 import jinja2
 
@@ -46,13 +48,32 @@ def sigterm_handler(signal, frame):
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 
+def _plain(obj):
+    if isinstance(obj, dict):
+        return {format(k): _plain(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_plain(v) for v in obj]
+    if obj is None or isinstance(obj, (bool, int, float)):
+        return obj
+    return format(obj)
+
 def load_settings():
-    with open('/etc/dci-rhel-agent/settings.yml', 'r') as settings:
-        try:
-            return(yaml.load(settings, Loader=yaml.SafeLoader))
-        except yaml.YAMLError as exc:
-            print(exc)
-            sys.exit(1)
+    path = '/etc/dci-rhel-agent/settings.yml'
+    try:
+        with open(path, 'r') as settings:
+            data = settings.read()
+        if '!vault' not in data:
+            return yaml.safe_load(data)
+        from ansible.cli import CLI
+        from ansible.parsing.dataloader import DataLoader
+        from ansible.parsing.utils.yaml import from_yaml
+        vault_client = environ.get('DCI_VAULT_CLIENT', shutil.which('dci-vault-client'))
+        vault_secrets = CLI.setup_vault_secrets(
+            loader=DataLoader(), vault_ids=[vault_client])
+        return _plain(from_yaml(data, vault_secrets=vault_secrets))
+    except Exception as exc:
+        print(exc)
+        sys.exit(1)
 
 def provision_and_test(extravars, cmdline):
     # Path is static in the container
@@ -117,8 +138,18 @@ def main():
     if skip_download:
         cmdline += ' --skip-tags "download"'
 
-    # Read the settings file
+    vault_client = environ.get('DCI_VAULT_CLIENT', shutil.which('dci-vault-client'))
+    if vault_client:
+        cmdline += ' --vault-id %s' % vault_client
+        environ['ANSIBLE_VAULT_IDENTITY_LIST'] = vault_client
+
+    # Read the settings file (decrypt !vault with dci-vault-client)
     sets = load_settings()
+    # Plain copy for dci-downloader (yaml.safe_load cannot parse !vault)
+    decrypted = tempfile.NamedTemporaryFile(
+        prefix='dci-settings-', suffix='.yml', delete=False)
+    yaml.safe_dump(sets, decrypted, default_flow_style=False)
+    decrypted.close()
 
     # Check if the settings contain multiple topics and process accordingly
     if 'topics' in sets:
@@ -128,6 +159,7 @@ def main():
         for idx, current_job in enumerate(jobs):
             print ("Beginning provision/test jobs for topic %s" % current_job['topic'])
             current_job['local_repo'] = sets['local_repo']
+            current_job['dci_settings_file'] = decrypted.name
             if 'jumpbox' in sets:
                 current_job['jumpbox'] = sets['jumpbox']
             if 'domain' in sets:

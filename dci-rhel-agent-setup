@@ -26,9 +26,11 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 signal.signal(signal.SIGINT, sigterm_handler)
 
 def load_settings(settings_path):
+  # BaseLoader keeps !vault as plain strings (same first-pass approach as
+  # dci-pipeline); decryption is done inside the agent container.
   with open(settings_path, 'r') as settings:
     try:
-      return yaml.safe_load(settings)
+      return yaml.load(settings, Loader=yaml.BaseLoader)
     except yaml.YAMLError as exc:
       print(exc)
       sys.exit(1)
@@ -53,7 +55,7 @@ def main():
     settings_path = args.config
     dci_rhel_agent_url = args.url
 
-    entrypoint = "ansible-playbook -v -e @/etc/dci-rhel-agent/settings.yml -i /etc/dci-rhel-agent/inventory setup-jumpbox.yml"
+    entrypoint = "ansible-playbook -v --vault-id /usr/bin/dci-vault-client -e @/etc/dci-rhel-agent/settings.yml -i /etc/dci-rhel-agent/inventory setup-jumpbox.yml"
 
     settings = load_settings(settings_path)
 

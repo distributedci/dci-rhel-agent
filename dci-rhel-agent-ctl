@@ -29,9 +29,11 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 signal.signal(signal.SIGINT, sigterm_handler)
 
 def load_settings(settings_path):
+  # BaseLoader keeps !vault as plain strings (same first-pass approach as
+  # dci-pipeline); decryption is done inside the agent container.
   with open(settings_path, 'r') as settings:
     try:
-      return yaml.safe_load(settings)
+      return yaml.load(settings, Loader=yaml.BaseLoader)
     except yaml.YAMLError as exc:
       print(exc)
       sys.exit(1)

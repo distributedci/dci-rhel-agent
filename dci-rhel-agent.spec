@@ -22,6 +22,7 @@ BuildRequires:    python3-pyyaml
 Requires:         podman >= 4
 Requires:         make
 Requires:         dci-downloader
+Requires:         python3-dciclient
 %if 0%{?rhel} && 0%{?rhel} < 8
 Requires:         PyYAML
 %else
