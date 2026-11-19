@@ -4,3 +4,4 @@ __pycache__/
 
 dci-rhel-agent/env/
 dci-rhel-agent/artifacts/
+hooks/set_pxe_boot_order.yml

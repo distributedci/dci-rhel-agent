@@ -55,10 +55,6 @@ def load_settings():
             sys.exit(1)
 
 def provision_and_test(extravars, cmdline):
-    # Path is static in the container
-    # local_repo = '/opt/dci'
-    # extravars['local_repo'] = local_repo
-
     if 'topic' in extravars.keys():
         print ("Topic is %s" % extravars['topic'])
     else:
@@ -116,6 +112,7 @@ def main():
     skip_download = True if environ.get('SKIP_DOWNLOAD') == 'True' else False
     if skip_download:
         cmdline += ' --skip-tags "download"'
+    download_skipped = tests_only or skip_download
 
     # Read the settings file
     sets = load_settings()
@@ -128,6 +125,7 @@ def main():
         for idx, current_job in enumerate(jobs):
             print ("Beginning provision/test jobs for topic %s" % current_job['topic'])
             current_job['local_repo'] = sets['local_repo']
+            current_job['skip_download'] = download_skipped
             if 'jumpbox' in sets:
                 current_job['jumpbox'] = sets['jumpbox']
             if 'domain' in sets:
