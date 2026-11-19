@@ -61,30 +61,60 @@
       replace:
         path: /tmp/settings.yml.redacted
         regexp: '^(\s*(?:power_user|power_password|power_pass|sut_password|sol_command)\s*:\s*).*$'
-        replace: '\g<1><redacted for security>'
+        replace: '\g<1>{{ redacted_placeholder }}'
 
     - name: 'Collect the credentials that must not be uploaded'
       set_fact:
         upload_secrets: >-
-          {{ ( _sol_commands | map('regex_findall', '(?:^|\s)-P[ \t]*(\S+)') | flatten
-               + _sol_commands | map('regex_findall', '(?:^|\s)--pass(?:word|wd)[ =][ \t]*(\S+)') | flatten
-               + _sol_commands | map('regex_findall', '(?:^|\s)(?:-u|--user[ =])[ \t]*[^\s:]*:(\S+)') | flatten
-               + _settings | regex_findall('(?m)^[ \t]*power_(?:password|pass)[ \t]*:[ \t]*(\S.*?)[ \t]*$') )
-             | map('regex_replace', "^[\"']+", '')
-             | map('regex_replace', "[\"']+$", '')
-             | reject('match', '^.{0,3}$')
+          {{ ( ( _sol_commands | map('regex_findall', _sol_password_re) | flatten
+                 + _sol_commands | map('regex_findall', _sol_userpass_re) | flatten )
+               | map('regex_replace', '^["\x27]+', '')
+               | map('regex_replace', '["\x27]+$', '')
+               | list
+               + _settings | regex_findall(_power_dq_re)
+               + _settings | regex_findall(_power_sq_re)
+               + _settings | regex_findall(_power_plain_re) )
+             | reject('equalto', '')
              | unique | list }}
       vars:
         _settings: "{{ lookup('file', '/etc/dci-rhel-agent/settings.yml') }}"
         _sol_commands: "{{ _settings | regex_findall('(?m)^[ \t]*sol_command[ \t]*:[ \t]*(.*)$') }}"
+        _sol_password_re: '(?:^|\s)(?:-P|--pass(?:word|wd))[ \t=]*("[^"]*"|\x27[^\x27]*\x27|\S+)'
+        _sol_userpass_re: '(?:^|\s)(?:-u|--user[ =])[ \t]*[^\s:]*:("[^"]*"|\x27[^\x27]*\x27|\S+)'
+        _power_key_re: '(?m)^[ \t]*power_(?:password|pass)[ \t]*:[ \t]*'
+        _power_dq_re: '{{ _power_key_re }}"([^"]*)"[ \t]*(?:#.*)?$'
+        _power_sq_re: '{{ _power_key_re }}\x27([^\x27]*)\x27[ \t]*(?:#.*)?$'
+        _power_plain_re: '{{ _power_key_re }}([^"\x27#\s].*?)(?:[ \t]+#.*)?[ \t]*$'
       no_log: true
+
+    # A credential reaches an XML artifact in its escaped form, so the pattern
+    # has to carry both spellings of every secret.
+    - name: 'Build the pattern that matches those credentials'
+      set_fact:
+        upload_secrets_regexp: >-
+          {{ ( upload_secrets + _xml_forms ) | unique | map('regex_escape') | join('|') }}
+      vars:
+        _xml_forms: >-
+          {{ upload_secrets | map('replace', '&', '&amp;')
+             | map('replace', '<', '&lt;')
+             | map('replace', '>', '&gt;')
+             | map('replace', '"', '&quot;')
+             | map('replace', "'", '&apos;')
+             | list }}
+      no_log: true
+
+    - name: 'Redact the credential arguments left in the settings copy'
+      replace:
+        path: /tmp/settings.yml.redacted
+        regexp: '{{ credential_arg_regexp }}'
+        replace: '\g<1>{{ redacted_placeholder }}'
 
     - name: 'Redact the credentials embedded in the settings copy'
       replace:
         path: /tmp/settings.yml.redacted
-        regexp: '{{ upload_secrets | map("regex_escape") | join("|") }}'
-        replace: '<redacted for security>'
-      when: upload_secrets | length > 0
+        regexp: '{{ upload_secrets_regexp }}'
+        replace: '{{ redacted_placeholder }}'
+      when: upload_secrets_regexp | length > 0
       no_log: true
 
     - name: 'Upload redacted settings yml file'
