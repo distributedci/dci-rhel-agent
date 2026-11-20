@@ -6,6 +6,24 @@
     status: "failure"
   tags: dci
 
+- name: 'Collect logs on failure'
+  delegate_to: localhost
+  when: "'sut' not in group_names"
+  block:
+    - name: 'Create temp dir if necessary'
+      include_tasks: create_temp_dir.yml
+      when:
+        - hostvars.localhost.job_logs is not defined
+        - not hostvars.localhost.logs_collected | default(false) | bool
+
+    - name: 'Upload failure logs to DCI Control Server'
+      include_tasks: logs.yml
+      when: not hostvars.localhost.logs_collected | default(false) | bool
+  rescue:
+    - name: 'Log collection failed after job failure'
+      debug:
+        msg: 'Warning: Could not collect logs after job failure'
+
 - name: 'Failed job'
   fail:
     msg: 'Something went wrong. Review the log at: https://www.distributed-ci.io/jobs/{{ hostvars.localhost.job_id }}/jobStates'

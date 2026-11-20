@@ -8,3 +8,6 @@ lab_port: 8008
 bridge_name: "br-dci"
 bridge_zone: libvirt
 libvirt_images_dir: /var/lib/libvirt/images
+credential_arg_regexp: '((?:^|[ \t])(?:-P|--pass(?:word|wd))[ \t=]*)("[^"]*"|\x27[^\x27]*\x27|\S+)'
+redacted_placeholder: '<redacted for security>'
+redacted_xml_placeholder: '[redacted for security]'

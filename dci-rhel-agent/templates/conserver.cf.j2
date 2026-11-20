@@ -7,7 +7,16 @@ default * {
         rw *;
         # enable logging
         logfile /var/consoles/&;
+        logfilemax 10m;
 }
+
+# No access block: conserver refuses every client that no rule covers, and the
+# agent never connects as one - it reads /var/consoles directly.  Trusting
+# 127.0.0.1 here would let any local account on the jumpbox attach to a SUT
+# console, read-write.  To watch a live console, add a rule locally, e.g.
+#   access * {
+#           trusted 127.0.0.1;
+#   }
 
 {% for system_key, system in systems.items() %}
 {% if 'sol_command' in system %}

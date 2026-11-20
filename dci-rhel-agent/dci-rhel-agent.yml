@@ -60,8 +60,66 @@
     - name: 'Redact sensitive BMC credentials from settings copy'
       replace:
         path: /tmp/settings.yml.redacted
-        regexp: '^(\s*(?:power_user|power_password)\s*:\s*).*$'
-        replace: '\g<1><redacted for security>'
+        regexp: '^(\s*(?:power_user|power_password|power_pass|sut_password|sol_command)\s*:\s*).*$'
+        replace: '\g<1>{{ redacted_placeholder }}'
+
+    - name: 'Collect the credentials that must not be uploaded'
+      set_fact:
+        upload_secrets: >-
+          {{ ( ( _sol_commands | map('regex_findall', _sol_password_re) | flatten
+                 + _sol_commands | map('regex_findall', _sol_userpass_re) | flatten )
+               | map('regex_replace', '^["\x27]+', '')
+               | map('regex_replace', '["\x27]+$', '')
+               | list
+               + _settings | regex_findall(_power_dq_re)
+               + _settings | regex_findall(_power_sq_re)
+               + _settings | regex_findall(_power_plain_re) )
+             | reject('equalto', '')
+             | unique | list }}
+      vars:
+        _settings: "{{ lookup('file', '/etc/dci-rhel-agent/settings.yml') }}"
+        _sol_commands: "{{ _settings | regex_findall('(?m)^[ \t]*sol_command[ \t]*:[ \t]*(.*)$') }}"
+        _sol_password_re: '(?:^|\s)(?:-P|--pass(?:word|wd))[ \t=]*("[^"]*"|\x27[^\x27]*\x27|\S+)'
+        _sol_userpass_re: '(?:^|\s)(?:-u|--user[ =])[ \t]*[^\s:]*:("[^"]*"|\x27[^\x27]*\x27|\S+)'
+        _power_key_re: '(?m)^[ \t]*power_(?:password|pass)[ \t]*:[ \t]*'
+        _power_dq_re: '{{ _power_key_re }}"([^"]*)"[ \t]*(?:#.*)?$'
+        _power_sq_re: '{{ _power_key_re }}\x27([^\x27]*)\x27[ \t]*(?:#.*)?$'
+        _power_plain_re: '{{ _power_key_re }}([^"\x27#\s].*?)(?:[ \t]+#.*)?[ \t]*$'
+      no_log: true
+
+    - name: 'Build the pattern that matches those credentials'
+      set_fact:
+        upload_secrets_regexp: >-
+          {{ upload_secrets | unique
+             | sort(reverse=true, case_sensitive=true)
+             | map('regex_escape')
+             | map('regex_replace', '[\\\\]?&', _amp)
+             | map('regex_replace', '[\\\\]?<', _lt)
+             | map('regex_replace', '[\\\\]?>', _gt)
+             | map('regex_replace', '[\\\\]?"', _quot)
+             | map('regex_replace', "[\\\\]?'", _apos)
+             | join('|') }}
+      vars:
+        _amp: '(?:&|&amp;|&#0*38;|&#[xX]0*26;)'
+        _lt: '(?:<|&lt;|&#0*60;|&#[xX]0*3[cC];)'
+        _gt: '(?:>|&gt;|&#0*62;|&#[xX]0*3[eE];)'
+        _quot: '(?:"|&quot;|&#0*34;|&#[xX]0*22;)'
+        _apos: "(?:'|&apos;|&#0*39;|&#[xX]0*27;)"
+      no_log: true
+
+    - name: 'Redact the credential arguments left in the settings copy'
+      replace:
+        path: /tmp/settings.yml.redacted
+        regexp: '{{ credential_arg_regexp }}'
+        replace: '\g<1>{{ redacted_placeholder }}'
+
+    - name: 'Redact the credentials embedded in the settings copy'
+      replace:
+        path: /tmp/settings.yml.redacted
+        regexp: '{{ upload_secrets_regexp }}'
+        replace: '{{ redacted_placeholder }}'
+      when: upload_secrets_regexp | length > 0
+      no_log: true
 
     - name: 'Upload redacted settings yml file'
       ignore_errors: yes
@@ -121,6 +179,22 @@
       rescue:
         - name: Teardown error
           include_tasks: teardown_error.yml
+
+- name: 'Setup Conserver for Console Logging'
+  hosts: localhost
+  gather_facts: no
+  tags:
+    - pre-run
+    - conserver
+  tasks:
+    - name: 'Configure conserver on the jumpbox'
+      include_tasks:
+        file: conserver.yml
+        apply:
+          tags: conserver
+      when:
+        - systems is defined
+        - systems | dict2items | selectattr('value.sol_command', 'defined') | list | length > 0
 
 - name: 'Prepare the Distro and Harness'
   hosts: localhost
@@ -182,6 +256,15 @@
       rescue:
         - name: Teardown failure
           include_tasks: teardown_failure.yml
+      always:
+        - name: 'Collect the console log for this SUT'
+          include_tasks:
+            file: collect_console_logs.yml
+            apply:
+              tags: conserver
+          vars:
+            console_system: "{{ inventory_hostname }}"
+          tags: conserver
 
 - name: 'Launch tests'
   hosts: localhost

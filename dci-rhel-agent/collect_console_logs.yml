@@ -1,0 +1,29 @@
+---
+- name: 'Collect the console log for {{ console_system }}'
+  ignore_unreachable: true
+  block:
+    - name: 'Find the console logs for {{ console_system }}'
+      find:
+        paths: /var/consoles
+        patterns:
+          - "{{ console_system }}"
+          - "{{ console_system }}-*"
+        file_type: file
+      become: yes
+      delegate_to: jumpbox
+      register: system_console_logs
+
+    - name: 'Fetch the console logs for {{ console_system }}'
+      fetch:
+        src: "{{ item.path }}"
+        dest: "{{ hostvars.localhost.job_logs.path }}/{{ item.path | basename }}.console.log"
+        flat: yes
+      become: yes
+      delegate_to: jumpbox
+      loop: "{{ system_console_logs.files | default([]) }}"
+      loop_control:
+        label: "{{ item.path }}"
+  rescue:
+    - name: 'Console log collection failed for {{ console_system }}'
+      debug:
+        msg: 'Warning: could not collect the console log for {{ console_system }}, continuing'

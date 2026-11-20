@@ -1,32 +1,82 @@
 ---
-- name: Configure conserver
-  hosts: jumpbox
-  become: yes
-  gather_facts: no
-  tags: conserver
-  tasks:
-    - name: Install required packages
-      package:
-        name:
-          - conserver
-          - conserver-client
-        state: present
-    - name: Create /var/consoles if it does not exist
+#
+# Configure conserver on the jumpbox so that every system with a sol_command
+# gets its console captured to /var/consoles/<fqdn>.
+- name: Setup conserver for console logging
+  ignore_unreachable: true
+  block:
+    - name: Work out which programs the SOL commands need
+      set_fact:
+        sol_programs: >-
+          {{ systems | dict2items
+             | selectattr('value.sol_command', 'defined')
+             | map(attribute='value.sol_command')
+             | map('trim')
+             | map('regex_replace', '\s.*$', '')
+             | map('basename')
+             | unique | list }}
+
+    - name: Check that every SOL program is present on the jumpbox
+      shell: "command -v {{ item | quote }}"
+      changed_when: false
+      failed_when: false
+      register: sol_program_check
+      loop: "{{ sol_programs }}"
+      delegate_to: jumpbox
+
+    - name: Warn about SOL programs that are missing from the jumpbox
+      debug:
+        msg: >-
+          Warning: '{{ item.item }}' is not installed on the jumpbox, so the
+          SOL command using it cannot run and its console log will be empty.
+      loop: "{{ sol_program_check.results | default([]) }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: item.rc | default(0) != 0
+
+    - name: Clear console logs left over from a previous job
+      file:
+        path: /var/consoles
+        state: absent
+      become: yes
+      delegate_to: jumpbox
+
+    - name: Create /var/consoles
       file:
         path: /var/consoles
         state: directory
-        mode: '0755'
+        mode: '0700'
+        owner: root
+        group: root
+      become: yes
+      delegate_to: jumpbox
+
     - name: Create conserver.cf file
       template:
         src: conserver.cf.j2
         dest: /etc/conserver.cf
         owner: root
         group: root
-        mode: 0644
-      notify:
-        - restart conserver
-  handlers:
-    - name: restart conserver
+        mode: 0600
+      become: yes
+      delegate_to: jumpbox
+
+    # Not enabled at boot.  conserver only ever runs for the duration of a job,
+    # and letting systemd restart it after a reboot would reattach the SOL
+    # sessions and grow /var/consoles while no job is running.
+    - name: Start conserver with a fresh set of log files
       service:
         name: conserver
         state: restarted
+        enabled: no
+      become: yes
+      delegate_to: jumpbox
+
+    - name: Conserver setup completed successfully
+      debug:
+        msg: "Conserver setup completed - console logging is now active with fresh log files"
+
+  rescue:
+    - name: Conserver setup failed
+      debug:
+        msg: "Warning: Conserver setup failed, console logging will not be available but job will continue"
