@@ -6,6 +6,7 @@ import argparse
 import subprocess
 import signal
 import sys
+import tempfile
 import yaml
 import os
 
@@ -36,6 +37,34 @@ def load_settings(settings_path):
       print(exc)
       sys.exit(1)
 
+def set_by_path(data, path, value):
+  """Set nested key via dotted path (numeric segments = list indexes)."""
+  parts = path.split('.')
+  cur = data
+  for i, part in enumerate(parts[:-1]):
+    key = int(part) if part.isdigit() else part
+    if isinstance(key, str) and (key not in cur or cur[key] is None):
+      cur[key] = [] if parts[i + 1].isdigit() else {}
+    cur = cur[key]
+  last = parts[-1]
+  cur[int(last) if last.isdigit() else last] = value
+
+def apply_overrides(settings, overrides):
+  for override in overrides:
+    if '=' not in override:
+      print("Error: override must be KEY=VALUE, got: %s" % override)
+      sys.exit(1)
+    key, raw = override.split('=', 1)
+    try:
+      value = yaml.safe_load(raw)
+    except yaml.YAMLError:
+      value = raw
+    try:
+      set_by_path(settings, key, value)
+    except (KeyError, IndexError, TypeError) as exc:
+      print("Error: cannot apply override '%s': %s" % (override, exc))
+      sys.exit(1)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--start', action='store_true', help="Start dci-rhel-agent")
@@ -49,6 +78,7 @@ def main():
     parser.add_argument('-v', '--verbosity', action='store', help="Verbosity level for Ansible log (0-4).  Default is 1", type=int, choices=range(5), default=1)
     parser.add_argument('--tests-only', action='store_true', help="Skip provisioning and only run enabled RH tests and user tests.")
     parser.add_argument('-e', '--environment', action='append', help="Set custom environment variables from the command line, usage: -e var_name=value", nargs='+')
+    parser.add_argument('-o', '--override', action='append', default=[], help="Override a settings.yml key (dotted path). Repeatable. Example: -o topics.0.topic=RHEL-9.4")
 
     args = parser.parse_args()
 
@@ -69,6 +99,14 @@ def main():
 
     if args.start:
         settings = load_settings(settings_path)
+        temp_settings = None
+        if args.override:
+            apply_overrides(settings, args.override)
+            tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.yml', prefix='dci-rhel-agent-settings-', delete=False)
+            yaml.safe_dump(settings, tmp, default_flow_style=False)
+            tmp.close()
+            temp_settings = tmp.name
+            settings_path = temp_settings
         provisioner_dir = settings.get('lab', {}).get('provisioner_dir', None)
         if provisioner_dir is not None:
             logs_path = '{0}/logs'.format(provisioner_dir)
@@ -118,6 +156,11 @@ def main():
         myCmd = myCmd + ' %s %s' % (dci_rhel_agent_url, entrypoint)
         proc = subprocess.Popen(myCmd, shell=True)
         proc.wait()
+        if temp_settings:
+            try:
+                os.unlink(temp_settings)
+            except OSError:
+                pass
         sys.exit(proc.returncode)
     else:
       parser.print_help(sys.stderr)
