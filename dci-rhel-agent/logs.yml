@@ -64,28 +64,41 @@
         file_type: file
       register: staged_artifacts
 
-    # The marker for an XML artifact carries no angle brackets, so redacting a
-    # junit file does not leave it malformed.
+    - name: Sort the staged files by how they have to be redacted
+      set_fact:
+        staged_text_files: "{{ _staged | rejectattr('path', 'search', '\\.xml$') | map(attribute='path') | list }}"
+        staged_xml_files: "{{ _staged | selectattr('path', 'search', '\\.xml$') | map(attribute='path') | list }}"
+      vars:
+        _staged: "{{ (staged_logs.files | default([])) + (staged_artifacts.files | default([])) }}"
+
     - name: Redact credential arguments from the files staged for upload
       delegate_to: localhost
       replace:
-        path: '{{ item.path }}'
+        path: '{{ item }}'
         regexp: '{{ credential_arg_regexp }}'
-        replace: '\g<1>{{ item.path.endswith(".xml") | ternary(redacted_xml_placeholder, redacted_placeholder) }}'
-      loop: "{{ (staged_logs.files | default([])) + (staged_artifacts.files | default([])) }}"
-      loop_control:
-        label: '{{ item.path }}'
+        replace: '\g<1>{{ redacted_placeholder }}'
+      loop: '{{ staged_text_files }}'
 
     - name: Redact credentials from the files staged for upload
       delegate_to: localhost
       replace:
-        path: '{{ item.path }}'
+        path: '{{ item }}'
         regexp: '{{ hostvars.localhost.upload_secrets_regexp }}'
-        replace: '{{ item.path.endswith(".xml") | ternary(redacted_xml_placeholder, redacted_placeholder) }}'
-      loop: "{{ (staged_logs.files | default([])) + (staged_artifacts.files | default([])) }}"
-      loop_control:
-        label: '{{ item.path }}'
+        replace: '{{ redacted_placeholder }}'
+      loop: '{{ staged_text_files }}'
       when: hostvars.localhost.upload_secrets_regexp | default('') | length > 0
+      no_log: true
+
+    - name: Redact the credentials from the XML artifacts staged for upload
+      delegate_to: localhost
+      redact_xml:
+        path: '{{ item }}'
+        patterns:
+          - regexp: '{{ credential_arg_regexp }}'
+            replace: '\g<1>{{ redacted_placeholder }}'
+          - regexp: '{{ hostvars.localhost.upload_secrets_regexp | default("") }}'
+            replace: '{{ redacted_placeholder }}'
+      loop: '{{ staged_xml_files }}'
       no_log: true
 
     - name: Upload logs directory to DCI Control Server
@@ -117,9 +130,6 @@
         mime: 'application/junit'
       with_fileglob: '{{ hostvars.localhost.job_artifacts.path }}/*.xml'
 
-    # Set once everything has been uploaded, not on entry: a run that fails
-    # part way through has not collected the logs, so the teardown blocks must
-    # still be allowed to try.
     - name: Mark the job logs as collected
       set_fact:
         logs_collected: true

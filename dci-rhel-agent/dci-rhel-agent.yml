@@ -87,20 +87,24 @@
         _power_plain_re: '{{ _power_key_re }}([^"\x27#\s].*?)(?:[ \t]+#.*)?[ \t]*$'
       no_log: true
 
-    # A credential reaches an XML artifact in its escaped form, so the pattern
-    # has to carry both spellings of every secret.
     - name: 'Build the pattern that matches those credentials'
       set_fact:
         upload_secrets_regexp: >-
-          {{ ( upload_secrets + _xml_forms ) | unique | map('regex_escape') | join('|') }}
+          {{ upload_secrets | unique
+             | sort(reverse=true, case_sensitive=true)
+             | map('regex_escape')
+             | map('regex_replace', '[\\\\]?&', _amp)
+             | map('regex_replace', '[\\\\]?<', _lt)
+             | map('regex_replace', '[\\\\]?>', _gt)
+             | map('regex_replace', '[\\\\]?"', _quot)
+             | map('regex_replace', "[\\\\]?'", _apos)
+             | join('|') }}
       vars:
-        _xml_forms: >-
-          {{ upload_secrets | map('replace', '&', '&amp;')
-             | map('replace', '<', '&lt;')
-             | map('replace', '>', '&gt;')
-             | map('replace', '"', '&quot;')
-             | map('replace', "'", '&apos;')
-             | list }}
+        _amp: '(?:&|&amp;|&#0*38;|&#[xX]0*26;)'
+        _lt: '(?:<|&lt;|&#0*60;|&#[xX]0*3[cC];)'
+        _gt: '(?:>|&gt;|&#0*62;|&#[xX]0*3[eE];)'
+        _quot: '(?:"|&quot;|&#0*34;|&#[xX]0*22;)'
+        _apos: "(?:'|&apos;|&#0*39;|&#[xX]0*27;)"
       no_log: true
 
     - name: 'Redact the credential arguments left in the settings copy'
