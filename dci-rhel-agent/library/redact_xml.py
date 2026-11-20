@@ -57,6 +57,65 @@ def redact_tree(tree, compiled):
     return changed
 
 
+def parse_with_comments(path):
+    """Parse path, keeping the comments and the processing instructions.
+
+    The default parser drops both, so a credential written into a comment
+    would be neither redacted nor removed.  Kept as nodes they carry their
+    body in .text and are redacted like any other value.  insert_comments
+    arrived in Python 3.8; on anything older the comments are dropped as
+    before, and the rewrite forced by matches_outside_tree() is what keeps
+    them from being uploaded.
+    """
+    try:
+        parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True,
+                                                    insert_pis=True))
+    except TypeError:
+        parser = None
+    return ET.parse(path, parser=parser)
+
+
+def markers_of(compiled):
+    """The replacement texts, and their escaped spelling, as written out.
+
+    A marker is not a leak, but it can read like one: with a secret of 'a',
+    '<redacted for security>' matches the pattern.  They are blanked before
+    a file is searched for anything left over.
+    """
+    markers = []
+    for _, replacement in compiled:
+        marker = re.sub(r'\\g<\d+>|\\\d', '', replacement)
+        if marker:
+            markers.append(marker)
+            markers.append(marker.replace('&', '&amp;').replace('<', '&lt;')
+                           .replace('>', '&gt;').replace('"', '&quot;'))
+    return markers
+
+
+def still_matches(text, compiled, markers):
+    """Does any pattern still match text, ignoring the markers we wrote?"""
+    probe = text
+    for marker in markers:
+        probe = probe.replace(marker, '')
+    return any(regexp.search(probe) for regexp, _ in compiled)
+
+
+def values_match(tree, compiled, markers):
+    """Does any pattern still match a value of the tree?
+
+    Only the values are looked at.  Searching the serialised document instead
+    would hit the markup - an element or an attribute named 'name' matches a
+    secret of 'a' - and send a perfectly good artifact down the plain text
+    path that this module exists to avoid.
+    """
+    for element in tree.iter():
+        values = [element.text, element.tail] + list(element.attrib.values())
+        for value in values:
+            if value and still_matches(value, compiled, markers):
+                return True
+    return False
+
+
 def write_tree(module, tree, path):
     """Replace path with the redacted tree, atomically."""
     handle, temp_path = tempfile.mkstemp(dir=os.path.dirname(path))
@@ -100,9 +159,12 @@ def main():
 
     path = module.params['path']
     compiled = compile_patterns(module)
+    markers = markers_of(compiled)
 
     try:
-        tree = ET.parse(path)
+        with open(path, 'rb') as handle:
+            original = handle.read().decode('utf-8', 'surrogateescape')
+        tree = parse_with_comments(path)
     except ET.ParseError as err:
         changed = redact_as_text(module, path, compiled)
         module.exit_json(changed=changed, path=path, well_formed=False,
@@ -111,7 +173,21 @@ def main():
         module.fail_json(msg="could not read %s: %s" % (path, err))
 
     changed = redact_tree(tree, compiled)
+
+    # What sits before the root element - a comment there, the DOCTYPE and its
+    # internal subset - never reaches the tree and so cannot be redacted.  It
+    # does not survive serialisation either, so a file whose raw text still
+    # matches has to be written out even when no value in the tree changed.
+    if not changed and still_matches(original, compiled, markers):
+        changed = True
+
     if changed and not module.check_mode:
+        if values_match(tree, compiled, markers):
+            # Nothing should reach this, but an upload must never carry a
+            # credential: redact the file as plain text instead.
+            redact_as_text(module, path, compiled)
+            module.exit_json(changed=True, path=path, well_formed=False,
+                             msg="%s still matched after redaction, redacted as plain text" % path)
         write_tree(module, tree, path)
 
     module.exit_json(changed=changed, path=path, well_formed=True)
